@@ -1,0 +1,27 @@
+# Next.js build & output
+.next/
+out/
+build/
+dist/
+
+# Node dependencies
+node_modules/
+
+# Package managers lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Environment & local settings
+.env*
+!.env.example
+.vercel/
+
+# Coverage & testing
+coverage/
+
+# Static assets
+public/
+*.min.js
+*.min.css

@@ -1,26 +1,566 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ============================================================================
+ * MovieShelf — Global Design System
+ * ============================================================================
+ *
+ * MovieShelf is a personal movie shelf — not a streaming platform.
+ *
+ * Design direction:
+ * - cinematic
+ * - premium
+ * - dark
+ * - restrained
+ * - content-first
+ * - subtle brand glow
+ *
+ * Stack:
+ * - Next.js
+ * - Tailwind CSS v4
+ * - shadcn/ui
+ *
+ * ============================================================================
+ */
+
+/* ============================================================================
+   DESIGN TOKENS
+   ============================================================================ */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  /* --------------------------------------------------------------------------
+     Core
+     -------------------------------------------------------------------------- */
+
+  --background: oklch(0.105 0.012 260);
+  --foreground: oklch(0.965 0.008 90);
+
+  --card: oklch(0.135 0.014 260);
+  --card-foreground: var(--foreground);
+
+  --popover: oklch(0.135 0.014 260);
+  --popover-foreground: var(--foreground);
+
+  /* --------------------------------------------------------------------------
+     Brand
+     -------------------------------------------------------------------------- */
+
+  --primary: oklch(0.665 0.235 22);
+  --primary-foreground: oklch(0.985 0.008 90);
+
+  --primary-hover: oklch(0.705 0.225 22);
+  --primary-muted: oklch(0.665 0.235 22 / 14%);
+  --primary-glow: oklch(0.665 0.235 22 / 22%);
+
+  --secondary: oklch(0.18 0.018 260);
+  --secondary-foreground: oklch(0.92 0.01 90);
+
+  --accent: oklch(0.76 0.17 82);
+  --accent-foreground: oklch(0.16 0.025 70);
+
+  /* --------------------------------------------------------------------------
+     Muted / Surfaces
+     -------------------------------------------------------------------------- */
+
+  --muted: oklch(0.165 0.015 260);
+  --muted-foreground: oklch(0.68 0.012 260);
+
+  --surface: oklch(0.125 0.014 260);
+  --surface-elevated: oklch(0.155 0.018 260);
+  --surface-hover: oklch(0.185 0.02 260);
+
+  --surface-glass: oklch(0.14 0.018 260 / 72%);
+  --surface-glass-strong: oklch(0.11 0.015 260 / 88%);
+
+  /* --------------------------------------------------------------------------
+     Semantic
+     -------------------------------------------------------------------------- */
+
+  --destructive: oklch(0.63 0.22 24);
+  --destructive-foreground: var(--primary-foreground);
+
+  --success: oklch(0.72 0.16 150);
+  --success-foreground: oklch(0.15 0.025 150);
+
+  --warning: oklch(0.78 0.17 82);
+  --warning-foreground: oklch(0.18 0.025 70);
+
+  --info: oklch(0.7 0.13 245);
+  --info-foreground: oklch(0.15 0.02 245);
+
+  /* --------------------------------------------------------------------------
+     Borders / Inputs / Focus
+     -------------------------------------------------------------------------- */
+
+  --border: oklch(0.29 0.018 260 / 72%);
+  --border-subtle: oklch(0.23 0.015 260 / 64%);
+  --border-strong: oklch(0.38 0.02 260 / 82%);
+
+  --input: oklch(0.2 0.018 260);
+  --input-hover: oklch(0.24 0.02 260);
+
+  --ring: var(--primary);
+
+  /* --------------------------------------------------------------------------
+     Movie-specific
+     -------------------------------------------------------------------------- */
+
+  --rating: oklch(0.78 0.17 82);
+  --rating-muted: oklch(0.78 0.17 82 / 14%);
+
+  --poster-overlay: oklch(0.05 0.01 260 / 58%);
+  --poster-border: oklch(1 0 0 / 11%);
+
+  /* --------------------------------------------------------------------------
+     Layout
+     -------------------------------------------------------------------------- */
+
+  --radius: 0.75rem;
+
+  --container-content: 80rem;
+  --container-reading: 48rem;
+
+  --header-height: 4.5rem;
+
+  /* --------------------------------------------------------------------------
+     Shadows
+     -------------------------------------------------------------------------- */
+
+  --shadow-cinematic: 0 24px 80px rgb(0 0 0 / 48%);
+
+  --shadow-elevated: 0 8px 24px rgb(0 0 0 / 28%);
+
+  --shadow-brand: 0 12px 40px var(--primary-glow);
+
+  /* --------------------------------------------------------------------------
+     Motion
+     -------------------------------------------------------------------------- */
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
 }
+
+/* ============================================================================
+   SHADCN / TAILWIND THEME BRIDGE
+   ============================================================================ */
 
 @theme inline {
+  /* Core */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Brand */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Muted */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Semantic */
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Borders */
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* MovieShelf */
+  --color-rating: var(--rating);
+  --color-rating-muted: var(--rating-muted);
+
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-hover: var(--surface-hover);
+
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-muted: var(--primary-muted);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.35);
+  --radius-2xl: calc(var(--radius) * 1.75);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.7);
+
+  /* Typography
+   *
+   * These variables are provided by next/font in layout.tsx.
+   */
+  --font-sans: var(--font-sans-movieshelf);
+  --font-mono: var(--font-sans-movieshelf);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================================
+   BASE
+   ============================================================================ */
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply scroll-smooth;
+
+    background: var(--background);
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground antialiased;
+
+    font-family:
+      var(--font-sans-movieshelf), ui-sans-serif, system-ui, sans-serif;
+
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  button,
+  [role='button'] {
+    @apply cursor-pointer;
+  }
+
+  img {
+    @apply select-none;
+  }
+
+  a {
+    @apply outline-none;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================================
+   LAYOUT UTILITIES
+   ============================================================================ */
+
+@utility container-content {
+  width: 100%;
+  max-width: var(--container-content);
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @media (min-width: 640px) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility container-reading {
+  width: 100%;
+  max-width: var(--container-reading);
+  margin-inline: auto;
+}
+
+/* ============================================================================
+   SURFACE UTILITIES
+   ============================================================================ */
+
+@utility surface {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+}
+
+@utility surface-elevated {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-elevated);
+}
+
+@utility glass {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@utility glass-strong {
+  background: var(--surface-glass-strong);
+  border: 1px solid var(--border);
+
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+/* ============================================================================
+   CINEMATIC UTILITIES
+   ============================================================================ */
+
+@utility cinematic-glow {
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 3%),
+    var(--shadow-cinematic),
+    0 0 80px var(--primary-glow);
+}
+
+@utility poster-frame {
+  overflow: hidden;
+
+  border: 1px solid var(--poster-border);
+  border-radius: var(--radius-xl);
+
+  background: var(--surface);
+
+  box-shadow: var(--shadow-cinematic);
+}
+
+@utility poster-overlay {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 2%) 0%,
+    rgb(0 0 0 / 2%) 45%,
+    rgb(0 0 0 / 68%) 100%
+  );
+}
+
+@utility cinematic-gradient {
+  background:
+    radial-gradient(circle at 75% 25%, var(--primary-glow), transparent 35%),
+    linear-gradient(
+      135deg,
+      var(--background) 0%,
+      var(--surface) 55%,
+      var(--background) 100%
+    );
+}
+
+/* ============================================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================================ */
+
+@utility text-gradient-brand {
+  background: linear-gradient(
+    110deg,
+    var(--foreground) 0%,
+    var(--primary) 55%,
+    var(--accent) 100%
+  );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+}
+
+@utility text-gradient-primary {
+  background: linear-gradient(110deg, var(--primary) 0%, var(--accent) 100%);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+}
+
+/* ============================================================================
+   INTERACTION UTILITIES
+   ============================================================================ */
+
+@utility interactive {
+  transition:
+    color var(--duration-normal) var(--ease-standard),
+    background-color var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard),
+    box-shadow var(--duration-normal) var(--ease-standard),
+    transform var(--duration-normal) var(--ease-standard),
+    opacity var(--duration-normal) var(--ease-standard);
+}
+
+@utility interactive-lift {
+  transition:
+    color var(--duration-normal) var(--ease-standard),
+    background-color var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard),
+    box-shadow var(--duration-normal) var(--ease-standard),
+    transform var(--duration-normal) var(--ease-standard);
+}
+
+@utility focus-ring {
+  @apply outline-2 outline-offset-2 outline-ring;
+}
+
+/* ============================================================================
+   MOVIESHELF COMPONENT PRIMITIVES
+   ============================================================================ */
+
+@layer components {
+  .section {
+    @apply py-12 sm:py-16 lg:py-20;
+  }
+
+  .section-header {
+    @apply mb-6 flex items-end justify-between gap-4;
+  }
+
+  .section-title {
+    @apply text-xl font-semibold tracking-tight sm:text-2xl;
+  }
+
+  .section-description {
+    @apply mt-1 max-w-2xl text-sm leading-6 text-muted-foreground;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.16em] text-primary uppercase;
+  }
+
+  .movie-title {
+    @apply font-semibold tracking-tight text-foreground;
+  }
+
+  .movie-meta {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .movie-rating {
+    @apply inline-flex items-center gap-1 text-sm font-medium text-rating;
+  }
+
+  .nav-link {
+    @apply relative text-sm font-medium text-muted-foreground transition-colors duration-200;
+  }
+
+  .nav-link:hover,
+  .nav-link[data-active='true'] {
+    @apply text-foreground;
+  }
+
+  .nav-link[data-active='true']::after {
+    content: '';
+
+    position: absolute;
+    left: 50%;
+    bottom: -1.55rem;
+
+    width: 1.5rem;
+    height: 2px;
+
+    border-radius: 999px;
+
+    background: var(--primary);
+
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================================
+   SCROLLBAR
+   ============================================================================ */
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-hover) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--surface-hover);
+
+    border: 2px solid transparent;
+    border-radius: 999px;
+
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+    background-clip: padding-box;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY / REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
