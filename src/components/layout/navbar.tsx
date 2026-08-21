@@ -1,5 +1,6 @@
 'use client';
 
+import { authClient } from '@/lib/auth/client';
 import { cn } from '@/lib/utils';
 import {
   Bookmark,
@@ -11,8 +12,9 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Button } from '../ui/button';
 
 const navLinks = [
   {
@@ -33,6 +35,9 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -42,7 +47,7 @@ const Navbar = () => {
         <div className="flex h-(--header-height) items-center justify-between">
           {/* Brand */}
           <Link
-            href="/"
+            href="/home"
             className="group flex items-center gap-2.5"
             onClick={() => setMobileOpen(false)}
           >
@@ -100,6 +105,23 @@ const Navbar = () => {
             >
               <UserRound className="size-4" />
             </Link>
+
+            {/* Temporary */}
+            {session && (
+              <Button
+                onClick={async () =>
+                  await authClient.signOut({
+                    fetchOptions: {
+                      onSuccess: () => {
+                        router.push('/');
+                      },
+                    },
+                  })
+                }
+              >
+                Sign out
+              </Button>
+            )}
           </div>
 
           {/* Mobile trigger */}
