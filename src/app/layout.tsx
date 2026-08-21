@@ -1,5 +1,3 @@
-import Footer from '@/components/layout/footer';
-import Navbar from '@/components/layout/navbar';
 import type { Metadata } from 'next';
 import { Inter, Manrope } from 'next/font/google';
 import './globals.css';
@@ -11,7 +9,7 @@ const inter = Inter({
 });
 
 const manrope = Manrope({
-  variable: '--font-mono-movieshelf',
+  variable: '--font-heading-movieshelf',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -31,13 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} `}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-
-          <main className="flex-1">{children}</main>
-
-          <Footer />
-        </div>
+        {children}
       </body>
     </html>
   );

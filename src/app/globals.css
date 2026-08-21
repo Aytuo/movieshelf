@@ -222,7 +222,7 @@
    * These variables are provided by next/font in layout.tsx.
    */
   --font-sans: var(--font-sans-movieshelf);
-  --font-mono: var(--font-sans-movieshelf);
+  --font-heading: var(--font-heading-movieshelf);
 }
 
 /* ============================================================================
@@ -509,6 +509,13 @@
     background: var(--primary);
 
     transform: translateX(-50%);
+  }
+
+  .input {
+    @apply h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm transition-colors outline-none;
+    @apply placeholder:text-muted-foreground/60;
+    @apply focus:border-primary focus:ring-2 focus:ring-primary/20;
+    @apply disabled:cursor-not-allowed disabled:opacity-60;
   }
 }
 

@@ -6,47 +6,6 @@
  * the same data shapes and replace these sources with real responses.
  */
 
-export type NavLink = {
-  label: string;
-  href: string;
-  icon?: string;
-};
-
-export type Movie = {
-  id: number;
-  title: string;
-  originalTitle?: string;
-  year: number;
-  rating: number;
-  voteCount?: number;
-  genres: string[];
-  runtime?: number;
-  certification?: string;
-  overview: string;
-  posterPath: string;
-  backdropPath?: string;
-};
-
-export type MovieListItem = Pick<
-  Movie,
-  'id' | 'title' | 'year' | 'rating' | 'posterPath'
->;
-
-export type UserStats = {
-  moviesRated: number;
-  moviesWatched: number;
-  watchlistCount: number;
-  favoriteCount: number;
-};
-
-export type ActivityItem = {
-  id: string;
-  type: 'rating' | 'watchlist' | 'favorite' | 'review';
-  movie: MovieListItem;
-  value?: number;
-  createdAt: string;
-};
-
 /* -------------------------------------------------------------------------- */
 /* Site                                                                       */
 /* -------------------------------------------------------------------------- */
@@ -119,114 +78,143 @@ export const MOCK_MOVIES: Movie[] = [
   {
     id: 872585,
     title: 'Oppenheimer',
-    year: 2023,
-    rating: 8.1,
-    voteCount: 9000,
-    genres: ['Drama', 'History'],
-    runtime: 180,
-    certification: 'R',
+    originalTitle: 'Oppenheimer',
     overview:
       'The story of J. Robert Oppenheimer and his role in the development of the atomic bomb.',
+    tagline: 'The world forever changes.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/rLb2cwF3Pazuxaj0sRXQ037tGI1.jpg`,
+    releaseDate: '2023-07-21',
+    runtime: 180,
+    genres: ['Drama', 'History'],
+    rating: 8.1,
+    voteCount: 9000,
+    certification: 'R',
   },
   {
     id: 693134,
     title: 'Dune: Part Two',
-    year: 2024,
-    rating: 8.2,
-    voteCount: 7000,
-    genres: ['Science Fiction', 'Adventure'],
-    runtime: 166,
-    certification: 'PG-13',
+    originalTitle: 'Dune: Part Two',
     overview:
       'Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.',
+    tagline: 'Long live the fighters.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg`,
-    backdropPath: `${TMDB_IMAGE_BASE}/w1280/7c6Vq8r8h5HhKxYQ6rH9VhJ5X4K.jpg`,
+    backdropPath: `${TMDB_IMAGE_BASE}/w1280/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg`,
+    releaseDate: '2024-03-01',
+    runtime: 166,
+    genres: ['Science Fiction', 'Adventure', 'Drama'],
+    rating: 8.6,
+    voteCount: 12000,
   },
   {
     id: 569094,
     title: 'Spider-Man: Across the Spider-Verse',
-    year: 2023,
-    rating: 8.3,
-    voteCount: 7000,
-    genres: ['Animation', 'Action', 'Adventure'],
-    runtime: 140,
-    certification: 'PG',
+    originalTitle: 'Spider-Man: Across the Spider-Verse',
     overview:
       'Miles Morales catapults across the Multiverse and encounters a team of Spider-People charged with protecting its very existence.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg`,
+    releaseDate: '2023-06-02',
+    runtime: 140,
+    genres: ['Animation', 'Action', 'Adventure'],
+    rating: 8.3,
+    voteCount: 7000,
+    certification: 'PG',
   },
   {
     id: 155,
     title: 'The Dark Knight',
-    year: 2008,
-    rating: 8.5,
-    voteCount: 32000,
-    genres: ['Drama', 'Action', 'Crime'],
-    runtime: 152,
-    certification: 'PG-13',
+    originalTitle: 'The Dark Knight',
     overview:
       'Batman faces a criminal mastermind whose reign of chaos pushes Gotham and its heroes to their limits.',
+    tagline: 'Why so serious?',
     posterPath: `${TMDB_IMAGE_BASE}/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg`,
-    backdropPath: `${TMDB_IMAGE_BASE}/w1280/hZkgoQYus5vegHoetLkCJzb17zJ.jpg`,
+    backdropPath: `${TMDB_IMAGE_BASE}/w1280/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg`,
+    releaseDate: '2008-07-16',
+    runtime: 152,
+    genres: ['Drama', 'Action', 'Crime', 'Thriller'],
+    rating: 9.0,
+    voteCount: 33000,
+    certification: 'PG-13',
   },
   {
     id: 157336,
     title: 'Interstellar',
-    year: 2014,
-    rating: 8.4,
-    voteCount: 35000,
-    genres: ['Science Fiction', 'Drama', 'Adventure'],
-    runtime: 169,
-    certification: 'PG-13',
+    originalTitle: 'Interstellar',
     overview:
-      "A group of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+      "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+    tagline: 'Mankind was born on Earth. It was never meant to die here.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg`,
-    backdropPath: `${TMDB_IMAGE_BASE}/w1280/xJHokMbljvjADYdit5fK5e3K5mM.jpg`,
+    backdropPath: `${TMDB_IMAGE_BASE}/w1280/xJHokMbljvjADYdit5fK5cNTXkd.jpg`,
+    releaseDate: '2014-11-07',
+    runtime: 169,
+    genres: ['Adventure', 'Drama', 'Science Fiction'],
+    rating: 8.7,
+    voteCount: 35000,
+    certification: 'PG-13',
   },
   {
     id: 496243,
     title: 'Parasite',
-    year: 2019,
-    rating: 8.5,
-    voteCount: 19000,
-    genres: ['Comedy', 'Thriller', 'Drama'],
-    runtime: 133,
-    certification: 'R',
+    originalTitle: 'Parasite',
     overview:
       'A struggling family gradually becomes entangled with a wealthy household in an increasingly unpredictable way.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/TU9NIjwzjoKPwQHoHshkBcQ0S.jpg`,
+    releaseDate: '2019-05-30',
+    runtime: 133,
+    genres: ['Comedy', 'Thriller', 'Drama'],
+    rating: 8.5,
+    voteCount: 19000,
+    certification: 'R',
   },
   {
     id: 238,
     title: 'The Godfather',
-    year: 1972,
-    rating: 8.7,
-    voteCount: 21000,
-    genres: ['Drama', 'Crime'],
-    runtime: 175,
-    certification: 'R',
+    originalTitle: 'The Godfather',
     overview:
       'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
+    tagline: "An offer you can't refuse.",
     posterPath: `${TMDB_IMAGE_BASE}/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/tmU7GeKVybMWFButWEGl2M4GeiP.jpg`,
+    releaseDate: '1972-03-14',
+    runtime: 175,
+    genres: ['Drama', 'Crime'],
+    rating: 9.2,
+    voteCount: 20000,
+    certification: 'R',
   },
   {
     id: 27205,
     title: 'Inception',
-    year: 2010,
-    rating: 8.4,
-    voteCount: 36000,
-    genres: ['Action', 'Science Fiction', 'Adventure'],
-    runtime: 148,
-    certification: 'PG-13',
+    originalTitle: 'Inception',
     overview:
-      'A skilled thief who steals corporate secrets through dream-sharing technology is given a chance to have his past erased.',
+      'A skilled thief who steals secrets through dream-sharing technology is given a chance to erase his past by performing an impossible task.',
+    tagline: 'Your mind is the scene of the crime.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/s3TBrRGB1iav7gFOCNx3H31MoES.jpg`,
+    releaseDate: '2010-07-15',
+    runtime: 148,
+    genres: ['Action', 'Science Fiction', 'Adventure'],
+    rating: 8.8,
+    voteCount: 35000,
+    certification: 'PG-13',
+  },
+  {
+    id: 550,
+    title: 'Fight Club',
+    originalTitle: 'Fight Club',
+    overview:
+      'An insomniac office worker and a mysterious soap maker form an underground fight club that evolves into something far more dangerous.',
+    tagline: 'Mischief. Mayhem. Soap.',
+    posterPath: `${TMDB_IMAGE_BASE}/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg`,
+    backdropPath: `${TMDB_IMAGE_BASE}/w1280/hZkgoQYus5vegHoetLkCJzb17zJ.jpg`,
+    releaseDate: '1999-10-15',
+    runtime: 139,
+    genres: ['Drama'],
+    rating: 8.8,
+    voteCount: 28000,
+    certification: 'R',
   },
 ];
 
