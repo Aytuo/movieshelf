@@ -1,34 +1,15 @@
 import { db } from '@/lib/db';
 import { movie, userMovie } from '@/lib/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
-export async function addMovieToShelf({ userId, movieId }: AddMovieInput) {
-  await db
-    .insert(userMovie)
-    .values({
-      userId,
-      movieId,
-      status: 'watchlist',
-    })
-    .onConflictDoNothing();
-}
-
-export async function removeMovieFromShelf({ userId, movieId }: AddMovieInput) {
-  await db
-    .delete(userMovie)
-    .where(and(eq(userMovie.userId, userId), eq(userMovie.movieId, movieId)));
-}
-
-export async function isMovieOnShelf({ userId, movieId }: AddMovieInput) {
+export async function getUserMovieState(userId: string, movieId: string) {
   const result = await db
-    .select({
-      movieId: userMovie.movieId,
-    })
+    .select()
     .from(userMovie)
     .where(and(eq(userMovie.userId, userId), eq(userMovie.movieId, movieId)))
     .limit(1);
 
-  return result.length > 0;
+  return result[0] ?? null;
 }
 
 export async function getUserShelf(userId: string) {
@@ -39,5 +20,42 @@ export async function getUserShelf(userId: string) {
     })
     .from(userMovie)
     .innerJoin(movie, eq(movie.id, userMovie.movieId))
-    .where(eq(userMovie.userId, userId));
+    .where(eq(userMovie.userId, userId))
+    .orderBy(desc(userMovie.addedAt));
+}
+
+export async function getUserWatchedMovies(userId: string) {
+  return db
+    .select({
+      movie,
+      shelf: userMovie,
+    })
+    .from(userMovie)
+    .innerJoin(movie, eq(movie.id, userMovie.movieId))
+    .where(and(eq(userMovie.userId, userId), eq(userMovie.status, 'watched')))
+    .orderBy(desc(userMovie.watchedAt));
+}
+
+export async function getUserWatchlist(userId: string) {
+  return db
+    .select({
+      movie,
+      shelf: userMovie,
+    })
+    .from(userMovie)
+    .innerJoin(movie, eq(movie.id, userMovie.movieId))
+    .where(and(eq(userMovie.userId, userId), eq(userMovie.status, 'watchlist')))
+    .orderBy(desc(userMovie.addedAt));
+}
+
+export async function getUserFavorites(userId: string) {
+  return db
+    .select({
+      movie,
+      shelf: userMovie,
+    })
+    .from(userMovie)
+    .innerJoin(movie, eq(movie.id, userMovie.movieId))
+    .where(and(eq(userMovie.userId, userId), eq(userMovie.favorite, true)))
+    .orderBy(desc(userMovie.updatedAt));
 }

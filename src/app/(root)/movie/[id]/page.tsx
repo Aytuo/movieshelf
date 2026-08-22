@@ -1,5 +1,7 @@
 import MovieDetails from '@/components/movies/movie-details';
+import { requireSession } from '@/lib/auth/require-session';
 import { movieRepository } from '@/lib/repositories';
+import { getUserMovieState } from '@/lib/repositories/user-movie-repository';
 import { notFound } from 'next/navigation';
 
 type MovieDetailsPageProps = {
@@ -23,7 +25,33 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
     notFound();
   }
 
-  return <MovieDetails movie={movie} />;
+  const session = await requireSession();
+
+  const dbMovieState = await getUserMovieState(
+    session.user.id,
+    `tmdb_${movie.id}`
+  );
+
+  return (
+    <MovieDetails
+      movie={movie}
+      userMovie={
+        dbMovieState
+          ? {
+              inShelf: true,
+              status: dbMovieState.status,
+              favorite: dbMovieState.favorite,
+              rating: dbMovieState.rating,
+            }
+          : {
+              inShelf: false,
+              status: null,
+              favorite: false,
+              rating: null,
+            }
+      }
+    />
+  );
 };
 
 export default MovieDetailsPage;

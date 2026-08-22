@@ -2,6 +2,7 @@ import {
   index,
   integer,
   numeric,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -20,11 +21,12 @@ export const movie = pgTable(
     releaseDate: text('release_date'),
     runtime: integer('runtime'),
     genres: text('genres').array(),
-    rating: numeric('rating', {
+    tmdbRating: numeric('tmdb_rating', {
       precision: 3,
       scale: 1,
+      mode: 'number',
     }),
-    voteCount: integer('vote_count'),
+    tmdbVoteCount: integer('tmdb_vote_count'),
     tagline: text('tagline'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
@@ -34,3 +36,5 @@ export const movie = pgTable(
   },
   (table) => [index('movie_tmdb_id_idx').on(table.tmdbId)]
 );
+
+export const movieStatus = pgEnum('movie_status', ['watchlist', 'watched']);

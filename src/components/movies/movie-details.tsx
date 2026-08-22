@@ -1,12 +1,19 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Star } from 'lucide-react';
-import AddToShelfButton from './add-to-shelf-button';
+import MovieActions from './movie-actions';
 
 type MovieDetailsProps = {
   movie: Movie;
+
+  userMovie: {
+    inShelf: boolean;
+    status: 'watchlist' | 'watched' | null;
+    favorite: boolean;
+    rating: number | null;
+  };
 };
 
-const MovieDetails = ({ movie }: MovieDetailsProps) => {
+const MovieDetails = ({ movie, userMovie }: MovieDetailsProps) => {
   const poster = tmdbImage(movie.posterPath, 'w500');
 
   const backdrop = tmdbImage(movie.backdropPath, 'w1280');
@@ -93,7 +100,7 @@ const MovieDetails = ({ movie }: MovieDetailsProps) => {
               </div>
 
               <div className="mt-7">
-                <AddToShelfButton movieId={movie.id} />
+                <MovieActions movieId={movie.id} initialState={userMovie} />
               </div>
             </div>
           </div>

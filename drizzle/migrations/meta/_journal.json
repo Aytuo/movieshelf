@@ -15,6 +15,13 @@
       "when": 1787355920317,
       "tag": "0001_acoustic_baron_strucker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787434478815,
+      "tag": "0002_breezy_captain_america",
+      "breakpoints": true
     }
   ]
 }
