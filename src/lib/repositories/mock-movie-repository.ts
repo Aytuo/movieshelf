@@ -2,7 +2,20 @@ import { MOCK_MOVIES } from '@/constants';
 
 export const mockMovieRepository: MovieRepository = {
   async getById(id) {
-    return MOCK_MOVIES.find((movie) => movie.id === id) ?? null;
+    const movie = MOCK_MOVIES.find((movie) => movie.id === id);
+
+    if (!movie) {
+      return null;
+    }
+
+    return {
+      ...movie,
+      cast: [],
+      crew: [],
+      videos: [],
+      similar: [],
+      recommendations: [],
+    };
   },
 
   async getPopular() {
