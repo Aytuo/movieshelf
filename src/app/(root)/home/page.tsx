@@ -1,10 +1,13 @@
 import Hero from '@/components/home/hero';
 import MovieGrid from '@/components/movies/movie-grid';
-import { MOCK_MOVIES } from '@/constants';
+import {
+  MOCK_RECENTLY_ADDED_MOVIES,
+  MOCK_RECOMMENDED_MOVIES,
+} from '@/constants';
 
 export default function HomePage() {
-  const featuredMovies = MOCK_MOVIES;
-  const recentlyAdded = MOCK_MOVIES;
+  const featuredMovies = MOCK_RECOMMENDED_MOVIES;
+  const recentlyAdded = MOCK_RECENTLY_ADDED_MOVIES;
 
   return (
     <>
@@ -17,7 +20,7 @@ export default function HomePage() {
           <div className="relative container-content py-16 lg:py-20">
             <p className="text-sm font-medium text-primary">Welcome back</p>
 
-            <h1 className="font-heading mt-3 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-3 max-w-3xl font-heading text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Ready to find your next favorite?
             </h1>
 

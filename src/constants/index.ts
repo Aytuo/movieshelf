@@ -234,6 +234,13 @@ export const MOCK_POPULAR_MOVIES = [
   MOCK_MOVIES[7],
   MOCK_MOVIES[5],
 ];
+export const MOCK_RECENTLY_ADDED_MOVIES = [
+  MOCK_MOVIES[1],
+  MOCK_MOVIES[3],
+  MOCK_MOVIES[5],
+  MOCK_MOVIES[7],
+  MOCK_MOVIES[2],
+];
 
 /* -------------------------------------------------------------------------- */
 /* Mock user                                                                  */
