@@ -1,14 +1,16 @@
+import { sql } from 'drizzle-orm';
 import {
   boolean,
+  check,
   index,
-  integer,
+  numeric,
   pgTable,
   primaryKey,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
-import { movie } from './movie';
+import { movie, movieStatus } from './movie';
 
 export const userMovie = pgTable(
   'user_movie',
@@ -23,11 +25,12 @@ export const userMovie = pgTable(
       .references(() => movie.id, {
         onDelete: 'cascade',
       }),
-    status: text('status')
-      .$type<'watched' | 'watchlist'>()
-      .notNull()
-      .default('watchlist'),
-    rating: integer('rating'),
+    status: movieStatus('status').notNull().default('watchlist'),
+    rating: numeric('rating', {
+      precision: 3,
+      scale: 1,
+      mode: 'number',
+    }),
     favorite: boolean('favorite').notNull().default(false),
     watchedAt: timestamp('watched_at'),
     addedAt: timestamp('added_at').defaultNow().notNull(),
@@ -42,5 +45,9 @@ export const userMovie = pgTable(
     }),
     index('user_movie_user_id_idx').on(table.userId),
     index('user_movie_movie_id_idx').on(table.movieId),
+    check(
+      'user_movie_rating_range',
+      sql`${table.rating} IS NULL OR ${table.rating} BETWEEN 1 AND 10`
+    ),
   ]
 );

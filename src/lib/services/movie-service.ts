@@ -14,30 +14,30 @@ export async function ensureMovieExists(tmdbId: number) {
     return existing[0];
   }
 
-  const sourceMovie = await movieRepository.getById(tmdbId);
+  const source = await movieRepository.getById(tmdbId);
 
-  if (!sourceMovie) {
+  if (!source) {
     throw new Error('Movie not found.');
   }
 
-  const [createdMovie] = await db
+  const [created] = await db
     .insert(movie)
     .values({
-      id: `tmdb_${sourceMovie.id}`,
-      tmdbId: sourceMovie.id,
-      title: sourceMovie.title,
-      originalTitle: sourceMovie.originalTitle ?? sourceMovie.title ?? '',
-      overview: sourceMovie.overview,
-      posterPath: sourceMovie.posterPath,
-      backdropPath: sourceMovie.backdropPath,
-      releaseDate: sourceMovie.releaseDate,
-      runtime: sourceMovie.runtime,
-      genres: sourceMovie.genres,
-      rating: sourceMovie.rating.toFixed(1),
-      voteCount: sourceMovie.voteCount,
-      tagline: sourceMovie.tagline,
+      id: `tmdb_${source.id}`,
+      tmdbId: source.id,
+      title: source.title,
+      originalTitle: source.originalTitle ?? source.title ?? '',
+      overview: source.overview,
+      posterPath: source.posterPath,
+      backdropPath: source.backdropPath,
+      releaseDate: source.releaseDate,
+      runtime: source.runtime,
+      genres: source.genres,
+      tmdbRating: source.rating,
+      tmdbVoteCount: source.voteCount,
+      tagline: source.tagline,
     })
     .returning();
 
-  return createdMovie;
+  return created;
 }
