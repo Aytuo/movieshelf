@@ -56,8 +56,9 @@ export async function searchMovies(query: string, page = 1) {
 }
 
 export async function getMovieDetails(movieId: number) {
-  return tmdbFetch<TmdbMovieDetails>(`/movie/${movieId}`, {
+  return tmdbFetch<TmdbMovieBundle>(`/movie/${movieId}`, {
     language: 'en-US',
+    append_to_response: 'credits,videos,similar,recommendations',
   });
 }
 

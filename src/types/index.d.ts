@@ -5,10 +5,10 @@ declare global {
     icon?: string;
   };
 
-  type Movie = {
+  export type Movie = {
     id: number;
     title: string;
-    originalTitle?: string;
+    originalTitle: string;
     overview: string;
     posterPath: string | null;
     backdropPath: string | null;
@@ -18,7 +18,39 @@ declare global {
     rating: number;
     voteCount: number;
     tagline?: string;
-    certification?: string;
+  };
+
+  export type MovieCastMember = {
+    id: number;
+    name: string;
+    character: string;
+    profilePath: string | null;
+    order: number;
+  };
+
+  export type MovieCrewMember = {
+    id: number;
+    name: string;
+    job: string;
+    department: string;
+    profilePath: string | null;
+  };
+
+  export type MovieVideo = {
+    id: string;
+    key: string;
+    name: string;
+    site: string;
+    type: string;
+    official: boolean;
+  };
+
+  export type MovieDetails = Movie & {
+    cast: MovieCastMember[];
+    crew: MovieCrewMember[];
+    videos: MovieVideo[];
+    similar: Movie[];
+    recommendations: Movie[];
   };
 
   type MovieListItem = Pick<Movie, 'id' | 'title' | 'rating' | 'posterPath'>;
@@ -50,7 +82,7 @@ declare global {
   };
 
   export interface MovieRepository {
-    getById(id: number): Promise<Movie | null>;
+    getById(id: number): Promise<MovieDetails | null>;
 
     getPopular(): Promise<Movie[]>;
 
@@ -101,6 +133,50 @@ declare global {
     popularity: number;
     adult: boolean;
     original_language: string;
+  };
+
+  export type TmdbCreditCast = {
+    id: number;
+    name: string;
+    character: string;
+    profile_path: string | null;
+    order: number;
+  };
+
+  export type TmdbCreditCrew = {
+    id: number;
+    name: string;
+    job: string;
+    department: string;
+    profile_path: string | null;
+  };
+
+  export type TmdbCreditsResponse = {
+    id: number;
+    cast: TmdbCreditCast[];
+    crew: TmdbCreditCrew[];
+  };
+
+  export type TmdbVideo = {
+    id: string;
+    key: string;
+    name: string;
+    site: string;
+    type: string;
+    official: boolean;
+  };
+
+  export type TmdbVideosResponse = {
+    id: number;
+    results: TmdbVideo[];
+  };
+
+  export type TmdbMovieBundle = TmdbMovieDetails & {
+    credits?: TmdbCreditsResponse;
+    videos?: TmdbVideosResponse;
+
+    similar?: TmdbPagedResponse<TmdbMovieResult>;
+    recommendations?: TmdbPagedResponse<TmdbMovieResult>;
   };
 
   export type TmdbTrendingResponse = {

@@ -1,4 +1,7 @@
+import MovieVideo from '@/components/movies/moive-video';
+import MovieCast from '@/components/movies/movie-cast';
 import MovieDetails from '@/components/movies/movie-details';
+import MovieRecommendations from '@/components/movies/movie-recomendations';
 import { requireSession } from '@/lib/auth/require-session';
 import { movieRepository } from '@/lib/repositories';
 import { getUserMovieState } from '@/lib/repositories/user-movie-repository';
@@ -33,24 +36,55 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
   );
 
   return (
-    <MovieDetails
-      movie={movie}
-      userMovie={
-        dbMovieState
-          ? {
-              inShelf: true,
-              status: dbMovieState.status,
-              favorite: dbMovieState.favorite,
-              rating: dbMovieState.rating,
-            }
-          : {
-              inShelf: false,
-              status: null,
-              favorite: false,
-              rating: null,
-            }
-      }
-    />
+    <>
+      <MovieDetails
+        movie={movie}
+        userMovie={
+          dbMovieState
+            ? {
+                inShelf: true,
+                status: dbMovieState.status,
+                favorite: dbMovieState.favorite,
+                rating: dbMovieState.rating,
+              }
+            : {
+                inShelf: false,
+                status: null,
+                favorite: false,
+                rating: null,
+              }
+        }
+      />
+
+      <MovieCast cast={movie.cast} />
+
+      <MovieVideo
+        video={
+          movie.videos.find(
+            (video) =>
+              video.site === 'YouTube' &&
+              video.type === 'Trailer' &&
+              video.official
+          ) ??
+          movie.videos.find(
+            (video) => video.site === 'YouTube' && video.type === 'Trailer'
+          ) ??
+          null
+        }
+      />
+
+      <MovieRecommendations
+        movies={movie.similar}
+        title="Similar movies"
+        eyebrow="If you liked this"
+      />
+
+      <MovieRecommendations
+        movies={movie.recommendations}
+        title="More like this"
+        eyebrow="From TMDB"
+      />
+    </>
   );
 };
 
