@@ -1,3 +1,4 @@
+import { tmdbImage } from '@/lib/tmdb/images';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
 
@@ -6,13 +7,15 @@ type MovieCardProps = {
 };
 
 const MovieCard = ({ movie }: MovieCardProps) => {
+  const poster = tmdbImage(movie.posterPath, 'w500');
+
   return (
     <Link href={`/movie/${movie.id}`} className="group block">
       <article>
         <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
-          {movie.posterPath ? (
+          {poster ? (
             <img
-              src={movie.posterPath}
+              src={poster}
               alt={`${movie.title} poster`}
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"

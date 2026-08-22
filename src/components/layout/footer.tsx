@@ -65,6 +65,19 @@ const Footer = () => {
             <p>© {new Date().getFullYear()} MovieShelf. All rights reserved.</p>
 
             <p>Built with curiosity, good taste & too many movies.</p>
+
+            <p className="text-xs text-muted-foreground">
+              Movie data provided by{' '}
+              <a
+                href="https://www.themoviedb.org/"
+                target="_blank"
+                rel="noreferrer"
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                TMDB
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>

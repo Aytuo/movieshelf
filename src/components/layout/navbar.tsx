@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import {
   Bookmark,
   Film,
+  Flame,
   Heart,
   Menu,
   Search,
@@ -21,6 +22,11 @@ const navLinks = [
     label: 'Discover',
     href: '/discover',
     icon: Film,
+  },
+  {
+    label: 'Trending',
+    href: '/trending',
+    icon: Flame,
   },
   {
     label: 'My Shelf',
