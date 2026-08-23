@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   pgTable,
   text,
@@ -19,6 +20,9 @@ export const profile = pgTable(
     displayName: text('display_name'),
     bio: text('bio'),
     avatarUrl: text('avatar_url'),
+    onboardingCompleted: boolean('onboarding_completed')
+      .default(false)
+      .notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()
