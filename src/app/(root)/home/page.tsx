@@ -2,10 +2,18 @@ import Hero from '@/components/home/hero';
 import RecommendationSection from '@/components/recommendations/recommendation-section';
 import { requireSession } from '@/lib/auth/require-session';
 import { getColdStartRecommendations } from '@/lib/recommendations/cold-start';
+import { getProfileByUserId } from '@/lib/repositories/profile-repository';
 import { getRecommendationsForUser } from '@/lib/services/recommendation-service';
+import { redirect } from 'next/navigation';
 
 export default async function HomePage() {
   const session = await requireSession();
+
+  const profile = await getProfileByUserId(session.user.id);
+
+  if (profile && !profile.onboardingCompleted) {
+    redirect('/onboarding');
+  }
 
   const personalized = await getRecommendationsForUser(session.user.id);
 
