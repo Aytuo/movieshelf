@@ -1,15 +1,39 @@
-const ProfilePage = () => {
-  return (
-    <section className="container-content py-16">
-      <h1 className="font-heading text-4xl font-bold tracking-tight">
-        Profile
-      </h1>
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { profile } from '@/lib/db/schema';
+import { ensureProfile } from '@/lib/services/profile-service';
+import { eq } from 'drizzle-orm';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-      <p className="mt-3 text-muted-foreground">
-        Your movie taste, activity and collection.
-      </p>
-    </section>
-  );
+const ProfileIndexPage = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect('/login');
+  }
+
+  const result = await db
+    .select()
+    .from(profile)
+    .where(eq(profile.userId, session.user.id))
+    .limit(1);
+
+  const currentProfile = result[0];
+
+  if (!currentProfile) {
+    const createdProfile = await ensureProfile({
+      userId: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+    });
+
+    redirect(`/profile/${createdProfile.username}`);
+  }
+
+  redirect(`/profile/${currentProfile.username.toLowerCase()}`);
 };
 
-export default ProfilePage;
+export default ProfileIndexPage;

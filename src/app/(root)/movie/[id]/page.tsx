@@ -1,9 +1,10 @@
-import MovieVideo from '@/components/movies/moive-video';
-import MovieCast from '@/components/movies/movie-cast';
-import MovieDetails from '@/components/movies/movie-details';
-import MovieRecommendations from '@/components/movies/movie-recomendations';
+import MovieDetails from '@/components/movies/movie-details-view';
 import { requireSession } from '@/lib/auth/require-session';
 import { movieRepository } from '@/lib/repositories';
+import {
+  getMovieReviews,
+  getUserReviewForMovie,
+} from '@/lib/repositories/review-repository';
 import { getUserMovieState } from '@/lib/repositories/user-movie-repository';
 import { notFound } from 'next/navigation';
 
@@ -35,6 +36,11 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
     `tmdb_${movie.id}`
   );
 
+  const [existingReview, reviews] = await Promise.all([
+    getUserReviewForMovie(session.user.id, `tmdb_${movie.id}`),
+    getMovieReviews(`tmdb_${movie.id}`),
+  ]);
+
   return (
     <>
       <MovieDetails
@@ -54,35 +60,8 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
                 rating: null,
               }
         }
-      />
-
-      <MovieCast cast={movie.cast} />
-
-      <MovieVideo
-        video={
-          movie.videos.find(
-            (video) =>
-              video.site === 'YouTube' &&
-              video.type === 'Trailer' &&
-              video.official
-          ) ??
-          movie.videos.find(
-            (video) => video.site === 'YouTube' && video.type === 'Trailer'
-          ) ??
-          null
-        }
-      />
-
-      <MovieRecommendations
-        movies={movie.similar}
-        title="Similar movies"
-        eyebrow="If you liked this"
-      />
-
-      <MovieRecommendations
-        movies={movie.recommendations}
-        title="More like this"
-        eyebrow="From TMDB"
+        existingReview={existingReview}
+        reviews={reviews}
       />
     </>
   );
