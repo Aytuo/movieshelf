@@ -1,0 +1,334 @@
+'use client';
+
+import { useDebounce } from '@/hooks/use-debounce';
+import {
+  DISCOVER_SORT_OPTIONS,
+  LANGUAGE_OPTIONS,
+  MOVIE_GENRES,
+} from '@/lib/tmdb/discover-options';
+import { RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+
+type FilterState = {
+  genre: string;
+  yearFrom: string;
+  yearTo: string;
+  rating: string;
+  runtime: string;
+  language: string;
+  sort: string;
+};
+
+const FILTER_KEYS = [
+  'genre',
+  'yearFrom',
+  'yearTo',
+  'rating',
+  'runtime',
+  'language',
+  'sort',
+] as const;
+
+function readFilters(params: URLSearchParams): FilterState {
+  return {
+    genre: params.get('genre') ?? '',
+    yearFrom: params.get('yearFrom') ?? '',
+    yearTo: params.get('yearTo') ?? '',
+    rating: params.get('rating') ?? '',
+    runtime: params.get('runtime') ?? '',
+    language: params.get('language') ?? '',
+    sort: params.get('sort') ?? 'popularity.desc',
+  };
+}
+
+const DiscoverFilters = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const urlString = searchParams.toString();
+
+  const [draft, setDraft] = useState<FilterState>(() =>
+    readFilters(new URLSearchParams(urlString))
+  );
+
+  const debouncedDraft = useDebounce(draft, 500);
+
+  /**
+   * True only when the user is actively
+   * changing the local filter draft.
+   */
+  const dirtyRef = useRef(false);
+
+  /**
+   * Stores the last URL produced by this component.
+   *
+   * This prevents our own router.replace()
+   * from immediately overwriting the local draft.
+   */
+  const lastAppliedUrl = useRef(urlString);
+
+  /**
+   * Synchronize local state when the URL changes
+   * externally, e.g. browser Back / Forward,
+   * pagination, another component, etc.
+   */
+  useEffect(() => {
+    if (urlString === lastAppliedUrl.current) {
+      return;
+    }
+
+    setDraft(readFilters(new URLSearchParams(urlString)));
+
+    dirtyRef.current = false;
+
+    lastAppliedUrl.current = urlString;
+  }, [urlString]);
+
+  /**
+   * Apply the user's local draft after
+   * the debounce period.
+   */
+  useEffect(() => {
+    if (!dirtyRef.current) {
+      return;
+    }
+
+    const params = new URLSearchParams(urlString);
+
+    for (const key of FILTER_KEYS) {
+      params.delete(key);
+    }
+
+    if (debouncedDraft.genre) {
+      params.set('genre', debouncedDraft.genre);
+    }
+
+    if (debouncedDraft.yearFrom) {
+      params.set('yearFrom', debouncedDraft.yearFrom);
+    }
+
+    if (debouncedDraft.yearTo) {
+      params.set('yearTo', debouncedDraft.yearTo);
+    }
+
+    if (debouncedDraft.rating) {
+      params.set('rating', debouncedDraft.rating);
+    }
+
+    if (debouncedDraft.runtime) {
+      params.set('runtime', debouncedDraft.runtime);
+    }
+
+    if (debouncedDraft.language) {
+      params.set('language', debouncedDraft.language);
+    }
+
+    if (debouncedDraft.sort && debouncedDraft.sort !== 'popularity.desc') {
+      params.set('sort', debouncedDraft.sort);
+    }
+
+    /**
+     * Filtering starts a new result set.
+     */
+    params.delete('page');
+
+    const nextUrl = params.toString()
+      ? `${pathname}?${params.toString()}`
+      : pathname;
+
+    /**
+     * Mark this URL as ours BEFORE navigating.
+     */
+    lastAppliedUrl.current = params.toString();
+
+    dirtyRef.current = false;
+
+    router.replace(nextUrl, {
+      scroll: false,
+    });
+  }, [debouncedDraft, pathname, router, urlString]);
+
+  function update(key: keyof FilterState, value: string) {
+    setDraft((current) => ({
+      ...current,
+      [key]: value,
+    }));
+
+    dirtyRef.current = true;
+  }
+
+  function reset() {
+    setDraft({
+      genre: '',
+      yearFrom: '',
+      yearTo: '',
+      rating: '',
+      runtime: '',
+      language: '',
+      sort: 'popularity.desc',
+    });
+
+    dirtyRef.current = true;
+  }
+
+  const hasFilters = FILTER_KEYS.some((key) => {
+    if (key === 'sort') {
+      return draft.sort !== 'popularity.desc';
+    }
+
+    return Boolean(draft[key]);
+  });
+
+  return (
+    <aside className="rounded-2xl border border-border p-5 surface">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="size-4 text-primary" />
+
+          <span className="text-sm font-semibold">Filters</span>
+        </div>
+
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={reset}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <RotateCcw className="size-3" />
+            Reset
+          </button>
+        )}
+      </div>
+
+      <div className="mt-6 space-y-5">
+        <div>
+          <label className="label">Genre</label>
+
+          <select
+            value={draft.genre}
+            onChange={(event) => update('genre', event.target.value)}
+            className="input"
+          >
+            <option value="">All genres</option>
+
+            {MOVIE_GENRES.map((genre) => (
+              <option key={genre.id} value={genre.id}>
+                {genre.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="label">From year</label>
+
+            <input
+              type="number"
+              min="1888"
+              max={new Date().getFullYear()}
+              value={draft.yearFrom}
+              onChange={(event) => update('yearFrom', event.target.value)}
+              className="input"
+              placeholder="2010"
+            />
+          </div>
+
+          <div>
+            <label className="label">To year</label>
+
+            <input
+              type="number"
+              min="1888"
+              max={new Date().getFullYear()}
+              value={draft.yearTo}
+              onChange={(event) => update('yearTo', event.target.value)}
+              className="input"
+              placeholder="2025"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Minimum rating</label>
+
+          <select
+            value={draft.rating}
+            onChange={(event) => update('rating', event.target.value)}
+            className="input"
+          >
+            <option value="">Any rating</option>
+
+            {[6, 7, 7.5, 8, 8.5, 9].map((rating) => (
+              <option key={rating} value={rating}>
+                {rating.toFixed(1)}+
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="label">Maximum runtime</label>
+
+          <select
+            value={draft.runtime}
+            onChange={(event) => update('runtime', event.target.value)}
+            className="input"
+          >
+            <option value="">Any runtime</option>
+
+            <option value="90">Under 90 min</option>
+
+            <option value="120">Under 2 hours</option>
+
+            <option value="150">Under 2h 30m</option>
+
+            <option value="180">Under 3 hours</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="label">Original language</label>
+
+          <select
+            value={draft.language}
+            onChange={(event) => update('language', event.target.value)}
+            className="input"
+          >
+            <option value="">Any language</option>
+
+            {LANGUAGE_OPTIONS.map((language) => (
+              <option key={language.value} value={language.value}>
+                {language.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="label">Sort by</label>
+
+          <select
+            value={draft.sort}
+            onChange={(event) => update('sort', event.target.value)}
+            className="input"
+          >
+            {DISCOVER_SORT_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <p className="mt-5 text-[11px] leading-5 text-muted-foreground">
+        Changes are applied automatically when you stop editing.
+      </p>
+    </aside>
+  );
+};
+
+export default DiscoverFilters;

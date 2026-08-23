@@ -4,7 +4,6 @@ import {
   getTrendingMovies,
   searchMovies,
 } from '@/lib/tmdb/client';
-
 import { mapTmdbMovie, mapTmdbMovieDetails } from '@/lib/tmdb/mapper';
 
 export const tmdbMovieRepository: MovieRepository = {
@@ -15,7 +14,13 @@ export const tmdbMovieRepository: MovieRepository = {
   },
 
   async getPopular() {
-    const response = await discoverMovies(1);
+    const response = await discoverMovies();
+
+    return response.results.map(mapTmdbMovie);
+  },
+
+  async getTrending() {
+    const response = await getTrendingMovies('week');
 
     return response.results.map(mapTmdbMovie);
   },
@@ -26,9 +31,14 @@ export const tmdbMovieRepository: MovieRepository = {
     return response.results.map(mapTmdbMovie);
   },
 
-  async getTrending() {
-    const response = await getTrendingMovies('week');
+  async discover(filters) {
+    const response = await discoverMovies(filters);
 
-    return response.results.map(mapTmdbMovie);
+    return {
+      movies: response.results.map(mapTmdbMovie),
+      page: response.page,
+      totalPages: response.total_pages,
+      totalResults: response.total_results,
+    };
   },
 };
