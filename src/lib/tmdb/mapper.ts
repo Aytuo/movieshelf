@@ -1,3 +1,5 @@
+import { TMDB_GENRES } from './genres';
+
 function mapMovieResult(movie: TmdbMovieResult): Movie {
   return {
     id: movie.id,
@@ -8,7 +10,9 @@ function mapMovieResult(movie: TmdbMovieResult): Movie {
     backdropPath: movie.backdrop_path,
     releaseDate: movie.release_date,
     runtime: null,
-    genres: [],
+    genres: (movie.genre_ids ?? [])
+      .map((id) => TMDB_GENRES[id])
+      .filter((genre): genre is string => Boolean(genre)),
     rating: movie.vote_average,
     voteCount: movie.vote_count,
   };

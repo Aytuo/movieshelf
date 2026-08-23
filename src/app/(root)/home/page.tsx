@@ -1,13 +1,20 @@
 import Hero from '@/components/home/hero';
-import MovieGrid from '@/components/movies/movie-grid';
-import {
-  MOCK_RECENTLY_ADDED_MOVIES,
-  MOCK_RECOMMENDED_MOVIES,
-} from '@/constants';
+import RecommendationSection from '@/components/recommendations/recommendation-section';
+import { requireSession } from '@/lib/auth/require-session';
+import { getColdStartRecommendations } from '@/lib/recommendations/cold-start';
+import { getRecommendationsForUser } from '@/lib/services/recommendation-service';
 
-export default function HomePage() {
-  const featuredMovies = MOCK_RECOMMENDED_MOVIES;
-  const recentlyAdded = MOCK_RECENTLY_ADDED_MOVIES;
+export default async function HomePage() {
+  const session = await requireSession();
+
+  const personalized = await getRecommendationsForUser(session.user.id);
+
+  const recommendations =
+    personalized.length > 0
+      ? personalized
+      : await getColdStartRecommendations();
+
+  const isPersonalized = personalized.length > 0;
 
   return (
     <>
@@ -31,35 +38,19 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="container-content py-12 lg:py-16">
-          <div className="mb-7 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="font-heading text-2xl font-bold tracking-tight">
-                Recommended for you
-              </h2>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                A few movies worth discovering.
-              </p>
-            </div>
-          </div>
-
-          <MovieGrid movies={featuredMovies} />
-        </section>
-
-        <section className="container-content pb-16 lg:pb-24">
-          <div className="mb-7">
-            <h2 className="font-heading text-2xl font-bold tracking-tight">
-              Recently added
-            </h2>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Movies waiting to find their place on your shelf.
-            </p>
-          </div>
-
-          <MovieGrid movies={recentlyAdded} />
-        </section>
+        <RecommendationSection
+          recommendations={recommendations}
+          title={
+            isPersonalized
+              ? 'Picked for you'
+              : 'Popular while we learn your taste'
+          }
+          description={
+            isPersonalized
+              ? "Based on the movies you've rated and collected."
+              : "Rate a few movies and we'll start tailoring this space to you."
+          }
+        />
       </div>
     </>
   );

@@ -1,7 +1,9 @@
+import TastePreview from '@/components/profile/taste-preview';
 import { db } from '@/lib/db';
 import { profile } from '@/lib/db/schema';
 import { getUserReviews } from '@/lib/repositories/review-repository';
 import { getUserShelf } from '@/lib/repositories/user-movie-repository';
+import { getTasteProfile } from '@/lib/services/taste-service';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { eq } from 'drizzle-orm';
 import { Bookmark, Film, Heart, Star } from 'lucide-react';
@@ -46,6 +48,8 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
         ).toFixed(1)
       : '—';
+
+  const taste = await getTasteProfile(userProfile.userId);
 
   return (
     <main className="container-content py-12 lg:py-16">
@@ -147,6 +151,16 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             );
           })}
         </div>
+      </section>
+
+      <section className="border-t border-border/60 py-12">
+        <div className="mb-6">
+          <p className="eyebrow">Cinematic identity</p>
+
+          <h2 className="mt-2 font-heading text-2xl font-bold">Your Taste</h2>
+        </div>
+
+        <TastePreview taste={taste} username={userProfile.username} />
       </section>
 
       <section className="border-t border-border/60 py-12">
