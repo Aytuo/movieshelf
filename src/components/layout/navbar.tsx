@@ -15,6 +15,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import GlobalSearch from '../search/global-search';
 import { Button } from '../ui/button';
 
 const navLinks = [
@@ -87,17 +88,7 @@ const Navbar = () => {
 
           {/* Desktop actions */}
           <div className="hidden items-center gap-2 md:flex">
-            <Link
-              href="/search"
-              aria-label="Search movies"
-              className={cn(
-                'flex size-9 items-center justify-center rounded-lg',
-                'text-muted-foreground transition-colors',
-                'hover:bg-surface-hover hover:text-foreground'
-              )}
-            >
-              <Search className="size-4" />
-            </Link>
+            <GlobalSearch />
 
             <Link
               href="/profile"

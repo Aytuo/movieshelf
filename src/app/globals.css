@@ -517,6 +517,10 @@
     @apply focus:border-primary focus:ring-2 focus:ring-primary/20;
     @apply disabled:cursor-not-allowed disabled:opacity-60;
   }
+
+  .label {
+    @apply mb-2 block text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase;
+  }
 }
 
 /* ============================================================================

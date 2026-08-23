@@ -83,12 +83,15 @@ declare global {
 
   export interface MovieRepository {
     getById(id: number): Promise<MovieDetails | null>;
-
     getPopular(): Promise<Movie[]>;
-
     getTrending(): Promise<Movie[]>;
-
     search(query: string): Promise<Movie[]>;
+    discover(filters: DiscoverFilters): Promise<{
+      movies: Movie[];
+      page: number;
+      totalPages: number;
+      totalResults: number;
+    }>;
   }
 
   export type TmdbMovieResult = {
@@ -236,6 +239,26 @@ declare global {
     score: number;
     reason: string;
     reasonType: RecommendationReason;
+  };
+
+  export type DiscoverSort =
+    | 'popularity.desc'
+    | 'vote_average.desc'
+    | 'primary_release_date.desc'
+    | 'primary_release_date.asc'
+    | 'vote_count.desc';
+
+  export type DiscoverFilters = {
+    genre?: number;
+    yearFrom?: number;
+    yearTo?: number;
+    minRating?: number;
+    maxRating?: number;
+    minRuntime?: number;
+    maxRuntime?: number;
+    language?: string;
+    sortBy?: DiscoverSort;
+    page?: number;
   };
 }
 
