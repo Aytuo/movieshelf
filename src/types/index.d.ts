@@ -174,7 +174,6 @@ declare global {
   export type TmdbMovieBundle = TmdbMovieDetails & {
     credits?: TmdbCreditsResponse;
     videos?: TmdbVideosResponse;
-
     similar?: TmdbPagedResponse<TmdbMovieResult>;
     recommendations?: TmdbPagedResponse<TmdbMovieResult>;
   };
@@ -184,6 +183,59 @@ declare global {
     results: TmdbMovieResult[];
     total_pages: number;
     total_results: number;
+  };
+
+  export type TasteGenre = {
+    name: string;
+    count: number;
+    percentage: number;
+  };
+
+  export type TasteDecade = {
+    decade: string;
+    count: number;
+    percentage: number;
+  };
+
+  export type RatingDistributionItem = {
+    rating: number;
+    count: number;
+  };
+
+  export type TasteProfile = {
+    totalMovies: number;
+    watchedMovies: number;
+    watchlistMovies: number;
+    favoriteMovies: number;
+    ratedMovies: number;
+    averageRating: number | null;
+    topGenres: TasteGenre[];
+    favoriteDecades: TasteDecade[];
+    ratingDistribution: RatingDistributionItem[];
+    highestRatedMovies: {
+      id: string;
+      tmdbId: number;
+      title: string;
+      posterPath: string | null;
+      rating: number;
+    }[];
+    lowestRatedMovies: {
+      id: string;
+      tmdbId: number;
+      title: string;
+      posterPath: string | null;
+      rating: number;
+    }[];
+  };
+
+  export type RecommendationReason =
+    'because-you-liked' | 'matches-your-taste' | 'explore';
+
+  export type MovieRecommendation = {
+    movie: Movie;
+    score: number;
+    reason: string;
+    reasonType: RecommendationReason;
   };
 }
 
