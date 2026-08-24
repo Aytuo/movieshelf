@@ -35,27 +35,22 @@ export function parseDiscoverFilters(params: {
   language?: string;
   sort?: string;
   page?: string;
+  hideOnShelf?: string;
 }): DiscoverFilters {
-  const genre = positiveInteger(params.genre);
-  const yearFrom = positiveInteger(params.yearFrom);
-  const yearTo = positiveInteger(params.yearTo);
-  const minRating = positiveNumber(params.rating);
-  const maxRuntime = positiveInteger(params.runtime);
-  const page = positiveInteger(params.page) ?? 1;
-
-  const sortBy =
+  const sort =
     params.sort && VALID_SORTS.has(params.sort)
       ? (params.sort as DiscoverFilters['sortBy'])
       : 'popularity.desc';
 
   return {
-    genre,
-    yearFrom,
-    yearTo,
-    minRating,
-    maxRuntime,
+    genre: positiveInteger(params.genre),
+    yearFrom: positiveInteger(params.yearFrom),
+    yearTo: positiveInteger(params.yearTo),
+    minRating: positiveNumber(params.rating),
+    maxRuntime: positiveInteger(params.runtime),
     language: params.language || undefined,
-    sortBy,
-    page,
+    sortBy: sort,
+    page: positiveInteger(params.page) ?? 1,
+    hideOnShelf: params.hideOnShelf === 'true',
   };
 }

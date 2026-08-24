@@ -1,22 +1,12 @@
 'use client';
 
-import { authClient } from '@/lib/auth/client';
 import { cn } from '@/lib/utils';
-import {
-  Bookmark,
-  Film,
-  Flame,
-  Heart,
-  Menu,
-  Search,
-  UserRound,
-  X,
-} from 'lucide-react';
+import { Bookmark, Film, Flame, Heart, Menu, X } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import GlobalSearch from '../search/global-search';
-import { Button } from '../ui/button';
+import UserMenu from './user-menu';
 
 const navLinks = [
   {
@@ -41,10 +31,12 @@ const navLinks = [
   },
 ];
 
-const Navbar = () => {
-  const router = useRouter();
-  const { data: session } = authClient.useSession();
+type NavbarProps = {
+  user: User;
+  profile: Profile;
+};
 
+const Navbar = ({ user, profile }: NavbarProps) => {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -52,6 +44,21 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="container-content">
         <div className="flex h-(--header-height) items-center justify-between">
+          {/* Mobile trigger */}
+          <button
+            type="button"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((current) => !current)}
+            className="flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground md:hidden"
+          >
+            {mobileOpen ? (
+              <X className="size-4" />
+            ) : (
+              <Menu className="size-4" />
+            )}
+          </button>
+
           {/* Brand */}
           <Link
             href="/home"
@@ -86,55 +93,25 @@ const Navbar = () => {
             })}
           </nav>
 
-          {/* Desktop actions */}
-          <div className="hidden items-center gap-2 md:flex">
+          {/* Actions */}
+          <div className="flex items-center gap-2">
             <GlobalSearch />
 
-            <Link
-              href="/profile"
-              aria-label="Profile"
-              className={cn(
-                'flex size-9 items-center justify-center rounded-lg',
-                'border border-border bg-surface',
-                'text-muted-foreground transition-colors',
-                'hover:border-border-strong hover:text-foreground'
-              )}
-            >
-              <UserRound className="size-4" />
-            </Link>
-
-            {/* Temporary */}
-            {session && (
-              <Button
-                onClick={async () =>
-                  await authClient.signOut({
-                    fetchOptions: {
-                      onSuccess: () => {
-                        router.push('/');
-                      },
-                    },
-                  })
-                }
-              >
-                Sign out
-              </Button>
+            {user && profile && (
+              <UserMenu
+                user={{
+                  name: user.name,
+                  email: user.email,
+                  image: user.image ?? null,
+                }}
+                profile={{
+                  username: profile.username,
+                  displayName: profile.displayName,
+                  avatarUrl: profile.avatarUrl,
+                }}
+              />
             )}
           </div>
-
-          {/* Mobile trigger */}
-          <button
-            type="button"
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((current) => !current)}
-            className="flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground md:hidden"
-          >
-            {mobileOpen ? (
-              <X className="size-4" />
-            ) : (
-              <Menu className="size-4" />
-            )}
-          </button>
         </div>
 
         {/* Mobile navigation */}
@@ -166,26 +143,6 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-
-              <div className="my-2 h-px bg-border/60" />
-
-              <Link
-                href="/search"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-              >
-                <Search className="size-4" />
-                Search
-              </Link>
-
-              <Link
-                href="/profile"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-              >
-                <UserRound className="size-4" />
-                Profile
-              </Link>
             </nav>
           </div>
         )}

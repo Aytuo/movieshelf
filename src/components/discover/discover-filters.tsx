@@ -18,6 +18,7 @@ type FilterState = {
   runtime: string;
   language: string;
   sort: string;
+  hideOnShelf: string;
 };
 
 const FILTER_KEYS = [
@@ -28,6 +29,7 @@ const FILTER_KEYS = [
   'runtime',
   'language',
   'sort',
+  'hideOnShelf',
 ] as const;
 
 function readFilters(params: URLSearchParams): FilterState {
@@ -39,6 +41,7 @@ function readFilters(params: URLSearchParams): FilterState {
     runtime: params.get('runtime') ?? '',
     language: params.get('language') ?? '',
     sort: params.get('sort') ?? 'popularity.desc',
+    hideOnShelf: params.get('hideOnShelf') ?? '',
   };
 }
 
@@ -55,25 +58,10 @@ const DiscoverFilters = () => {
 
   const debouncedDraft = useDebounce(draft, 500);
 
-  /**
-   * True only when the user is actively
-   * changing the local filter draft.
-   */
   const dirtyRef = useRef(false);
 
-  /**
-   * Stores the last URL produced by this component.
-   *
-   * This prevents our own router.replace()
-   * from immediately overwriting the local draft.
-   */
   const lastAppliedUrl = useRef(urlString);
 
-  /**
-   * Synchronize local state when the URL changes
-   * externally, e.g. browser Back / Forward,
-   * pagination, another component, etc.
-   */
   useEffect(() => {
     if (urlString === lastAppliedUrl.current) {
       return;
@@ -86,10 +74,6 @@ const DiscoverFilters = () => {
     lastAppliedUrl.current = urlString;
   }, [urlString]);
 
-  /**
-   * Apply the user's local draft after
-   * the debounce period.
-   */
   useEffect(() => {
     if (!dirtyRef.current) {
       return;
@@ -129,23 +113,19 @@ const DiscoverFilters = () => {
       params.set('sort', debouncedDraft.sort);
     }
 
-    /**
-     * Filtering starts a new result set.
-     */
+    if (debouncedDraft.hideOnShelf) {
+      params.set('hideOnShelf', debouncedDraft.hideOnShelf);
+    }
+
     params.delete('page');
 
-    const nextUrl = params.toString()
-      ? `${pathname}?${params.toString()}`
-      : pathname;
+    const query = params.toString();
 
-    /**
-     * Mark this URL as ours BEFORE navigating.
-     */
-    lastAppliedUrl.current = params.toString();
+    lastAppliedUrl.current = query;
 
     dirtyRef.current = false;
 
-    router.replace(nextUrl, {
+    router.replace(query ? `${pathname}?${query}` : pathname, {
       scroll: false,
     });
   }, [debouncedDraft, pathname, router, urlString]);
@@ -168,18 +148,22 @@ const DiscoverFilters = () => {
       runtime: '',
       language: '',
       sort: 'popularity.desc',
+      hideOnShelf: '',
     });
 
     dirtyRef.current = true;
   }
 
-  const hasFilters = FILTER_KEYS.some((key) => {
-    if (key === 'sort') {
-      return draft.sort !== 'popularity.desc';
-    }
-
-    return Boolean(draft[key]);
-  });
+  const hasFilters = Boolean(
+    draft.genre ||
+    draft.yearFrom ||
+    draft.yearTo ||
+    draft.rating ||
+    draft.runtime ||
+    draft.language ||
+    draft.hideOnShelf ||
+    draft.sort !== 'popularity.desc'
+  );
 
   return (
     <aside className="rounded-2xl border border-border p-5 surface">
@@ -197,7 +181,7 @@ const DiscoverFilters = () => {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <RotateCcw className="size-3" />
-            Reset
+            Reset filters
           </button>
         )}
       </div>
@@ -321,6 +305,30 @@ const DiscoverFilters = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="border-t border-border/60 pt-5">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={draft.hideOnShelf === 'true'}
+              onChange={(event) =>
+                update('hideOnShelf', event.target.checked ? 'true' : '')
+              }
+              className="mt-0.5 size-4 rounded border-border accent-primary"
+            />
+
+            <span>
+              <span className="block text-sm font-medium">
+                Hide movies on my shelf
+              </span>
+
+              <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                Only show movies you haven&apos;t already added to your
+                collection.
+              </span>
+            </span>
+          </label>
         </div>
       </div>
 

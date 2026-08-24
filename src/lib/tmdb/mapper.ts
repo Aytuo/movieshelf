@@ -13,6 +13,7 @@ function mapMovieResult(movie: TmdbMovieResult): Movie {
     genres: (movie.genre_ids ?? [])
       .map((id) => TMDB_GENRES[id])
       .filter((genre): genre is string => Boolean(genre)),
+    originalLanguage: movie.original_language,
     rating: movie.vote_average,
     voteCount: movie.vote_count,
   };

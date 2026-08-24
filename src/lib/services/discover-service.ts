@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { movie, userMovie } from '@/lib/db/schema';
+import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
 import { movieRepository } from '@/lib/repositories';
 import { eq } from 'drizzle-orm';
 
@@ -7,22 +8,58 @@ export async function discoverForUser(
   userId: string,
   filters: DiscoverFilters
 ) {
-  const result = await movieRepository.discover(filters);
+  const page = filters.page ?? 1;
 
-  const existing = await db
-    .select({
-      tmdbId: movie.tmdbId,
-    })
-    .from(userMovie)
-    .innerJoin(movie, eq(movie.id, userMovie.movieId))
-    .where(eq(userMovie.userId, userId));
+  const requiredCount = page * DISCOVER_PAGE_SIZE;
+
+  const existing = filters.hideOnShelf
+    ? await db
+        .select({
+          tmdbId: movie.tmdbId,
+        })
+        .from(userMovie)
+        .innerJoin(movie, eq(movie.id, userMovie.movieId))
+        .where(eq(userMovie.userId, userId))
+    : [];
 
   const knownIds = new Set(existing.map((item) => item.tmdbId));
 
-  const movies = result.movies.filter((movie) => !knownIds.has(movie.id));
+  let result = await movieRepository.discover(filters, {
+    maxMovies: requiredCount,
+  });
+
+  let filtered = result.movies.filter((movie) => !knownIds.has(movie.id));
+
+  /*
+   * When shelf exclusion is enabled, keep fetching
+   * additional TMDB candidates until we have enough
+   * usable movies for the requested application page.
+   */
+  while (
+    filters.hideOnShelf &&
+    filtered.length < requiredCount &&
+    result.movies.length < 200
+  ) {
+    const nextCandidateCount = result.movies.length + DISCOVER_PAGE_SIZE;
+
+    result = await movieRepository.discover(filters, {
+      maxMovies: nextCandidateCount,
+    });
+
+    filtered = result.movies.filter((movie) => !knownIds.has(movie.id));
+
+    if (result.movies.length === result.totalResults) {
+      break;
+    }
+  }
+
+  const start = (page - 1) * DISCOVER_PAGE_SIZE;
+
+  const end = start + DISCOVER_PAGE_SIZE;
 
   return {
     ...result,
-    movies,
+
+    movies: filtered.slice(start, end),
   };
 }
