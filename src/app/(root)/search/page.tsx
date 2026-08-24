@@ -127,7 +127,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
 
             {results.movies.length > 0 ? (
               <>
-                <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                   {results.movies.map((movie) => {
                     const poster = tmdbImage(movie.posterPath, 'w500');
 

@@ -5,6 +5,27 @@ declare global {
     icon?: string;
   };
 
+  export type User = {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    email: string;
+    emailVerified: boolean;
+    name: string;
+    image?: string | null | undefined | undefined;
+  };
+
+  export type Profile = {
+    userId: string;
+    username: string;
+    displayName: string | null;
+    bio: string | null;
+    avatarUrl: string | null;
+    onboardingCompleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+
   export type Movie = {
     id: number;
     title: string;
@@ -15,6 +36,7 @@ declare global {
     releaseDate: string;
     runtime: number | null;
     genres: string[];
+    originalLanguage: string;
     rating: number;
     voteCount: number;
     tagline?: string;
@@ -86,7 +108,12 @@ declare global {
     getPopular(): Promise<Movie[]>;
     getTrending(): Promise<Movie[]>;
     search(query: string): Promise<Movie[]>;
-    discover(filters: DiscoverFilters): Promise<{
+    discover(
+      filters: DiscoverFilters,
+      options?: {
+        maxMovies?: number;
+      }
+    ): Promise<{
       movies: Movie[];
       page: number;
       totalPages: number;
@@ -259,6 +286,7 @@ declare global {
     language?: string;
     sortBy?: DiscoverSort;
     page?: number;
+    hideOnShelf?: boolean;
   };
 }
 

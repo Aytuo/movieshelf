@@ -57,6 +57,7 @@ export async function searchMovies(
     page: String(page),
     language: 'en-US',
     include_adult: 'false',
+
     ...(options?.year
       ? {
           primary_release_year: String(options.year),

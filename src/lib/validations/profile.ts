@@ -13,6 +13,7 @@ export const usernameSchema = z
 
 export const profileUpdateSchema = z.object({
   username: usernameSchema,
+
   displayName: z
     .string()
     .trim()
@@ -23,6 +24,13 @@ export const profileUpdateSchema = z.object({
     .string()
     .trim()
     .max(280, 'Bio cannot exceed 280 characters.')
+    .optional()
+    .or(z.literal('')),
+  avatarUrl: z
+    .string()
+    .trim()
+    .url('Please enter a valid image URL.')
+    .max(500, 'Avatar URL is too long.')
     .optional()
     .or(z.literal('')),
 });
