@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Bookmark, Film, Flame, Heart, Menu, X } from 'lucide-react';
+import { Bookmark, Film, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -14,21 +14,21 @@ const navLinks = [
     href: '/discover',
     icon: Film,
   },
-  {
-    label: 'Trending',
-    href: '/trending',
-    icon: Flame,
-  },
+  // {
+  //   label: 'Trending',
+  //   href: '/trending',
+  //   icon: Flame,
+  // },
   {
     label: 'My Shelf',
     href: '/shelf',
     icon: Bookmark,
   },
-  {
-    label: 'Favorites',
-    href: '/favorites',
-    icon: Heart,
-  },
+  // {
+  //   label: 'Favorites',
+  //   href: '/favorites',
+  //   icon: Heart,
+  // },
 ];
 
 type NavbarProps = {
