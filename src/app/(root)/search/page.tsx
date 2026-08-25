@@ -1,7 +1,6 @@
 import SearchPagination from '@/components/search/search-pagination';
-import { searchMovies } from '@/lib/tmdb/client';
+import { searchMoviesForPage } from '@/lib/services/search-service';
 import { tmdbImage } from '@/lib/tmdb/images';
-import { mapTmdbMovie } from '@/lib/tmdb/mapper';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 
@@ -15,36 +14,32 @@ type SearchPageProps = {
 
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const params = await searchParams;
-
   const query = params.q?.trim() ?? '';
-
-  const year = Number(params.year);
-
-  const page = Number(params.page);
-
-  const currentPage = Number.isInteger(page) && page > 0 ? page : 1;
+  const parsedYear = Number(params.year);
+  const year =
+    Number.isInteger(parsedYear) && parsedYear > 0 ? parsedYear : undefined;
+  const parsedPage = Number(params.page);
+  const currentPage =
+    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   let results = {
-    movies: [] as ReturnType<typeof mapTmdbMovie>[],
+    movies: [] as Awaited<ReturnType<typeof searchMoviesForPage>>['movies'],
+    page: 1,
     totalResults: 0,
     totalPages: 0,
   };
 
   if (query) {
-    const response = await searchMovies(query, currentPage, {
-      year: Number.isInteger(year) && year > 0 ? year : undefined,
+    results = await searchMoviesForPage({
+      query,
+      page: currentPage,
+      year,
     });
-
-    results = {
-      movies: response.results.map(mapTmdbMovie),
-      totalResults: response.total_results,
-      totalPages: response.total_pages,
-    };
   }
 
   return (
     <section className="container-content py-10 lg:py-14">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-10">
           <p className="eyebrow">Search</p>
 
@@ -75,7 +70,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
             type="number"
             min="1888"
             max={new Date().getFullYear()}
-            defaultValue={Number.isInteger(year) && year > 0 ? year : ''}
+            defaultValue={year ?? ''}
             placeholder="Year"
             className="input h-12"
           />
@@ -164,10 +159,10 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                 </div>
 
                 <SearchPagination
-                  page={currentPage}
+                  page={results.page}
                   totalPages={results.totalPages}
                   query={query}
-                  year={Number.isInteger(year) && year > 0 ? year : undefined}
+                  year={year}
                 />
               </>
             ) : (

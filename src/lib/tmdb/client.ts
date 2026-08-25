@@ -106,6 +106,12 @@ export async function discoverMovies(filters: DiscoverFilters = {}) {
         }
       : {}),
 
+    ...(filters.minVoteCount !== undefined
+      ? {
+          'vote_count.gte': String(filters.minVoteCount),
+        }
+      : {}),
+
     ...(filters.minRuntime !== undefined
       ? {
           'with_runtime.gte': String(filters.minRuntime),
@@ -130,5 +136,115 @@ export async function getMovieDetails(movieId: number) {
   return tmdbFetch<TmdbMovieBundle>(`/movie/${movieId}`, {
     language: 'en-US',
     append_to_response: 'credits,videos,similar,recommendations',
+  });
+}
+
+export async function getRecommendedMoviesByTmdb(
+  page: number = 1,
+  region: string = 'US'
+) {
+  return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
+    page: String(page),
+    language: 'en-US',
+    region,
+    sort_by: 'popularity.desc',
+    include_adult: 'false',
+    include_video: 'false',
+    'vote_average.gte': '7.0',
+    'vote_count.gte': '250',
+  });
+}
+
+export async function getTopPicksMovies(
+  page: number = 1,
+  region: string = 'US'
+) {
+  return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
+    page: String(page),
+    language: 'en-US',
+    region,
+    sort_by: 'vote_average.desc',
+    include_adult: 'false',
+    include_video: 'false',
+    'vote_average.gte': '7.5',
+    'vote_count.gte': '500',
+  });
+}
+
+export async function getNowPlayingMovies(
+  page: number = 1,
+  region: string = 'US'
+) {
+  const today = new Date();
+  const pastDate = new Date();
+  pastDate.setDate(today.getDate() - 42);
+
+  const minDate = pastDate.toISOString().split('T')[0];
+  const maxDate = today.toISOString().split('T')[0];
+
+  return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
+    page: String(page),
+    language: 'en-US',
+    region,
+    sort_by: 'popularity.desc',
+    include_adult: 'false',
+    include_video: 'false',
+    with_release_type: '2|3',
+    'primary_release_date.gte': minDate,
+    'primary_release_date.lte': maxDate,
+  });
+}
+
+export async function getUpcomingMovies(
+  page: number = 1,
+  region: string = 'US'
+) {
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setMonth(today.getMonth() + 3);
+
+  const minDate = today.toISOString().split('T')[0];
+  const maxDate = futureDate.toISOString().split('T')[0];
+
+  return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
+    page: String(page),
+    language: 'en-US',
+    region,
+    sort_by: 'popularity.desc',
+    include_adult: 'false',
+    include_video: 'false',
+    with_release_type: '2|3',
+    'primary_release_date.gte': minDate,
+    'primary_release_date.lte': maxDate,
+  });
+}
+
+export async function getPopularMovies(
+  page: number = 1,
+  region: string = 'US'
+) {
+  return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/movie/popular', {
+    page: String(page),
+    language: 'en-US',
+    region,
+  });
+}
+
+export async function getTopRatedMovies(
+  page: number = 1,
+  region: string = 'US'
+) {
+  const today = new Date().toISOString().split('T')[0];
+
+  return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
+    page: String(page),
+    language: 'en-US',
+    region,
+    sort_by: 'vote_average.desc',
+    include_adult: 'false',
+    include_video: 'false',
+    without_genres: '99,10755',
+    'vote_count.gte': '10000',
+    'primary_release_date.lte': today,
   });
 }

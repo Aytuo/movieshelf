@@ -107,6 +107,8 @@ declare global {
     getById(id: number): Promise<MovieDetails | null>;
     getPopular(): Promise<Movie[]>;
     getTrending(): Promise<Movie[]>;
+    getTopPicks(): Promise<Movie[]>;
+    getUpcoming(): Promise<Movie[]>;
     search(query: string): Promise<Movie[]>;
     discover(
       filters: DiscoverFilters,
@@ -283,6 +285,7 @@ declare global {
     maxRating?: number;
     minRuntime?: number;
     maxRuntime?: number;
+    minVoteCount?: number;
     language?: string;
     sortBy?: DiscoverSort;
     page?: number;

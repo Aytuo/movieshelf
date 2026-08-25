@@ -1,7 +1,10 @@
 import MovieGrid from '@/components/movies/movie-grid';
 import { movieRepository } from '@/lib/repositories';
+import { redirect } from 'next/navigation';
 
 const TrendingPage = async () => {
+  redirect('/home');
+
   const movies = await movieRepository.getTrending();
 
   return (
