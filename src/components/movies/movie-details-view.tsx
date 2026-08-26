@@ -183,6 +183,14 @@ const MovieDetailsView = ({
               <div className="mt-7">
                 <MovieActions movieId={movie.id} initialState={userMovie} />
               </div>
+
+              {userMovie.status === 'watched' && (
+                <p className="text-xs text-muted-foreground">
+                  {userMovie.rating
+                    ? `You rated this ${userMovie.rating}/10.`
+                    : "You've watched this movie."}
+                </p>
+              )}
             </div>
           </div>
         </div>

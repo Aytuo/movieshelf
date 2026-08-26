@@ -37,6 +37,8 @@ export async function markMovieAsWatched(tmdbId: number) {
   await markAsWatched(userId, movie.id);
 
   revalidatePath('/shelf');
+  revalidatePath('/history');
+  revalidatePath('/activity');
   revalidatePath(`/movie/${tmdbId}`);
 }
 
