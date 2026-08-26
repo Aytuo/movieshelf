@@ -6,6 +6,8 @@ if (!token) {
   throw new Error('TMDB_API_READ_ACCESS_TOKEN is not configured.');
 }
 
+// Movies
+
 async function tmdbFetch<T>(
   path: string,
   searchParams?: Record<string, string>
@@ -246,5 +248,120 @@ export async function getTopRatedMovies(
     without_genres: '99,10755',
     'vote_count.gte': '10000',
     'primary_release_date.lte': today,
+  });
+}
+
+// TV Series
+export async function getTrendingTv(timeWindow: 'day' | 'week' = 'week') {
+  return tmdbFetch<TmdbPagedResponse<TmdbTvResult>>(
+    `/trending/tv/${timeWindow}`,
+    {
+      language: 'en-US',
+    }
+  );
+}
+
+export async function searchTv(
+  query: string,
+  page = 1,
+  options?: {
+    year?: number;
+  }
+) {
+  return tmdbFetch<TmdbPagedResponse<TmdbTvResult>>('/search/tv', {
+    query,
+    page: String(page),
+    language: 'en-US',
+    include_adult: 'false',
+
+    ...(options?.year
+      ? {
+          first_air_date_year: String(options.year),
+        }
+      : {}),
+  });
+}
+
+export async function discoverTv(filters: TvDiscoverFilters = {}) {
+  return tmdbFetch<TmdbPagedResponse<TmdbTvResult>>('/discover/tv', {
+    page: String(filters.page ?? 1),
+    language: 'en-US',
+    include_adult: 'false',
+    include_null_first_air_dates: 'false',
+
+    sort_by: filters.sortBy ?? 'popularity.desc',
+
+    ...(filters.genre
+      ? {
+          with_genres: String(filters.genre),
+        }
+      : {}),
+
+    ...(filters.yearFrom
+      ? {
+          'first_air_date.gte': `${filters.yearFrom}-01-01`,
+        }
+      : {}),
+
+    ...(filters.yearTo
+      ? {
+          'first_air_date.lte': `${filters.yearTo}-12-31`,
+        }
+      : {}),
+
+    ...(filters.minRating !== undefined
+      ? {
+          'vote_average.gte': String(filters.minRating),
+        }
+      : {}),
+
+    ...(filters.maxRating !== undefined
+      ? {
+          'vote_average.lte': String(filters.maxRating),
+        }
+      : {}),
+
+    ...(filters.minRuntime !== undefined
+      ? {
+          'with_runtime.gte': String(filters.minRuntime),
+        }
+      : {}),
+
+    ...(filters.maxRuntime !== undefined
+      ? {
+          'with_runtime.lte': String(filters.maxRuntime),
+        }
+      : {}),
+
+    ...(filters.language
+      ? {
+          with_original_language: filters.language,
+        }
+      : {}),
+  });
+}
+
+export async function getTvDetails(tvId: number) {
+  return tmdbFetch<TmdbTvBundle>(`/tv/${tvId}`, {
+    language: 'en-US',
+    append_to_response: 'aggregate_credits,videos,similar,recommendations',
+  });
+}
+
+export async function searchMulti(query: string, page = 1) {
+  return tmdbFetch<TmdbPagedResponse<TmdbMultiSearchResult>>('/search/multi', {
+    query,
+    page: String(page),
+    language: 'en-US',
+    include_adult: 'false',
+  });
+}
+
+export async function searchPeople(query: string, page = 1) {
+  return tmdbFetch<TmdbPagedResponse<TmdbPersonResult>>('/search/person', {
+    query,
+    page: String(page),
+    language: 'en-US',
+    include_adult: 'false',
   });
 }

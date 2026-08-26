@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { userMovie } from '@/lib/db/schema';
+import { userMovie, watchHistory } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
 
 export async function addToWatchlist(userId: string, movieId: string) {
@@ -20,21 +20,33 @@ export async function removeFromShelf(userId: string, movieId: string) {
 }
 
 export async function markAsWatched(userId: string, movieId: string) {
-  await db
-    .insert(userMovie)
-    .values({
+  const watchedAt = new Date();
+
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(userMovie)
+      .values({
+        userId,
+        movieId,
+        status: 'watched',
+        watchedAt,
+      })
+      .onConflictDoUpdate({
+        target: [userMovie.userId, userMovie.movieId],
+        set: {
+          status: 'watched',
+          watchedAt,
+          updatedAt: watchedAt,
+        },
+      });
+
+    await tx.insert(watchHistory).values({
+      id: crypto.randomUUID(),
       userId,
       movieId,
-      status: 'watched',
-      watchedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [userMovie.userId, userMovie.movieId],
-      set: {
-        status: 'watched',
-        watchedAt: new Date(),
-      },
+      watchedAt,
     });
+  });
 }
 
 export async function toggleFavorite(userId: string, movieId: string) {

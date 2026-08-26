@@ -291,6 +291,199 @@ declare global {
     page?: number;
     hideOnShelf?: boolean;
   };
+
+  export type MediaType = 'movie' | 'tv';
+
+  export type Media = Movie | TvShow;
+
+  export type MediaListItem =
+    | Pick<Movie, 'id' | 'title' | 'rating' | 'posterPath'>
+    | Pick<TvShow, 'id' | 'name' | 'rating' | 'posterPath'>;
+
+  export type TvShow = {
+    id: number;
+    name: string;
+    originalName: string;
+    overview: string;
+    posterPath: string | null;
+    backdropPath: string | null;
+    firstAirDate: string;
+    lastAirDate?: string | null;
+    genres: string[];
+    originalLanguage: string;
+    rating: number;
+    voteCount: number;
+    numberOfSeasons?: number;
+    numberOfEpisodes?: number;
+    status?: string | null;
+    tagline?: string | null;
+  };
+
+  export type TvCastMember = {
+    id: number;
+    name: string;
+    character: string;
+    profilePath: string | null;
+    order: number;
+  };
+
+  export type TvCreator = {
+    id: number;
+    name: string;
+    profilePath: string | null;
+  };
+
+  export type TvSeason = {
+    id: number;
+    name: string;
+    overview: string;
+    seasonNumber: number;
+    episodeCount: number;
+    airDate: string | null;
+    posterPath: string | null;
+  };
+
+  export type TvShowDetails = TvShow & {
+    cast: TvCastMember[];
+    creators: TvCreator[];
+    seasons: TvSeason[];
+    similar: TvShow[];
+    recommendations: TvShow[];
+    videos: MovieVideo[];
+  };
+
+  export type TmdbTvResult = {
+    id: number;
+    name: string;
+    original_name: string;
+    overview: string | null;
+    poster_path: string | null;
+    backdrop_path: string | null;
+    first_air_date: string;
+    genre_ids?: number[];
+    vote_average: number;
+    vote_count: number;
+    popularity: number;
+    adult: boolean;
+    original_language: string;
+  };
+
+  export type TmdbTvDetails = {
+    id: number;
+    name: string;
+    original_name: string;
+    overview: string | null;
+    tagline: string | null;
+    poster_path: string | null;
+    backdrop_path: string | null;
+    first_air_date: string;
+    last_air_date: string | null;
+    genres: {
+      id: number;
+      name: string;
+    }[];
+    vote_average: number;
+    vote_count: number;
+    popularity: number;
+    adult: boolean;
+    original_language: string;
+    number_of_seasons: number;
+    number_of_episodes: number;
+    status: string | null;
+    seasons: TmdbTvSeason[];
+    created_by: TmdbTvCreator[];
+  };
+
+  export type TmdbTvSeason = {
+    id: number;
+    name: string;
+    overview: string | null;
+    season_number: number;
+    episode_count: number;
+    air_date: string | null;
+    poster_path: string | null;
+  };
+
+  export type TmdbTvCreator = {
+    id: number;
+    name: string;
+    profile_path: string | null;
+  };
+
+  export type TmdbTvAggregateCast = {
+    id: number;
+    name: string;
+    profile_path: string | null;
+    roles?: {
+      character: string;
+      episode_count: number;
+    }[];
+    total_episode_count?: number;
+  };
+
+  export type TmdbTvAggregateCredits = {
+    id: number;
+    cast: TmdbTvAggregateCast[];
+  };
+
+  export type TvDiscoverFilters = {
+    genre?: number;
+    yearFrom?: number;
+    yearTo?: number;
+    minRating?: number;
+    maxRating?: number;
+    minRuntime?: number;
+    maxRuntime?: number;
+    language?: string;
+    sortBy?: TvDiscoverSort;
+    page?: number;
+  };
+
+  export type TmdbTvBundle = TmdbTvDetails & {
+    aggregate_credits?: TmdbTvAggregateCredits;
+    videos?: TmdbVideosResponse;
+    similar?: TmdbPagedResponse<TmdbTvResult>;
+    recommendations?: TmdbPagedResponse<TmdbTvResult>;
+  };
+
+  export interface TvRepository {
+    getById(id: number): Promise<TvShowDetails | null>;
+    getPopular(): Promise<TvShow[]>;
+    getTrending(): Promise<TvShow[]>;
+    getTopRated(): Promise<TvShow[]>;
+    search(query: string): Promise<TvShow[]>;
+    discover(filters: TvDiscoverFilters): Promise<{
+      shows: TvShow[];
+      page: number;
+      totalPages: number;
+      totalResults: number;
+    }>;
+  }
+
+  export type TmdbMultiSearchResult =
+    | (TmdbMovieResult & {
+        media_type: 'movie';
+      })
+    | (TmdbTvResult & {
+        media_type: 'tv';
+      })
+    | {
+        id: number;
+        name: string;
+        original_name?: string;
+        profile_path: string | null;
+        known_for_department: string | null;
+        media_type: 'person';
+      };
+
+  export type TmdbPersonResult = {
+    id: number;
+    name: string;
+    original_name?: string;
+    profile_path: string | null;
+    known_for_department: string | null;
+    popularity: number;
+  };
 }
 
 export {};

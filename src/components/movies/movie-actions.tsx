@@ -98,7 +98,8 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:opacity-50"
           >
             <Check className="size-4" />
-            Mark as watched
+
+            {state.status === 'watched' ? 'Watched again' : 'Mark as watched'}
           </button>
         ) : null}
 
