@@ -4,13 +4,14 @@ import {
   completeTasteOnboarding,
   skipTasteOnboarding,
 } from '@/lib/actions/onboarding.action';
+import { Media } from '@/lib/media';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 import RatingStep from './rating-step';
 import SelectionStep from './selection-step';
 
 type TasteOnboardingProps = {
-  movies: Movie[];
+  movies: Media[];
 };
 
 type Step = 'selection' | 'rating';
@@ -24,7 +25,7 @@ const TasteOnboarding = ({ movies }: TasteOnboardingProps) => {
   const [isPending, startTransition] = useTransition();
 
   const selectedMovies = useMemo(
-    () => movies.filter((movie) => selectedIds.includes(movie.id)),
+    () => movies.filter((movie) => selectedIds.includes(movie.tmdbId)),
     [movies, selectedIds]
   );
 

@@ -1,8 +1,9 @@
 import { tmdbImage } from '@/lib/tmdb/images';
+import { MediaRecommendation } from '@/types';
 import Link from 'next/link';
 
 type RecommendationSectionProps = {
-  recommendations: MovieRecommendation[];
+  recommendations: MediaRecommendation[];
   title?: string;
   description?: string;
 };
@@ -33,17 +34,21 @@ const RecommendationSection = ({
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {recommendations.map(({ movie, reason }) => {
-          const poster = tmdbImage(movie.posterPath, 'w500');
+        {recommendations.map(({ media, reason }) => {
+          const poster = tmdbImage(media.posterPath, 'w500');
 
           return (
-            <Link key={movie.id} href={`/movie/${movie.id}`} className="group">
+            <Link
+              key={media.tmdbId}
+              href={`/movie/${media.tmdbId}`}
+              className="group"
+            >
               <article>
                 <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
                   {poster && (
                     <img
                       src={poster}
-                      alt={`${movie.title} poster`}
+                      alt={`${media.title} poster`}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                     />
@@ -53,7 +58,7 @@ const RecommendationSection = ({
                 </div>
 
                 <h3 className="mt-3 line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">
-                  {movie.title}
+                  {media.title}
                 </h3>
 
                 <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">

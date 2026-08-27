@@ -1,12 +1,13 @@
 'use client';
 
+import { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
 type MovieCarouselProps = {
-  movies: Movie[];
+  movies: Media[];
   title: string;
   eyebrow?: string;
   description?: string;
@@ -106,8 +107,8 @@ const MovieCarousel = ({
 
           return (
             <Link
-              key={movie.id}
-              href={`/movie/${movie.id}`}
+              key={movie.tmdbId}
+              href={`/movie/${movie.tmdbId}`}
               className="group w-[155px] shrink-0 snap-start sm:w-[180px] lg:w-[200px]"
             >
               <article>

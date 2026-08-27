@@ -1,9 +1,10 @@
+import { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
 
 type RankedMovieListProps = {
-  movies: Movie[];
+  movies: Media[];
 };
 
 const RankedMovieList = ({ movies }: RankedMovieListProps) => {
@@ -40,8 +41,8 @@ const RankedMovieList = ({ movies }: RankedMovieListProps) => {
 
             return (
               <Link
-                key={movie.id}
-                href={`/movie/${movie.id}`}
+                key={movie.tmdbId}
+                href={`/movie/${movie.tmdbId}`}
                 className="group"
               >
                 <article className="relative isolate min-h-[240px] overflow-hidden rounded-2xl border border-border/60 bg-surface">

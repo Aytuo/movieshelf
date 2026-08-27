@@ -1,3 +1,4 @@
+import { TasteProfile } from '@/types';
 import Link from 'next/link';
 
 type TastePreviewProps = {

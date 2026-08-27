@@ -1,5 +1,7 @@
+import { MediaVideo } from '@/lib/media';
+
 type MovieVideoProps = {
-  video: MovieVideo | null;
+  video: MediaVideo | null;
 };
 
 const MovieVideo = ({ video }: MovieVideoProps) => {

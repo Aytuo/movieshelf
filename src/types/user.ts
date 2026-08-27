@@ -11,3 +11,10 @@ export type User = {
   name: string;
   image?: string | null;
 };
+
+export type UserStats = {
+  moviesRated: number;
+  moviesWatched: number;
+  watchlistCount: number;
+  favoriteCount: number;
+};

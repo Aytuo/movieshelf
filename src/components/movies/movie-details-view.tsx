@@ -1,11 +1,12 @@
+import { MovieDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Star } from 'lucide-react';
 import ReviewCard from '../reviews/review-card';
 import ReviewForm from '../reviews/review-form';
-import MovieVideo from './moive-video';
 import MovieActions from './movie-actions';
 import MovieCast from './movie-cast';
 import MovieRecommendations from './movie-recomendations';
+import MovieVideo from './movie-video';
 
 type MovieDetailsViewProps = {
   movie: MovieDetails;
@@ -117,10 +118,10 @@ const MovieDetailsView = ({
               <div className="mt-5 flex flex-wrap gap-2">
                 {movie.genres.map((genre) => (
                   <span
-                    key={genre}
+                    key={genre.id}
                     className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground"
                   >
-                    {genre}
+                    {genre.name}
                   </span>
                 ))}
               </div>
@@ -181,7 +182,7 @@ const MovieDetailsView = ({
               </div>
 
               <div className="mt-7">
-                <MovieActions movieId={movie.id} initialState={userMovie} />
+                <MovieActions movieId={movie.tmdbId} initialState={userMovie} />
               </div>
 
               {userMovie.status === 'watched' && (
@@ -233,7 +234,7 @@ const MovieDetailsView = ({
             <div className="rounded-2xl p-5 surface sm:p-7">
               {userMovie.status === 'watched' ? (
                 <ReviewForm
-                  movieId={movie.id}
+                  movieId={movie.tmdbId}
                   initialValues={
                     existingReview
                       ? {

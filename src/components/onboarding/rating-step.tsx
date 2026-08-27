@@ -1,3 +1,4 @@
+import { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 
 const RatingStep = ({
@@ -9,7 +10,7 @@ const RatingStep = ({
   error,
   isPending,
 }: {
-  movies: Movie[];
+  movies: Media[];
   ratings: Record<number, number>;
   onRating: (movieId: number, rating: number) => void;
   onBack: () => void;
@@ -50,11 +51,11 @@ const RatingStep = ({
             {movies.map((movie) => {
               const poster = tmdbImage(movie.posterPath, 'w185');
 
-              const currentRating = ratings[movie.id] ?? 8;
+              const currentRating = ratings[movie.tmdbId] ?? 8;
 
               return (
                 <div
-                  key={movie.id}
+                  key={movie.tmdbId}
                   className="flex items-center gap-4 rounded-xl p-3 surface sm:p-4"
                 >
                   <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-surface-hover">
@@ -86,7 +87,7 @@ const RatingStep = ({
                           key={value}
                           type="button"
                           aria-label={`Rate ${value} out of 10`}
-                          onClick={() => onRating(movie.id, value)}
+                          onClick={() => onRating(movie.tmdbId, value)}
                           className={[
                             'flex size-7 items-center justify-center rounded-md text-[10px] font-semibold transition-colors',
                             currentRating === value

@@ -1,16 +1,17 @@
+import { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Star } from 'lucide-react';
 import Link from 'next/link';
 
 type MovieCardProps = {
-  movie: Movie;
+  movie: Media;
 };
 
 const MovieCard = ({ movie }: MovieCardProps) => {
   const poster = tmdbImage(movie.posterPath, 'w500');
 
   return (
-    <Link href={`/movie/${movie.id}`} className="group block">
+    <Link href={`/movie/${movie.tmdbId}`} className="group block">
       <article>
         <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
           {poster ? (
@@ -40,14 +41,18 @@ const MovieCard = ({ movie }: MovieCardProps) => {
           </h3>
 
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{new Date(movie.releaseDate).getFullYear()}</span>
+            <span>
+              {movie.releaseDate
+                ? new Date(movie.releaseDate).getFullYear()
+                : '—'}
+            </span>
 
-            {movie.genres[0] && (
+            {/* {movie.genres[0] && (
               <>
                 <span className="size-0.5 rounded-full bg-muted-foreground/50" />
-                <span>{movie.genres[0]}</span>
+                <span>{movie.genres[0].name}</span>
               </>
-            )}
+            )} */}
           </div>
         </div>
       </article>

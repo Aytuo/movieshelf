@@ -1,6 +1,7 @@
-import { TMDB_MOVIES_GENRES } from '../tmdb/genres';
+import type { Movie } from '@/lib/media';
+import type { MoviesDiscoverFilters } from '@/types';
 
-function getYear(releaseDate: string) {
+function getYear(releaseDate: string | null) {
   if (!releaseDate) {
     return null;
   }
@@ -10,15 +11,8 @@ function getYear(releaseDate: string) {
   return Number.isFinite(year) ? year : null;
 }
 
-export function filterMovies(movies: Movie[], filters: DiscoverFilters) {
+export function filterMovies(movies: Movie[], filters: MoviesDiscoverFilters) {
   return movies.filter((movie) => {
-    if (
-      filters.genre &&
-      !movie.genres.includes(TMDB_MOVIES_GENRES[filters.genre])
-    ) {
-      return false;
-    }
-
     const year = getYear(movie.releaseDate);
 
     if (filters.yearFrom && (!year || year < filters.yearFrom)) {
@@ -40,13 +34,6 @@ export function filterMovies(movies: Movie[], filters: DiscoverFilters) {
     if (filters.language && movie.originalLanguage !== filters.language) {
       return false;
     }
-
-    /*
-     * Runtime deliberately isn't handled here.
-     * TMDB search results don't contain runtime.
-     * Discover applies runtime filtering directly
-     * through the TMDB API.
-     */
 
     return true;
   });

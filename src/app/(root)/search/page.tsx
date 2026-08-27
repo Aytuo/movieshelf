@@ -128,8 +128,8 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
 
                     return (
                       <Link
-                        key={movie.id}
-                        href={`/movie/${movie.id}`}
+                        key={movie.tmdbId}
+                        href={`/movie/${movie.tmdbId}`}
                         className="group"
                       >
                         <article>

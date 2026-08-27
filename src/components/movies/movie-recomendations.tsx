@@ -1,7 +1,8 @@
+import { Media } from '@/lib/media';
 import MovieCard from './movie-card';
 
 type MovieRecommendationsProps = {
-  movies: Movie[];
+  movies: Media[];
   title?: string;
   eyebrow?: string;
 };
@@ -27,7 +28,7 @@ const MovieRecommendations = ({
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {movies.slice(0, 6).map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
+          <MovieCard key={movie.tmdbId} movie={movie} />
         ))}
       </div>
     </section>

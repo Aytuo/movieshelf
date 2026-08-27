@@ -1,3 +1,4 @@
+import { Media } from '@/lib/media';
 import Link from 'next/link';
 import OnboardingMovieCard from './onboarding-movie-card';
 
@@ -10,7 +11,7 @@ const SelectionStep = ({
   error,
   isPending,
 }: {
-  movies: Movie[];
+  movies: Media[];
   selectedIds: number[];
   onToggle: (movieId: number) => void;
   onContinue: () => void;
@@ -62,9 +63,9 @@ const SelectionStep = ({
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {movies.map((movie) => (
             <OnboardingMovieCard
-              key={movie.id}
+              key={movie.tmdbId}
               movie={movie}
-              selected={selectedIds.includes(movie.id)}
+              selected={selectedIds.includes(movie.tmdbId)}
               onToggle={onToggle}
             />
           ))}

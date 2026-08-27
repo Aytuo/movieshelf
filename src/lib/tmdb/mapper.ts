@@ -1,7 +1,33 @@
-import type { Media } from '@/lib/media/types';
-import type { TmdbMovieResult, TmdbTvResult } from './types';
+import type {
+  Media,
+  MediaCastMember,
+  MediaCrewMember,
+  MediaGenre,
+  MediaVideo,
+  Movie,
+  MovieDetails,
+  TvCreator,
+  TvDetails,
+  TvSeason,
+  TvShow,
+} from '@/lib/media';
 
-function mapMovieResult(movie: TmdbMovieResult): Media {
+import type {
+  TmdbCreditCast,
+  TmdbCreditCrew,
+  TmdbMovieBundle,
+  TmdbMovieResult,
+  TmdbTvAggregateCast,
+  TmdbTvBundle,
+  TmdbTvResult,
+  TmdbVideo,
+} from './types';
+
+/* ========================================================================== */
+/*                              BASIC MEDIA                                   */
+/* ========================================================================== */
+
+function mapMovieResult(movie: TmdbMovieResult): Movie {
   return {
     tmdbId: movie.id,
     type: 'movie',
@@ -17,7 +43,7 @@ function mapMovieResult(movie: TmdbMovieResult): Media {
   };
 }
 
-function mapTvResult(tv: TmdbTvResult): Media {
+function mapTvResult(tv: TmdbTvResult): TvShow {
   return {
     tmdbId: tv.id,
     type: 'tv',
@@ -33,9 +59,11 @@ function mapTvResult(tv: TmdbTvResult): Media {
   };
 }
 
-// TODO:
+/* ========================================================================== */
+/*                              MOVIE DETAILS                                 */
+/* ========================================================================== */
 
-function mapCastMember(person: TmdbCreditCast): MovieCastMember {
+function mapMovieCastMember(person: TmdbCreditCast): MediaCastMember {
   return {
     id: person.id,
     name: person.name,
@@ -45,7 +73,7 @@ function mapCastMember(person: TmdbCreditCast): MovieCastMember {
   };
 }
 
-function mapCrewMember(person: TmdbCreditCrew): MovieCrewMember {
+function mapCrewMember(person: TmdbCreditCrew): MediaCrewMember {
   return {
     id: person.id,
     name: person.name,
@@ -55,7 +83,11 @@ function mapCrewMember(person: TmdbCreditCrew): MovieCrewMember {
   };
 }
 
-function mapVideo(video: TmdbVideo): MovieVideo {
+/* ========================================================================== */
+/*                               VIDEO                                        */
+/* ========================================================================== */
+
+function mapVideo(video: TmdbVideo): MediaVideo {
   return {
     id: video.id,
     key: video.key,
@@ -66,27 +98,11 @@ function mapVideo(video: TmdbVideo): MovieVideo {
   };
 }
 
-export function mapTmdbMovie(movie: TmdbMovieResult): Movie {
-  return mapMovieResult(movie);
-}
+/* ========================================================================== */
+/*                                TV DETAILS                                  */
+/* ========================================================================== */
 
-export function mapTmdbMovieDetails(movie: TmdbMovieBundle): MovieDetails {
-  return {
-    ...mapMovieResult(movie),
-    tagline: movie.tagline ?? undefined,
-    runtime: movie.runtime,
-    genres: movie.genres.map((genre) => genre.name),
-    cast: (movie.credits?.cast ?? []).slice(0, 12).map(mapCastMember),
-    crew: (movie.credits?.crew ?? []).map(mapCrewMember),
-    videos: (movie.videos?.results ?? []).map(mapVideo),
-    similar: (movie.similar?.results ?? []).slice(0, 6).map(mapMovieResult),
-    recommendations: (movie.recommendations?.results ?? [])
-      .slice(0, 6)
-      .map(mapMovieResult),
-  };
-}
-
-function mapTvCastMember(person: TmdbTvAggregateCast): TvCastMember {
+function mapTvCastMember(person: TmdbTvAggregateCast): MediaCastMember {
   return {
     id: person.id,
     name: person.name,
@@ -96,48 +112,88 @@ function mapTvCastMember(person: TmdbTvAggregateCast): TvCastMember {
   };
 }
 
-export function mapTmdbTv(tv: TmdbTvResult): TvShow {
+function mapGenre(genre: { id: number; name: string }): MediaGenre {
+  return {
+    id: genre.id,
+    name: genre.name,
+  };
+}
+
+function mapTvCreator(creator: {
+  id: number;
+  name: string;
+  profile_path: string | null;
+}): TvCreator {
+  return {
+    id: creator.id,
+    name: creator.name,
+    profilePath: creator.profile_path,
+  };
+}
+
+function mapTvSeason(season: {
+  id: number;
+  name: string;
+  overview: string | null;
+  season_number: number;
+  episode_count: number;
+  air_date: string | null;
+  poster_path: string | null;
+}): TvSeason {
+  return {
+    id: season.id,
+    name: season.name,
+    overview: season.overview ?? '',
+    seasonNumber: season.season_number,
+    episodeCount: season.episode_count,
+    airDate: season.air_date,
+    posterPath: season.poster_path,
+  };
+}
+
+/* ========================================================================== */
+/*                              PUBLIC MAPPERS                                 */
+/* ========================================================================== */
+
+export function mapTmdbMovie(movie: TmdbMovieResult): Media {
+  return mapMovieResult(movie);
+}
+
+export function mapTmdbTv(tv: TmdbTvResult): Media {
   return mapTvResult(tv);
 }
 
-export function mapTmdbTvDetails(tv: TmdbTvBundle): TvShowDetails {
+export function mapTmdbMovieDetails(movie: TmdbMovieBundle): MovieDetails {
   return {
-    ...mapTvResult({
-      id: tv.id,
-      name: tv.name,
-      original_name: tv.original_name,
-      overview: tv.overview,
-      poster_path: tv.poster_path,
-      backdrop_path: tv.backdrop_path,
-      first_air_date: tv.first_air_date,
-      genre_ids: tv.genres.map((genre) => genre.id),
-      vote_average: tv.vote_average,
-      vote_count: tv.vote_count,
-      popularity: tv.popularity,
-      adult: tv.adult,
-      original_language: tv.original_language,
-    }),
+    ...mapMovieResult(movie),
+    type: 'movie',
+    tagline: movie.tagline,
+    runtime: movie.runtime,
+    genres: movie.genres.map(mapGenre),
+    cast: (movie.credits?.cast ?? []).slice(0, 12).map(mapMovieCastMember),
+    crew: (movie.credits?.crew ?? []).map(mapCrewMember),
+    videos: (movie.videos?.results ?? []).map(mapVideo),
+    similar: (movie.similar?.results ?? []).slice(0, 6).map(mapMovieResult),
+    recommendations: (movie.recommendations?.results ?? [])
+      .slice(0, 6)
+      .map(mapMovieResult),
+  };
+}
+
+export function mapTmdbTvDetails(tv: TmdbTvBundle): TvDetails {
+  return {
+    ...mapTvResult(tv),
+    type: 'tv',
+    tagline: tv.tagline,
     lastAirDate: tv.last_air_date,
     numberOfSeasons: tv.number_of_seasons,
     numberOfEpisodes: tv.number_of_episodes,
     status: tv.status,
-    tagline: tv.tagline,
-    genres: tv.genres.map((genre) => genre.name),
-    creators: tv.created_by.map((creator) => ({
-      id: creator.id,
-      name: creator.name,
-      profilePath: creator.profile_path,
-    })),
-    seasons: tv.seasons.map((season) => ({
-      id: season.id,
-      name: season.name,
-      overview: season.overview ?? '',
-      seasonNumber: season.season_number,
-      episodeCount: season.episode_count,
-      airDate: season.air_date,
-      posterPath: season.poster_path,
-    })),
+    genres: tv.genres.map(mapGenre),
+    creators: tv.created_by.map(mapTvCreator),
+    seasons: tv.seasons.map(mapTvSeason),
     cast: (tv.aggregate_credits?.cast ?? []).slice(0, 12).map(mapTvCastMember),
+    crew: [],
     videos: (tv.videos?.results ?? []).map(mapVideo),
     similar: (tv.similar?.results ?? []).slice(0, 6).map(mapTvResult),
     recommendations: (tv.recommendations?.results ?? [])

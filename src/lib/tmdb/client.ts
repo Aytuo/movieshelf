@@ -1,3 +1,15 @@
+import { MoviesDiscoverFilters, TvDiscoverFilters } from '@/types';
+import {
+  TmdbMovieBundle,
+  TmdbMovieResult,
+  TmdbMultiSearchResult,
+  TmdbPagedResponse,
+  TmdbPersonResult,
+  TmdbTrendingResponse,
+  TmdbTvBundle,
+  TmdbTvResult,
+} from './types';
+
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 const token = process.env.TMDB_API_READ_ACCESS_TOKEN;
@@ -66,7 +78,7 @@ export async function searchMovies(
   });
 }
 
-export async function discoverMovies(filters: DiscoverFilters = {}) {
+export async function discoverMovies(filters: MoviesDiscoverFilters = {}) {
   return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
     page: String(filters.page ?? 1),
     language: 'en-US',

@@ -1,7 +1,8 @@
+import { MediaCastMember } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 
 type MovieCastProps = {
-  cast: MovieCastMember[];
+  cast: MediaCastMember[];
 };
 
 const MovieCast = ({ cast }: MovieCastProps) => {

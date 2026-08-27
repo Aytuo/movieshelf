@@ -1,4 +1,4 @@
-import TasteProfile from '@/components/profile/taste-profile';
+import Taste from '@/components/profile/taste';
 import { db } from '@/lib/db';
 import { profile } from '@/lib/db/schema';
 import { getTasteProfile } from '@/lib/services/taste-service';
@@ -43,7 +43,7 @@ const TastePage = async ({ params }: TastePageProps) => {
         </p>
       </div>
 
-      <TasteProfile taste={taste} />
+      <Taste taste={taste} />
     </main>
   );
 };

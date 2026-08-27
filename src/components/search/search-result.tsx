@@ -1,3 +1,4 @@
+import { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -6,7 +7,7 @@ const SearchResults = ({
   results,
   onResultClick,
 }: {
-  results: Movie[];
+  results: Media[];
   onResultClick: () => void;
 }) => {
   return (
@@ -16,8 +17,8 @@ const SearchResults = ({
 
         return (
           <Link
-            key={movie.id}
-            href={`/movie/${movie.id}`}
+            key={movie.tmdbId}
+            href={`/movie/${movie.tmdbId}`}
             onClick={onResultClick}
             className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-hover"
           >

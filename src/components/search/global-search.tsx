@@ -1,6 +1,7 @@
 'use client';
 
 import { useDebounce } from '@/hooks/use-debounce';
+import { Media } from '@/lib/media';
 import { ArrowRight, Command, Loader2, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
@@ -11,7 +12,7 @@ import SearchResults from './search-result';
 const GlobalSearch = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Movie[]>([]);
+  const [results, setResults] = useState<Media[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +91,7 @@ const GlobalSearch = () => {
         }
 
         const data = (await response.json()) as {
-          movies: Movie[];
+          movies: Media[];
           totalResults: number;
         };
 

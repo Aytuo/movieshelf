@@ -1,9 +1,10 @@
 'use client';
 
+import { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 
 type OnboardingMovieCardProps = {
-  movie: Movie;
+  movie: Media;
   selected: boolean;
   onToggle: (movieId: number) => void;
 };
@@ -18,7 +19,7 @@ const OnboardingMovieCard = ({
   return (
     <button
       type="button"
-      onClick={() => onToggle(movie.id)}
+      onClick={() => onToggle(movie.tmdbId)}
       aria-pressed={selected}
       className={[
         'group relative overflow-hidden rounded-xl text-left transition-all duration-200',

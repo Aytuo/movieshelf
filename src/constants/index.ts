@@ -6,6 +6,9 @@
  * the same data shapes and replace these sources with real responses.
  */
 
+import { MediaListItem, MovieDetails } from '@/lib/media';
+import { ActivityItem, NavLink, UserStats } from '@/types';
+
 /* -------------------------------------------------------------------------- */
 /* Site                                                                       */
 /* -------------------------------------------------------------------------- */
@@ -74,9 +77,10 @@ export const HOME_SECTION_TITLES = {
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
-export const MOCK_MOVIES: Movie[] = [
+export const MOCK_MOVIES: MovieDetails[] = [
   {
-    id: 872585,
+    tmdbId: 872585,
+    type: 'movie',
     title: 'Oppenheimer',
     originalTitle: 'Oppenheimer',
     overview:
@@ -86,13 +90,22 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/rLb2cwF3Pazuxaj0sRXQ037tGI1.jpg`,
     releaseDate: '2023-07-21',
     runtime: 180,
-    genres: ['Drama', 'History'],
+    originalLanguage: 'en',
     rating: 8.1,
     voteCount: 9000,
-    certification: 'R',
+    genres: [
+      { id: 18, name: 'Drama' },
+      { id: 36, name: 'History' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 693134,
+    tmdbId: 693134,
+    type: 'movie',
     title: 'Dune: Part Two',
     originalTitle: 'Dune: Part Two',
     overview:
@@ -102,27 +115,49 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg`,
     releaseDate: '2024-03-01',
     runtime: 166,
-    genres: ['Science Fiction', 'Adventure', 'Drama'],
+    originalLanguage: 'en',
     rating: 8.6,
     voteCount: 12000,
+    genres: [
+      { id: 878, name: 'Science Fiction' },
+      { id: 12, name: 'Adventure' },
+      { id: 18, name: 'Drama' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 569094,
+    tmdbId: 569094,
+    type: 'movie',
     title: 'Spider-Man: Across the Spider-Verse',
     originalTitle: 'Spider-Man: Across the Spider-Verse',
     overview:
       'Miles Morales catapults across the Multiverse and encounters a team of Spider-People charged with protecting its very existence.',
+    tagline: 'With great power comes great responsibility.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg`,
     releaseDate: '2023-06-02',
     runtime: 140,
-    genres: ['Animation', 'Action', 'Adventure'],
+    originalLanguage: 'en',
     rating: 8.3,
     voteCount: 7000,
-    certification: 'PG',
+    genres: [
+      { id: 16, name: 'Animation' },
+      { id: 28, name: 'Action' },
+      { id: 12, name: 'Adventure' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 155,
+    tmdbId: 155,
+    type: 'movie',
     title: 'The Dark Knight',
     originalTitle: 'The Dark Knight',
     overview:
@@ -132,13 +167,24 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg`,
     releaseDate: '2008-07-16',
     runtime: 152,
-    genres: ['Drama', 'Action', 'Crime', 'Thriller'],
+    originalLanguage: 'en',
     rating: 9.0,
     voteCount: 33000,
-    certification: 'PG-13',
+    genres: [
+      { id: 18, name: 'Drama' },
+      { id: 28, name: 'Action' },
+      { id: 80, name: 'Crime' },
+      { id: 53, name: 'Thriller' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 157336,
+    tmdbId: 157336,
+    type: 'movie',
     title: 'Interstellar',
     originalTitle: 'Interstellar',
     overview:
@@ -148,28 +194,49 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/xJHokMbljvjADYdit5fK5cNTXkd.jpg`,
     releaseDate: '2014-11-07',
     runtime: 169,
-    genres: ['Adventure', 'Drama', 'Science Fiction'],
+    originalLanguage: 'en',
     rating: 8.7,
     voteCount: 35000,
-    certification: 'PG-13',
+    genres: [
+      { id: 12, name: 'Adventure' },
+      { id: 18, name: 'Drama' },
+      { id: 878, name: 'Science Fiction' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 496243,
+    tmdbId: 496243,
+    type: 'movie',
     title: 'Parasite',
-    originalTitle: 'Parasite',
+    originalTitle: '기생충',
     overview:
       'A struggling family gradually becomes entangled with a wealthy household in an increasingly unpredictable way.',
+    tagline: 'Act like you own the place.',
     posterPath: `${TMDB_IMAGE_BASE}/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg`,
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/TU9NIjwzjoKPwQHoHshkBcQ0S.jpg`,
     releaseDate: '2019-05-30',
     runtime: 133,
-    genres: ['Comedy', 'Thriller', 'Drama'],
+    originalLanguage: 'ko',
     rating: 8.5,
     voteCount: 19000,
-    certification: 'R',
+    genres: [
+      { id: 35, name: 'Comedy' },
+      { id: 53, name: 'Thriller' },
+      { id: 18, name: 'Drama' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 238,
+    tmdbId: 238,
+    type: 'movie',
     title: 'The Godfather',
     originalTitle: 'The Godfather',
     overview:
@@ -179,13 +246,22 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/tmU7GeKVybMWFButWEGl2M4GeiP.jpg`,
     releaseDate: '1972-03-14',
     runtime: 175,
-    genres: ['Drama', 'Crime'],
+    originalLanguage: 'en',
     rating: 9.2,
     voteCount: 20000,
-    certification: 'R',
+    genres: [
+      { id: 18, name: 'Drama' },
+      { id: 80, name: 'Crime' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 27205,
+    tmdbId: 27205,
+    type: 'movie',
     title: 'Inception',
     originalTitle: 'Inception',
     overview:
@@ -195,13 +271,23 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/s3TBrRGB1iav7gFOCNx3H31MoES.jpg`,
     releaseDate: '2010-07-15',
     runtime: 148,
-    genres: ['Action', 'Science Fiction', 'Adventure'],
+    originalLanguage: 'en',
     rating: 8.8,
     voteCount: 35000,
-    certification: 'PG-13',
+    genres: [
+      { id: 28, name: 'Action' },
+      { id: 878, name: 'Science Fiction' },
+      { id: 12, name: 'Adventure' },
+    ],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
   {
-    id: 550,
+    tmdbId: 550,
+    type: 'movie',
     title: 'Fight Club',
     originalTitle: 'Fight Club',
     overview:
@@ -211,10 +297,15 @@ export const MOCK_MOVIES: Movie[] = [
     backdropPath: `${TMDB_IMAGE_BASE}/w1280/hZkgoQYus5vegHoetLkCJzb17zJ.jpg`,
     releaseDate: '1999-10-15',
     runtime: 139,
-    genres: ['Drama'],
+    originalLanguage: 'en',
     rating: 8.8,
     voteCount: 28000,
-    certification: 'R',
+    genres: [{ id: 18, name: 'Drama' }],
+    cast: [],
+    crew: [],
+    videos: [],
+    similar: [],
+    recommendations: [],
   },
 ];
 
@@ -260,14 +351,14 @@ export const MOCK_USER_STATS: UserStats = {
   favoriteCount: 16,
 };
 
-export const MOCK_WATCHLIST: MovieListItem[] = [
+export const MOCK_WATCHLIST: MediaListItem[] = [
   MOCK_MOVIES[0],
   MOCK_MOVIES[6],
   MOCK_MOVIES[2],
   MOCK_MOVIES[7],
 ];
 
-export const MOCK_FAVORITES: MovieListItem[] = [
+export const MOCK_FAVORITES: MediaListItem[] = [
   MOCK_MOVIES[3],
   MOCK_MOVIES[4],
   MOCK_MOVIES[5],

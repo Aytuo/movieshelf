@@ -1,4 +1,5 @@
 import { getTasteSummary } from '@/lib/taste/taste-summary';
+import { TasteProfile } from '@/types';
 import { Star } from 'lucide-react';
 
 type TasteProfileProps = {
@@ -28,7 +29,7 @@ function Stat({
   );
 }
 
-const TasteProfile = ({ taste }: TasteProfileProps) => {
+const Taste = ({ taste }: TasteProfileProps) => {
   const summary = getTasteSummary(taste);
 
   const maxRatingCount = Math.max(
@@ -224,4 +225,4 @@ const TasteProfile = ({ taste }: TasteProfileProps) => {
   );
 };
 
-export default TasteProfile;
+export default Taste;

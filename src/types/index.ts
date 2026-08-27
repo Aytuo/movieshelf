@@ -1,3 +1,4 @@
+export * from './activity';
 export * from './discover';
 export * from './navigation';
 export * from './profile';
