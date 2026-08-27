@@ -7,6 +7,8 @@ import {
   searchMovies,
 } from '@/lib/tmdb/client';
 import { mapTmdbMovie, mapTmdbMovieDetails } from '@/lib/tmdb/mapper';
+import { Movie } from '../media';
+import type { MovieRepository } from './types';
 
 export const tmdbMovieRepository: MovieRepository = {
   async getById(id) {
@@ -61,7 +63,6 @@ export const tmdbMovieRepository: MovieRepository = {
     const uniqueMovies = new Map<number, Movie>();
 
     let tmdbPage = 1;
-
     let totalResults = 0;
     let totalPages = 1;
 
@@ -76,13 +77,12 @@ export const tmdbMovieRepository: MovieRepository = {
       });
 
       totalResults = response.total_results;
-
       totalPages = response.total_pages;
 
       for (const result of response.results) {
         const mapped = mapTmdbMovie(result);
 
-        uniqueMovies.set(mapped.id, mapped);
+        uniqueMovies.set(mapped.tmdbId, mapped);
       }
 
       if (tmdbPage >= totalPages) {
@@ -92,24 +92,10 @@ export const tmdbMovieRepository: MovieRepository = {
       tmdbPage += 1;
     }
 
-    const allMovies = Array.from(uniqueMovies.values());
-
     return {
-      /*
-       * IMPORTANT:
-       * Return the candidate pool here.
-       * Do NOT slice to the requested app page.
-       *
-       * discoverForUser() owns application-level
-       * pagination because it may need to remove
-       * movies already on the user's shelf first.
-       */
-      movies: allMovies,
-
+      movies: Array.from(uniqueMovies.values()),
       page: appPage,
-
       totalResults,
-
       totalPages: Math.max(1, Math.ceil(totalResults / DISCOVER_PAGE_SIZE)),
     };
   },

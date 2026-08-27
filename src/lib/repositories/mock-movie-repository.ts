@@ -1,9 +1,9 @@
 import { MOCK_MOVIES } from '@/constants';
-import { TMDB_MOVIES_GENRES } from '../tmdb/genres';
+import { MovieRepository } from './types';
 
 export const mockMovieRepository: MovieRepository = {
   async getById(id) {
-    const movie = MOCK_MOVIES.find((movie) => movie.id === id);
+    const movie = MOCK_MOVIES.find((movie) => movie.tmdbId === id);
 
     if (!movie) {
       return null;
@@ -27,6 +27,14 @@ export const mockMovieRepository: MovieRepository = {
     return MOCK_MOVIES.slice(0, 5);
   },
 
+  async getTopPicks() {
+    return MOCK_MOVIES;
+  },
+
+  async getUpcoming() {
+    return MOCK_MOVIES;
+  },
+
   async search(query) {
     const normalized = query.trim().toLowerCase();
 
@@ -43,13 +51,33 @@ export const mockMovieRepository: MovieRepository = {
     let movies = [...MOCK_MOVIES];
 
     if (filters.genre) {
-      const genreName = Object.entries(TMDB_MOVIES_GENRES).find(
-        ([id]) => Number(id) === filters.genre
-      )?.[1];
+      movies = movies.filter((movie) =>
+        movie.genres.some((genre) => genre.id === filters.genre)
+      );
+    }
 
-      if (genreName) {
-        movies = movies.filter((movie) => movie.genres.includes(genreName));
-      }
+    if (filters.yearFrom) {
+      movies = movies.filter((movie) => {
+        if (!movie.releaseDate) {
+          return false;
+        }
+
+        const year = Number(movie.releaseDate.slice(0, 4));
+
+        return year >= filters.yearFrom!;
+      });
+    }
+
+    if (filters.yearTo) {
+      movies = movies.filter((movie) => {
+        if (!movie.releaseDate) {
+          return false;
+        }
+
+        const year = Number(movie.releaseDate.slice(0, 4));
+
+        return year <= filters.yearTo!;
+      });
     }
 
     if (filters.minRating !== undefined) {
@@ -60,11 +88,17 @@ export const mockMovieRepository: MovieRepository = {
       movies = movies.filter((movie) => movie.rating <= filters.maxRating!);
     }
 
+    if (filters.language) {
+      movies = movies.filter(
+        (movie) => movie.originalLanguage === filters.language
+      );
+    }
+
     return {
       movies,
-      page: 1,
-      totalPages: 1,
+      page: filters.page ?? 1,
       totalResults: movies.length,
+      totalPages: 1,
     };
   },
 };

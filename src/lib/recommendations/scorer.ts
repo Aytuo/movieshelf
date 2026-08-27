@@ -1,3 +1,5 @@
+import { MediaRecommendation } from '@/types';
+import { Movie } from '../media';
 import type { RecommendationCandidate } from './candidate-generator';
 
 type RatedMovie = {
@@ -77,7 +79,7 @@ export function scoreCandidate({
   candidate: RecommendationCandidate;
   signals: TasteSignals;
   sourceMovieTitle?: string;
-}): MovieRecommendation {
+}): MediaRecommendation {
   const movie = candidate.movie;
 
   /* ------------------------------------------------------------------------ */

@@ -4,8 +4,14 @@
 
 export type MediaType = 'movie' | 'tv';
 
+export interface MediaGenre {
+  id: number;
+  name: string;
+}
+
 export interface BaseMedia {
   tmdbId: number;
+  type: MediaType;
   title: string;
   originalTitle: string;
   overview: string;
@@ -15,6 +21,7 @@ export interface BaseMedia {
   rating: number;
   voteCount: number;
   originalLanguage: string;
+  genres: MediaGenre[];
 }
 
 export interface Movie extends BaseMedia {
@@ -39,11 +46,6 @@ export type MediaListItem = Pick<
 /* ========================================================================== */
 /* MEDIA DETAILS                                                               */
 /* ========================================================================== */
-
-export interface MediaGenre {
-  id: number;
-  name: string;
-}
 
 export interface MediaCastMember {
   id: number;
@@ -72,7 +74,6 @@ export interface MediaVideo {
 
 export interface BaseMediaDetails extends BaseMedia {
   tagline: string | null;
-  genres: MediaGenre[];
   cast: MediaCastMember[];
   crew: MediaCrewMember[];
   videos: MediaVideo[];

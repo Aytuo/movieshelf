@@ -1,5 +1,4 @@
 import type {
-  Media,
   MediaCastMember,
   MediaCrewMember,
   MediaGenre,
@@ -11,7 +10,7 @@ import type {
   TvSeason,
   TvShow,
 } from '@/lib/media';
-
+import { TMDB_MOVIES_GENRES, TMDB_TV_GENRES } from './genres';
 import type {
   TmdbCreditCast,
   TmdbCreditCrew,
@@ -40,6 +39,9 @@ function mapMovieResult(movie: TmdbMovieResult): Movie {
     rating: movie.vote_average,
     voteCount: movie.vote_count,
     originalLanguage: movie.original_language,
+    genres: (movie.genre_ids ?? []).map((id) =>
+      mapGenre(id, TMDB_MOVIES_GENRES)
+    ),
   };
 }
 
@@ -56,6 +58,7 @@ function mapTvResult(tv: TmdbTvResult): TvShow {
     rating: tv.vote_average,
     voteCount: tv.vote_count,
     originalLanguage: tv.original_language,
+    genres: (tv.genre_ids ?? []).map((id) => mapGenre(id, TMDB_TV_GENRES)),
   };
 }
 
@@ -112,10 +115,10 @@ function mapTvCastMember(person: TmdbTvAggregateCast): MediaCastMember {
   };
 }
 
-function mapGenre(genre: { id: number; name: string }): MediaGenre {
+function mapGenre(id: number, genres: Record<number, string>): MediaGenre {
   return {
-    id: genre.id,
-    name: genre.name,
+    id,
+    name: genres[id] ?? 'Unknown',
   };
 }
 
@@ -155,11 +158,11 @@ function mapTvSeason(season: {
 /*                              PUBLIC MAPPERS                                 */
 /* ========================================================================== */
 
-export function mapTmdbMovie(movie: TmdbMovieResult): Media {
+export function mapTmdbMovie(movie: TmdbMovieResult): Movie {
   return mapMovieResult(movie);
 }
 
-export function mapTmdbTv(tv: TmdbTvResult): Media {
+export function mapTmdbTv(tv: TmdbTvResult): TvShow {
   return mapTvResult(tv);
 }
 
@@ -169,7 +172,6 @@ export function mapTmdbMovieDetails(movie: TmdbMovieBundle): MovieDetails {
     type: 'movie',
     tagline: movie.tagline,
     runtime: movie.runtime,
-    genres: movie.genres.map(mapGenre),
     cast: (movie.credits?.cast ?? []).slice(0, 12).map(mapMovieCastMember),
     crew: (movie.credits?.crew ?? []).map(mapCrewMember),
     videos: (movie.videos?.results ?? []).map(mapVideo),
@@ -189,7 +191,6 @@ export function mapTmdbTvDetails(tv: TmdbTvBundle): TvDetails {
     numberOfSeasons: tv.number_of_seasons,
     numberOfEpisodes: tv.number_of_episodes,
     status: tv.status,
-    genres: tv.genres.map(mapGenre),
     creators: tv.created_by.map(mapTvCreator),
     seasons: tv.seasons.map(mapTvSeason),
     cast: (tv.aggregate_credits?.cast ?? []).slice(0, 12).map(mapTvCastMember),

@@ -2,11 +2,12 @@ import { db } from '@/lib/db';
 import { movie, userMovie } from '@/lib/db/schema';
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
 import { movieRepository } from '@/lib/repositories';
+import { MoviesDiscoverFilters } from '@/types';
 import { eq } from 'drizzle-orm';
 
 export async function discoverForUser(
   userId: string,
-  filters: DiscoverFilters
+  filters: MoviesDiscoverFilters
 ) {
   const page = filters.page ?? 1;
 
@@ -28,13 +29,8 @@ export async function discoverForUser(
     maxMovies: requiredCount,
   });
 
-  let filtered = result.movies.filter((movie) => !knownIds.has(movie.id));
+  let filtered = result.movies.filter((item) => !knownIds.has(item.tmdbId));
 
-  /*
-   * When shelf exclusion is enabled, keep fetching
-   * additional TMDB candidates until we have enough
-   * usable movies for the requested application page.
-   */
   while (
     filters.hideOnShelf &&
     filtered.length < requiredCount &&
@@ -46,9 +42,9 @@ export async function discoverForUser(
       maxMovies: nextCandidateCount,
     });
 
-    filtered = result.movies.filter((movie) => !knownIds.has(movie.id));
+    filtered = result.movies.filter((item) => !knownIds.has(item.tmdbId));
 
-    if (result.movies.length === result.totalResults) {
+    if (result.movies.length >= result.totalResults) {
       break;
     }
   }
@@ -59,7 +55,6 @@ export async function discoverForUser(
 
   return {
     ...result,
-
     movies: filtered.slice(start, end),
   };
 }

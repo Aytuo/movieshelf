@@ -5,6 +5,7 @@ import {
   searchTv,
 } from '@/lib/tmdb/client';
 import { mapTmdbTv, mapTmdbTvDetails } from '@/lib/tmdb/mapper';
+import { TvRepository } from './types';
 
 export const tmdbTvRepository: TvRepository = {
   async getById(id) {

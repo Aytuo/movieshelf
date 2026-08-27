@@ -2,7 +2,7 @@
 /*                                DISCOVER                                    */
 /* ========================================================================== */
 
-export type DiscoverSort =
+export type MoviesDiscoverSort =
   | 'popularity.desc'
   | 'vote_average.desc'
   | 'primary_release_date.desc'
@@ -26,7 +26,7 @@ export interface MoviesDiscoverFilters {
   maxRuntime?: number;
   minVoteCount?: number;
   language?: string;
-  sortBy?: DiscoverSort;
+  sortBy?: MoviesDiscoverSort;
   page?: number;
   hideOnShelf?: boolean;
 }

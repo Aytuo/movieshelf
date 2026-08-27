@@ -1,5 +1,5 @@
 import type { Movie } from '@/lib/media';
-import type { MoviesDiscoverFilters } from '@/types';
+import { MoviesDiscoverFilters } from '@/types';
 
 function getYear(releaseDate: string | null) {
   if (!releaseDate) {
@@ -11,8 +11,18 @@ function getYear(releaseDate: string | null) {
   return Number.isFinite(year) ? year : null;
 }
 
-export function filterMovies(movies: Movie[], filters: MoviesDiscoverFilters) {
+export function filterMovies(
+  movies: Movie[],
+  filters: MoviesDiscoverFilters
+): Movie[] {
   return movies.filter((movie) => {
+    if (
+      filters.genre &&
+      !movie.genres.some((genre) => genre.id === filters.genre)
+    ) {
+      return false;
+    }
+
     const year = getYear(movie.releaseDate);
 
     if (filters.yearFrom && (!year || year < filters.yearFrom)) {

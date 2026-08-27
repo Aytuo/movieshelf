@@ -47,12 +47,12 @@ const MovieCard = ({ movie }: MovieCardProps) => {
                 : '—'}
             </span>
 
-            {/* {movie.genres[0] && (
+            {movie.genres[0] && (
               <>
                 <span className="size-0.5 rounded-full bg-muted-foreground/50" />
                 <span>{movie.genres[0].name}</span>
               </>
-            )} */}
+            )}
           </div>
         </div>
       </article>

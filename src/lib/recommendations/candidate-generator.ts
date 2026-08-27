@@ -1,3 +1,4 @@
+import type { Movie } from '@/lib/media';
 import { movieRepository } from '@/lib/repositories';
 
 export type RecommendationCandidate = {
@@ -21,14 +22,10 @@ export async function generateCandidates(
   }
 
   const details = await Promise.all(
-    limitedSeeds.map(async (seed) => {
-      const movie = await movieRepository.getById(seed.tmdbId);
-
-      return {
-        seed,
-        movie,
-      };
-    })
+    limitedSeeds.map(async (seed) => ({
+      seed,
+      movie: await movieRepository.getById(seed.tmdbId),
+    }))
   );
 
   const candidates = new Map<number, RecommendationCandidate>();
@@ -38,9 +35,21 @@ export async function generateCandidates(
       continue;
     }
 
-    addCandidates(candidates, movie.similar, seed, 1);
+    addCandidates(
+      candidates,
+      movie.similar.filter((item): item is Movie => item.type === 'movie'),
+      seed,
+      1
+    );
 
-    addCandidates(candidates, movie.recommendations, seed, 0.85);
+    addCandidates(
+      candidates,
+      movie.recommendations.filter(
+        (item): item is Movie => item.type === 'movie'
+      ),
+      seed,
+      0.85
+    );
   }
 
   return Array.from(candidates.values());
@@ -57,10 +66,10 @@ function addCandidates(
 
     const similarityScore = rankScore * sourceWeight;
 
-    const existing = target.get(movie.id);
+    const existing = target.get(movie.tmdbId);
 
     if (!existing) {
-      target.set(movie.id, {
+      target.set(movie.tmdbId, {
         movie,
         similarityScore,
         sourceMovieId: seed.tmdbId,
@@ -69,8 +78,9 @@ function addCandidates(
       return;
     }
 
-    existing.similarityScore += similarityScore;
-
-    existing.similarityScore = Math.min(existing.similarityScore, 1);
+    existing.similarityScore = Math.min(
+      existing.similarityScore + similarityScore,
+      1
+    );
   });
 }
