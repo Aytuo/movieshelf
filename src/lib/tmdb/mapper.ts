@@ -1,24 +1,39 @@
-import { TMDB_GENRES } from './genres';
-import { TMDB_TV_GENRES } from './tv-genres';
+import type { Media } from '@/lib/media/types';
+import type { TmdbMovieResult, TmdbTvResult } from './types';
 
-function mapMovieResult(movie: TmdbMovieResult): Movie {
+function mapMovieResult(movie: TmdbMovieResult): Media {
   return {
-    id: movie.id,
+    tmdbId: movie.id,
+    type: 'movie',
     title: movie.title,
     originalTitle: movie.original_title,
     overview: movie.overview ?? '',
     posterPath: movie.poster_path,
     backdropPath: movie.backdrop_path,
-    releaseDate: movie.release_date,
-    runtime: null,
-    genres: (movie.genre_ids ?? [])
-      .map((id) => TMDB_GENRES[id])
-      .filter((genre): genre is string => Boolean(genre)),
-    originalLanguage: movie.original_language,
+    releaseDate: movie.release_date || null,
     rating: movie.vote_average,
     voteCount: movie.vote_count,
+    originalLanguage: movie.original_language,
   };
 }
+
+function mapTvResult(tv: TmdbTvResult): Media {
+  return {
+    tmdbId: tv.id,
+    type: 'tv',
+    title: tv.name,
+    originalTitle: tv.original_name,
+    overview: tv.overview ?? '',
+    posterPath: tv.poster_path,
+    backdropPath: tv.backdrop_path,
+    releaseDate: tv.first_air_date || null,
+    rating: tv.vote_average,
+    voteCount: tv.vote_count,
+    originalLanguage: tv.original_language,
+  };
+}
+
+// TODO:
 
 function mapCastMember(person: TmdbCreditCast): MovieCastMember {
   return {
@@ -68,24 +83,6 @@ export function mapTmdbMovieDetails(movie: TmdbMovieBundle): MovieDetails {
     recommendations: (movie.recommendations?.results ?? [])
       .slice(0, 6)
       .map(mapMovieResult),
-  };
-}
-
-function mapTvResult(tv: TmdbTvResult): TvShow {
-  return {
-    id: tv.id,
-    name: tv.name,
-    originalName: tv.original_name,
-    overview: tv.overview ?? '',
-    posterPath: tv.poster_path,
-    backdropPath: tv.backdrop_path,
-    firstAirDate: tv.first_air_date,
-    genres: (tv.genre_ids ?? [])
-      .map((id) => TMDB_TV_GENRES[id])
-      .filter((genre): genre is string => Boolean(genre)),
-    originalLanguage: tv.original_language,
-    rating: tv.vote_average,
-    voteCount: tv.vote_count,
   };
 }
 

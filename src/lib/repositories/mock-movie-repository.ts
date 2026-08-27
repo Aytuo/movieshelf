@@ -1,5 +1,5 @@
 import { MOCK_MOVIES } from '@/constants';
-import { TMDB_GENRES } from '../tmdb/genres';
+import { TMDB_MOVIES_GENRES } from '../tmdb/genres';
 
 export const mockMovieRepository: MovieRepository = {
   async getById(id) {
@@ -43,7 +43,7 @@ export const mockMovieRepository: MovieRepository = {
     let movies = [...MOCK_MOVIES];
 
     if (filters.genre) {
-      const genreName = Object.entries(TMDB_GENRES).find(
+      const genreName = Object.entries(TMDB_MOVIES_GENRES).find(
         ([id]) => Number(id) === filters.genre
       )?.[1];
 

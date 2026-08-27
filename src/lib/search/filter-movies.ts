@@ -1,4 +1,4 @@
-import { TMDB_GENRES } from '@/lib/tmdb/genres';
+import { TMDB_MOVIES_GENRES } from '../tmdb/genres';
 
 function getYear(releaseDate: string) {
   if (!releaseDate) {
@@ -12,7 +12,10 @@ function getYear(releaseDate: string) {
 
 export function filterMovies(movies: Movie[], filters: DiscoverFilters) {
   return movies.filter((movie) => {
-    if (filters.genre && !movie.genres.includes(TMDB_GENRES[filters.genre])) {
+    if (
+      filters.genre &&
+      !movie.genres.includes(TMDB_MOVIES_GENRES[filters.genre])
+    ) {
       return false;
     }
 

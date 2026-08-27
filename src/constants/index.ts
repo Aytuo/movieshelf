@@ -307,30 +307,93 @@ export const MOCK_ACTIVITY: ActivityItem[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/* Discover / filters                                                         */
+/* Genres                                                        */
 /* -------------------------------------------------------------------------- */
 
 export const MOVIE_GENRES = [
-  'Action',
-  'Adventure',
-  'Animation',
-  'Comedy',
-  'Crime',
-  'Documentary',
-  'Drama',
-  'Fantasy',
-  'Horror',
-  'Mystery',
-  'Romance',
-  'Science Fiction',
-  'Thriller',
+  { id: 28, name: 'Action' },
+  { id: 12, name: 'Adventure' },
+  { id: 16, name: 'Animation' },
+  { id: 35, name: 'Comedy' },
+  { id: 80, name: 'Crime' },
+  { id: 99, name: 'Documentary' },
+  { id: 18, name: 'Drama' },
+  { id: 10751, name: 'Family' },
+  { id: 14, name: 'Fantasy' },
+  { id: 36, name: 'History' },
+  { id: 27, name: 'Horror' },
+  { id: 10402, name: 'Music' },
+  { id: 9648, name: 'Mystery' },
+  { id: 10749, name: 'Romance' },
+  { id: 878, name: 'Science Fiction' },
+  { id: 53, name: 'Thriller' },
+  { id: 10752, name: 'War' },
+  { id: 37, name: 'Western' },
 ] as const;
 
+/* -------------------------------------------------------------------------- */
+/* Discover / filters                                                         */
+/* -------------------------------------------------------------------------- */
+
 export const DISCOVER_SORT_OPTIONS = [
-  { label: 'Popularity', value: 'popularity' },
-  { label: 'Highest rated', value: 'rating' },
-  { label: 'Newest', value: 'release-date' },
-  { label: 'Most voted', value: 'votes' },
+  {
+    value: 'popularity.desc',
+    label: 'Most popular',
+  },
+  {
+    value: 'vote_average.desc',
+    label: 'Highest rated',
+  },
+  {
+    value: 'primary_release_date.desc',
+    label: 'Newest',
+  },
+  {
+    value: 'primary_release_date.asc',
+    label: 'Oldest',
+  },
+  {
+    value: 'vote_count.desc',
+    label: 'Most rated',
+  },
+] as const;
+
+// export const DISCOVER_SORT_OPTIONS = [
+//   { label: 'Popularity', value: 'popularity' },
+//   { label: 'Highest rated', value: 'rating' },
+//   { label: 'Newest', value: 'release-date' },
+//   { label: 'Most voted', value: 'votes' },
+// ] as const;
+
+export const LANGUAGE_OPTIONS = [
+  {
+    value: 'en',
+    label: 'English',
+  },
+  {
+    value: 'pl',
+    label: 'Polish',
+  },
+  {
+    value: 'fr',
+    label: 'French',
+  },
+  {
+    value: 'de',
+    label: 'German',
+  },
+  {
+    value: 'es',
+    label: 'Spanish',
+  },
+  {
+    value: 'ja',
+    label: 'Japanese',
+  },
+  {
+    value: 'ko',
+    label: 'Korean',
+  },
 ] as const;
 
 /* -------------------------------------------------------------------------- */

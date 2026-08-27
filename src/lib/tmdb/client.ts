@@ -6,8 +6,6 @@ if (!token) {
   throw new Error('TMDB_API_READ_ACCESS_TOKEN is not configured.');
 }
 
-// Movies
-
 async function tmdbFetch<T>(
   path: string,
   searchParams?: Record<string, string>

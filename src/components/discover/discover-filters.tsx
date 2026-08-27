@@ -1,11 +1,11 @@
 'use client';
 
-import { useDebounce } from '@/hooks/use-debounce';
 import {
   DISCOVER_SORT_OPTIONS,
   LANGUAGE_OPTIONS,
   MOVIE_GENRES,
-} from '@/lib/tmdb/discover-options';
+} from '@/constants';
+import { useDebounce } from '@/hooks/use-debounce';
 import { RotateCcw, SlidersHorizontal } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';

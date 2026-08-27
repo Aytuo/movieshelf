@@ -22,30 +22,28 @@ export async function removeFromShelf(userId: string, movieId: string) {
 export async function markAsWatched(userId: string, movieId: string) {
   const watchedAt = new Date();
 
-  await db.transaction(async (tx) => {
-    await tx
-      .insert(userMovie)
-      .values({
-        userId,
-        movieId,
-        status: 'watched',
-        watchedAt,
-      })
-      .onConflictDoUpdate({
-        target: [userMovie.userId, userMovie.movieId],
-        set: {
-          status: 'watched',
-          watchedAt,
-          updatedAt: watchedAt,
-        },
-      });
-
-    await tx.insert(watchHistory).values({
-      id: crypto.randomUUID(),
+  await db
+    .insert(userMovie)
+    .values({
       userId,
       movieId,
+      status: 'watched',
       watchedAt,
+    })
+    .onConflictDoUpdate({
+      target: [userMovie.userId, userMovie.movieId],
+      set: {
+        status: 'watched',
+        watchedAt,
+        updatedAt: watchedAt,
+      },
     });
+
+  await db.insert(watchHistory).values({
+    id: crypto.randomUUID(),
+    userId,
+    movieId,
+    watchedAt,
   });
 }
 
