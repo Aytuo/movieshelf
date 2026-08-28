@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, userMovie } from '@/lib/db/schema';
+import { movie, userMovie } from '@/lib/db/schema/tables';
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
 import { MovieDiscoverFilters } from '@/types';
 import { eq } from 'drizzle-orm';

@@ -1,3 +1,5 @@
+import { MovieDiscoverFilters } from '@/types';
+
 const VALID_SORTS = new Set([
   'popularity.desc',
   'vote_average.desc',
@@ -36,10 +38,10 @@ export function parseDiscoverFilters(params: {
   sort?: string;
   page?: string;
   hideOnShelf?: string;
-}): DiscoverFilters {
+}): MovieDiscoverFilters {
   const sort =
     params.sort && VALID_SORTS.has(params.sort)
-      ? (params.sort as DiscoverFilters['sortBy'])
+      ? (params.sort as MovieDiscoverFilters['sortBy'])
       : 'popularity.desc';
 
   return {

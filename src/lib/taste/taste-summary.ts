@@ -1,3 +1,5 @@
+import { TasteProfile } from '@/types';
+
 export function getTasteSummary(taste: TasteProfile) {
   if (taste.watchedMovies === 0) {
     return {

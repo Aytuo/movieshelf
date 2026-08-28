@@ -1,7 +1,7 @@
 import { MediaRecommendation } from '@/types';
 import { desc, eq } from 'drizzle-orm';
 import { db } from '../db';
-import { movie, userMovie } from '../db/schema';
+import { movie, userMovie } from '../db/schema/tables';
 import { generateCandidates } from '../recommendations/candidate-generator';
 import { diversifyRecommendations } from '../recommendations/diversify';
 import { excludeKnownMovies } from '../recommendations/exclusions';

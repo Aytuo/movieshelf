@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, watchHistory } from '@/lib/db/schema';
+import { movie, watchHistory } from '@/lib/db/schema/tables';
 import { and, count, desc, eq } from 'drizzle-orm';
 
 export async function createWatchHistoryEntry({

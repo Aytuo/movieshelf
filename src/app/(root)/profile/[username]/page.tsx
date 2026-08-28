@@ -1,6 +1,6 @@
 import TastePreview from '@/components/profile/taste-preview';
 import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
+import { profile } from '@/lib/db/schema/tables';
 import { getUserReviews } from '@/lib/repositories/review-repository';
 import { getUserShelf } from '@/lib/repositories/user-movie-repository';
 import { getTasteProfile } from '@/lib/services/taste-service';

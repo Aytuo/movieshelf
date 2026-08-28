@@ -8,14 +8,16 @@ import {
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 
+/* ========================================================================== */
+/*                                    PROFILE                                 */
+/* ========================================================================== */
+
 export const profile = pgTable(
   'profile',
   {
     userId: text('user_id')
       .primaryKey()
-      .references(() => user.id, {
-        onDelete: 'cascade',
-      }),
+      .references(() => user.id, { onDelete: 'cascade' }),
     username: text('username').notNull(),
     displayName: text('display_name'),
     bio: text('bio'),

@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, userMovie } from '@/lib/db/schema';
+import { movie, userMovie } from '@/lib/db/schema/tables';
 import { and, desc, eq } from 'drizzle-orm';
 
 export async function getUserMovieState(userId: string, movieId: string) {

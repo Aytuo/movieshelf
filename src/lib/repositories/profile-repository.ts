@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
+import { profile } from '@/lib/db/schema/tables';
 import { and, eq, ne } from 'drizzle-orm';
 
 export async function getProfileByUserId(userId: string) {

@@ -1,6 +1,6 @@
 import Taste from '@/components/profile/taste';
 import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
+import { profile } from '@/lib/db/schema/tables';
 import { getTasteProfile } from '@/lib/services/taste-service';
 import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';

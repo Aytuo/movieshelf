@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { userMovie, watchHistory } from '@/lib/db/schema';
+import { userMovie, watchHistory } from '@/lib/db/schema/tables';
 import { and, eq } from 'drizzle-orm';
 
 export async function addToWatchlist(userId: string, movieId: string) {

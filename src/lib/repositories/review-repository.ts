@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, profile, review } from '@/lib/db/schema';
+import { movie, profile, review } from '@/lib/db/schema/tables';
 import { and, desc, eq } from 'drizzle-orm';
 
 export async function getMovieReviews(movieId: string) {

@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import type { ReviewInput } from '@/lib/validations/review';
 import { and, eq } from 'drizzle-orm';
-import { review } from '../db/schema';
+import { review } from '../db/schema/tables';
 
 export async function upsertReview(
   userId: string,

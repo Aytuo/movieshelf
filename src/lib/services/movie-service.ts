@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie } from '@/lib/db/schema';
+import { movie } from '@/lib/db/schema/tables';
 import { tmdbMovieRepository } from '@/lib/repositories';
 import { eq } from 'drizzle-orm';
 
