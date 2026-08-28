@@ -1,22 +1,21 @@
 import { db } from '@/lib/db';
-import { movie, watchHistory } from '@/lib/db/schema/tables';
+import { media, watchHistory } from '@/lib/db/schema';
 import { and, count, desc, eq } from 'drizzle-orm';
 
 export async function createWatchHistoryEntry({
   userId,
-  movieId,
+  mediaId,
   watchedAt = new Date(),
 }: {
   userId: string;
-  movieId: string;
+  mediaId: string;
   watchedAt?: Date;
 }) {
   const [entry] = await db
     .insert(watchHistory)
     .values({
-      id: crypto.randomUUID(),
       userId,
-      movieId,
+      mediaId,
       watchedAt,
     })
     .returning();
@@ -36,10 +35,10 @@ export async function getWatchHistoryPage({
   return db
     .select({
       history: watchHistory,
-      movie,
+      media,
     })
     .from(watchHistory)
-    .innerJoin(movie, eq(movie.id, watchHistory.movieId))
+    .innerJoin(media, eq(media.id, watchHistory.mediaId))
     .where(eq(watchHistory.userId, userId))
     .orderBy(desc(watchHistory.watchedAt))
     .limit(limit)
@@ -57,12 +56,12 @@ export async function getWatchHistoryCount(userId: string) {
   return result?.count ?? 0;
 }
 
-export async function getMovieWatchCount({
+export async function getMediaWatchCount({
   userId,
-  movieId,
+  mediaId,
 }: {
   userId: string;
-  movieId: string;
+  mediaId: string;
 }) {
   const [result] = await db
     .select({
@@ -70,7 +69,7 @@ export async function getMovieWatchCount({
     })
     .from(watchHistory)
     .where(
-      and(eq(watchHistory.userId, userId), eq(watchHistory.movieId, movieId))
+      and(eq(watchHistory.userId, userId), eq(watchHistory.mediaId, mediaId))
     );
 
   return result?.count ?? 0;

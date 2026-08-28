@@ -1,8 +1,8 @@
 import { db } from '@/lib/db';
-import { movie, profile, review } from '@/lib/db/schema/tables';
+import { media, profile, review } from '@/lib/db/schema';
 import { and, desc, eq } from 'drizzle-orm';
 
-export async function getMovieReviews(movieId: string) {
+export async function getMediaReviews(mediaId: string) {
   return db
     .select({
       review,
@@ -10,7 +10,7 @@ export async function getMovieReviews(movieId: string) {
     })
     .from(review)
     .innerJoin(profile, eq(profile.userId, review.userId))
-    .where(eq(review.movieId, movieId))
+    .where(eq(review.mediaId, mediaId))
     .orderBy(desc(review.createdAt));
 }
 
@@ -18,19 +18,19 @@ export async function getUserReviews(userId: string) {
   return db
     .select({
       review,
-      movie,
+      media,
     })
     .from(review)
-    .innerJoin(movie, eq(movie.id, review.movieId))
+    .innerJoin(media, eq(media.id, review.mediaId))
     .where(eq(review.userId, userId))
     .orderBy(desc(review.createdAt));
 }
 
-export async function getUserReviewForMovie(userId: string, movieId: string) {
+export async function getUserReviewForMedia(userId: string, mediaId: string) {
   const result = await db
     .select()
     .from(review)
-    .where(and(eq(review.userId, userId), eq(review.movieId, movieId)))
+    .where(and(eq(review.userId, userId), eq(review.mediaId, mediaId)))
     .limit(1);
 
   return result[0] ?? null;

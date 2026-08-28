@@ -39,6 +39,7 @@ export const media = pgTable(
       .$type<Array<{ id: number; name: string }>>()
       .notNull()
       .default(sql`'[]'::jsonb`), // Stored as: [ { id: 28, name: 'Action' }, { id: 18, name: 'Drama' } ].
+    originalLanguage: text('original_language').notNull().default(''),
     tmdbRating: numeric('tmdb_rating', {
       precision: 3,
       scale: 1,
