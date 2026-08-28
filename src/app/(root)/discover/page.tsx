@@ -7,7 +7,7 @@ import { requireSession } from '@/lib/auth/require-session';
 import { parseDiscoverFilters } from '@/lib/discover/parse-filters';
 import { discoverForUser } from '@/lib/services/discover-service';
 import { searchWithFilters } from '@/lib/services/search-service';
-import { MoviesDiscoverFilters } from '@/types';
+import { MovieDiscoverFilters } from '@/types';
 import Link from 'next/link';
 
 function FilterChip({ label }: { label: string }) {
@@ -43,7 +43,7 @@ function EmptyDiscoverState({ query }: { query: string }) {
   );
 }
 
-function hasActiveDiscoverFilters(filters: MoviesDiscoverFilters) {
+function hasActiveDiscoverFilters(filters: MovieDiscoverFilters) {
   return Boolean(
     filters.genre ||
     filters.yearFrom ||

@@ -1,10 +1,12 @@
+import type { MediaRecommendation } from '@/types';
+
 export function diversifyRecommendations(
-  recommendations: MovieRecommendation[],
+  recommendations: MediaRecommendation[],
   limit = 12
 ) {
-  const selected: MovieRecommendation[] = [];
+  const selected: MediaRecommendation[] = [];
 
-  const genreCounts = new Map<string, number>();
+  const genreCounts = new Map<number, number>();
 
   const remaining = [...recommendations].sort((a, b) => b.score - a.score);
 
@@ -14,9 +16,14 @@ export function diversifyRecommendations(
     for (let index = 0; index < remaining.length; index++) {
       const candidate = remaining[index];
 
-      const primaryGenre = candidate.movie.genres[0] ?? 'unknown';
+      const primaryGenre = candidate.media.genres[0];
 
-      const currentCount = genreCounts.get(primaryGenre) ?? 0;
+      if (!primaryGenre) {
+        selectedIndex = index;
+        break;
+      }
+
+      const currentCount = genreCounts.get(primaryGenre.id) ?? 0;
 
       if (currentCount < 3) {
         selectedIndex = index;
@@ -28,9 +35,14 @@ export function diversifyRecommendations(
 
     selected.push(candidate);
 
-    const primaryGenre = candidate.movie.genres[0] ?? 'unknown';
+    const primaryGenre = candidate.media.genres[0];
 
-    genreCounts.set(primaryGenre, (genreCounts.get(primaryGenre) ?? 0) + 1);
+    if (primaryGenre) {
+      genreCounts.set(
+        primaryGenre.id,
+        (genreCounts.get(primaryGenre.id) ?? 0) + 1
+      );
+    }
   }
 
   return selected;

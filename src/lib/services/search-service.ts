@@ -6,6 +6,7 @@ import {
 } from '@/lib/search/pagination';
 import { searchMovies } from '@/lib/tmdb/client';
 import { mapTmdbMovie } from '@/lib/tmdb/mapper';
+import { MovieDiscoverFilters } from '@/types';
 
 export async function searchWithFilters({
   query,
@@ -13,7 +14,7 @@ export async function searchWithFilters({
   page,
 }: {
   query: string;
-  filters: DiscoverFilters;
+  filters: MovieDiscoverFilters;
   page: number;
 }) {
   const normalized = query.trim();

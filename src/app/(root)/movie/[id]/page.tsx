@@ -1,6 +1,6 @@
 import MovieDetails from '@/components/movies/movie-details-view';
 import { requireSession } from '@/lib/auth/require-session';
-import { movieRepository } from '@/lib/repositories';
+import { tmdbMovieRepository } from '@/lib/repositories';
 import {
   getMovieReviews,
   getUserReviewForMovie,
@@ -23,7 +23,7 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
     notFound();
   }
 
-  const movie = await movieRepository.getById(movieId);
+  const movie = await tmdbMovieRepository.getById(movieId);
 
   if (!movie) {
     notFound();
@@ -33,12 +33,12 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
 
   const dbMovieState = await getUserMovieState(
     session.user.id,
-    `tmdb_${movie.id}`
+    `tmdb_${movie.tmdbId}`
   );
 
   const [existingReview, reviews] = await Promise.all([
-    getUserReviewForMovie(session.user.id, `tmdb_${movie.id}`),
-    getMovieReviews(`tmdb_${movie.id}`),
+    getUserReviewForMovie(session.user.id, `tmdb_${movie.tmdbId}`),
+    getMovieReviews(`tmdb_${movie.tmdbId}`),
   ]);
 
   return (

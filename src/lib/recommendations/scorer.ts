@@ -1,30 +1,29 @@
-import { MediaRecommendation } from '@/types';
-import { Movie } from '../media';
+import type { MediaRecommendation } from '@/types';
+import type { Media } from '../media';
 import type { RecommendationCandidate } from './candidate-generator';
 
-type RatedMovie = {
-  movie: Movie;
+type RatedMedia = {
+  media: Media;
   rating: number;
 };
 
 type TasteSignals = {
-  genreAffinity: Map<string, number>;
+  genreAffinity: Map<number, number>;
   decadeAffinity: Map<string, number>;
   averageRating: number | null;
 };
 
-export function buildTasteSignals(ratedMovies: RatedMovie[]): TasteSignals {
-  const genreSums = new Map<string, { total: number; count: number }>();
-
+export function buildTasteSignals(ratedMedia: RatedMedia[]): TasteSignals {
+  const genreSums = new Map<number, { total: number; count: number }>();
   const decadeSums = new Map<string, { total: number; count: number }>();
 
   let ratingTotal = 0;
 
-  for (const { movie, rating } of ratedMovies) {
+  for (const { media, rating } of ratedMedia) {
     ratingTotal += rating;
 
-    for (const genre of movie.genres) {
-      const current = genreSums.get(genre) ?? {
+    for (const genre of media.genres) {
+      const current = genreSums.get(genre.id) ?? {
         total: 0,
         count: 0,
       };
@@ -32,10 +31,10 @@ export function buildTasteSignals(ratedMovies: RatedMovie[]): TasteSignals {
       current.total += rating;
       current.count += 1;
 
-      genreSums.set(genre, current);
+      genreSums.set(genre.id, current);
     }
 
-    const decade = getDecade(movie.releaseDate);
+    const decade = getDecade(media.releaseDate);
 
     if (decade) {
       const current = decadeSums.get(decade) ?? {
@@ -50,10 +49,10 @@ export function buildTasteSignals(ratedMovies: RatedMovie[]): TasteSignals {
     }
   }
 
-  const genreAffinity = new Map<string, number>();
+  const genreAffinity = new Map<number, number>();
 
-  for (const [genre, value] of genreSums) {
-    genreAffinity.set(genre, value.total / value.count / 10);
+  for (const [genreId, value] of genreSums) {
+    genreAffinity.set(genreId, value.total / value.count / 10);
   }
 
   const decadeAffinity = new Map<string, number>();
@@ -65,9 +64,8 @@ export function buildTasteSignals(ratedMovies: RatedMovie[]): TasteSignals {
   return {
     genreAffinity,
     decadeAffinity,
-
     averageRating:
-      ratedMovies.length > 0 ? ratingTotal / ratedMovies.length : null,
+      ratedMedia.length > 0 ? ratingTotal / ratedMedia.length : null,
   };
 }
 
@@ -80,14 +78,14 @@ export function scoreCandidate({
   signals: TasteSignals;
   sourceMovieTitle?: string;
 }): MediaRecommendation {
-  const movie = candidate.movie;
+  const media = candidate.media;
 
   /* ------------------------------------------------------------------------ */
   /* Genre affinity — 30%                                                     */
   /* ------------------------------------------------------------------------ */
 
-  const genreScores = movie.genres
-    .map((genre) => signals.genreAffinity.get(genre) ?? 0)
+  const genreScores = media.genres
+    .map((genre) => signals.genreAffinity.get(genre.id) ?? 0)
     .filter((value) => value > 0);
 
   const genreScore =
@@ -105,7 +103,7 @@ export function scoreCandidate({
   /* Decade affinity — 10%                                                    */
   /* ------------------------------------------------------------------------ */
 
-  const decade = getDecade(movie.releaseDate);
+  const decade = getDecade(media.releaseDate);
 
   const decadeScore = decade ? (signals.decadeAffinity.get(decade) ?? 0) : 0;
 
@@ -113,9 +111,9 @@ export function scoreCandidate({
   /* TMDB quality — 10%                                                       */
   /* ------------------------------------------------------------------------ */
 
-  const ratingScore = Math.min(movie.rating / 10, 1);
+  const ratingScore = Math.min(media.rating / 10, 1);
 
-  const voteConfidence = Math.min(movie.voteCount / 5000, 1);
+  const voteConfidence = Math.min(media.voteCount / 5000, 1);
 
   const qualityScore = ratingScore * 0.7 + voteConfidence * 0.3;
 
@@ -123,7 +121,7 @@ export function scoreCandidate({
   /* Popularity / vote signal — 5%                                            */
   /* ------------------------------------------------------------------------ */
 
-  const popularityScore = 1 - Math.exp(-movie.voteCount / 2500);
+  const popularityScore = 1 - Math.exp(-media.voteCount / 2500);
 
   /* ------------------------------------------------------------------------ */
   /* Exploration — 15%                                                        */
@@ -142,7 +140,7 @@ export function scoreCandidate({
   const normalizedScore = Math.round(score * 100);
 
   const reason = getReason({
-    movie,
+    media,
     genreScore,
     similarityScore,
     decadeScore,
@@ -157,7 +155,7 @@ export function scoreCandidate({
         : 'explore';
 
   return {
-    movie,
+    media,
     score: normalizedScore,
     reason,
     reasonType,
@@ -165,13 +163,13 @@ export function scoreCandidate({
 }
 
 function getReason({
-  movie,
+  media,
   genreScore,
   similarityScore,
   decadeScore,
   sourceMovieTitle,
 }: {
-  movie: Movie;
+  media: Media;
   genreScore: number;
   similarityScore: number;
   decadeScore: number;
@@ -181,8 +179,8 @@ function getReason({
     return `Because you liked ${sourceMovieTitle}`;
   }
 
-  if (genreScore >= 0.65 && movie.genres.length > 0) {
-    return `${movie.genres[0]} matches your taste`;
+  if (genreScore >= 0.65 && media.genres.length > 0) {
+    return `${media.genres[0].name} matches your taste`;
   }
 
   if (decadeScore >= 0.7) {

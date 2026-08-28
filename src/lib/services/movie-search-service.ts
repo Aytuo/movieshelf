@@ -1,4 +1,4 @@
-import { movieRepository } from '@/lib/repositories';
+import { tmdbMovieRepository } from '@/lib/repositories';
 
 export async function searchForMovies(query: string) {
   const trimmed = query.trim();
@@ -7,5 +7,5 @@ export async function searchForMovies(query: string) {
     return [];
   }
 
-  return movieRepository.search(trimmed);
+  return tmdbMovieRepository.search(trimmed);
 }

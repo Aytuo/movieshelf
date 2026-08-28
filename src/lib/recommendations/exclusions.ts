@@ -1,6 +1,10 @@
+import { MediaRecommendation } from '@/types';
+
 export function excludeKnownMovies(
-  recommendations: MovieRecommendation[],
-  knownMovieIds: Set<number>
+  recommendations: MediaRecommendation[],
+  knownMediaIds: Set<number>
 ) {
-  return recommendations.filter(({ movie }) => !knownMovieIds.has(movie.id));
+  return recommendations.filter(
+    ({ media }) => !knownMediaIds.has(media.tmdbId)
+  );
 }

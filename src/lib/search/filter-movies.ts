@@ -1,5 +1,5 @@
 import type { Movie } from '@/lib/media';
-import { MoviesDiscoverFilters } from '@/types';
+import { MovieDiscoverFilters } from '@/types';
 
 function getYear(releaseDate: string | null) {
   if (!releaseDate) {
@@ -13,7 +13,7 @@ function getYear(releaseDate: string | null) {
 
 export function filterMovies(
   movies: Movie[],
-  filters: MoviesDiscoverFilters
+  filters: MovieDiscoverFilters
 ): Movie[] {
   return movies.filter((movie) => {
     if (

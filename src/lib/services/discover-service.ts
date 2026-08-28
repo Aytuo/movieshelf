@@ -1,13 +1,13 @@
 import { db } from '@/lib/db';
 import { movie, userMovie } from '@/lib/db/schema';
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
-import { movieRepository } from '@/lib/repositories';
-import { MoviesDiscoverFilters } from '@/types';
+import { MovieDiscoverFilters } from '@/types';
 import { eq } from 'drizzle-orm';
+import { tmdbMovieRepository } from '../repositories';
 
 export async function discoverForUser(
   userId: string,
-  filters: MoviesDiscoverFilters
+  filters: MovieDiscoverFilters
 ) {
   const page = filters.page ?? 1;
 
@@ -25,7 +25,7 @@ export async function discoverForUser(
 
   const knownIds = new Set(existing.map((item) => item.tmdbId));
 
-  let result = await movieRepository.discover(filters, {
+  let result = await tmdbMovieRepository.discover(filters, {
     maxMovies: requiredCount,
   });
 
@@ -38,7 +38,7 @@ export async function discoverForUser(
   ) {
     const nextCandidateCount = result.movies.length + DISCOVER_PAGE_SIZE;
 
-    result = await movieRepository.discover(filters, {
+    result = await tmdbMovieRepository.discover(filters, {
       maxMovies: nextCandidateCount,
     });
 

@@ -1,15 +1,15 @@
-import { movieRepository } from '@/lib/repositories';
+import { tmdbMovieRepository } from '@/lib/repositories';
+import type { MediaRecommendation } from '@/types';
 
-export async function getColdStartRecommendations() {
-  const movies = await movieRepository.getPopular();
+export async function getColdStartRecommendations(): Promise<
+  MediaRecommendation[]
+> {
+  const media = await tmdbMovieRepository.getPopular();
 
-  return movies.slice(0, 12).map<MediaRecommendation>((movie) => ({
-    movie,
-
+  return media.slice(0, 12).map((item): MediaRecommendation => ({
+    media: item,
     score: 0,
-
     reason: 'Popular on MovieShelf',
-
     reasonType: 'explore',
   }));
 }

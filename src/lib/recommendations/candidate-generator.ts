@@ -1,8 +1,8 @@
-import type { Movie } from '@/lib/media';
-import { movieRepository } from '@/lib/repositories';
+import type { Media } from '@/lib/media';
+import { tmdbMovieRepository } from '@/lib/repositories';
 
 export type RecommendationCandidate = {
-  movie: Movie;
+  media: Media;
   similarityScore: number;
   sourceMovieId: number | null;
 };
@@ -24,32 +24,20 @@ export async function generateCandidates(
   const details = await Promise.all(
     limitedSeeds.map(async (seed) => ({
       seed,
-      movie: await movieRepository.getById(seed.tmdbId),
+      media: await tmdbMovieRepository.getById(seed.tmdbId),
     }))
   );
 
   const candidates = new Map<number, RecommendationCandidate>();
 
-  for (const { seed, movie } of details) {
-    if (!movie) {
+  for (const { seed, media } of details) {
+    if (!media) {
       continue;
     }
 
-    addCandidates(
-      candidates,
-      movie.similar.filter((item): item is Movie => item.type === 'movie'),
-      seed,
-      1
-    );
+    addCandidates(candidates, media.similar, seed, 1);
 
-    addCandidates(
-      candidates,
-      movie.recommendations.filter(
-        (item): item is Movie => item.type === 'movie'
-      ),
-      seed,
-      0.85
-    );
+    addCandidates(candidates, media.recommendations, seed, 0.85);
   }
 
   return Array.from(candidates.values());
@@ -57,20 +45,20 @@ export async function generateCandidates(
 
 function addCandidates(
   target: Map<number, RecommendationCandidate>,
-  movies: Movie[],
+  media: Media[],
   seed: SeedMovie,
   sourceWeight: number
 ) {
-  movies.forEach((movie, index) => {
-    const rankScore = Math.max(0, 1 - index / Math.max(movies.length, 1));
+  media.forEach((item, index) => {
+    const rankScore = Math.max(0, 1 - index / Math.max(media.length, 1));
 
     const similarityScore = rankScore * sourceWeight;
 
-    const existing = target.get(movie.tmdbId);
+    const existing = target.get(item.tmdbId);
 
     if (!existing) {
-      target.set(movie.tmdbId, {
-        movie,
+      target.set(item.tmdbId, {
+        media: item,
         similarityScore,
         sourceMovieId: seed.tmdbId,
       });

@@ -1,5 +1,11 @@
 import { db } from '@/lib/db';
 import { movie, userMovie } from '@/lib/db/schema';
+import {
+  RatingDistributionItem,
+  TasteDecade,
+  TasteGenre,
+  TasteProfile,
+} from '@/types';
 import { desc, eq } from 'drizzle-orm';
 
 function getDecade(releaseDate: string | null) {

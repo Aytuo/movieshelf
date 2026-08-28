@@ -1,5 +1,11 @@
-import type { Movie, MovieDetails, TvDetails, TvShow } from '@/lib/media';
-import { MoviesDiscoverFilters, TvDiscoverFilters } from '@/types';
+import type {
+  Media,
+  Movie,
+  MovieDetails,
+  TvDetails,
+  TvShow,
+} from '@/lib/media';
+import { MovieDiscoverFilters, TvDiscoverFilters } from '@/types';
 
 export interface MovieDiscoverResult {
   movies: Movie[];
@@ -21,22 +27,25 @@ export interface DiscoverOptions {
 
 export interface MovieRepository {
   getById(id: number): Promise<MovieDetails | null>;
-  getPopular(): Promise<Movie[]>;
-  getTrending(): Promise<Movie[]>;
-  getTopPicks(): Promise<Movie[]>;
-  getUpcoming(): Promise<Movie[]>;
-  search(query: string): Promise<Movie[]>;
+  getPopular(): Promise<Media[]>;
+  getTrending(): Promise<Media[]>;
+  getTopPicks(): Promise<Media[]>;
+  getUpcoming(): Promise<Media[]>;
+  search(query: string): Promise<Media[]>;
   discover(
-    filters: MoviesDiscoverFilters,
+    filters: MovieDiscoverFilters,
     options?: DiscoverOptions
   ): Promise<MovieDiscoverResult>;
 }
 
 export interface TvRepository {
   getById(id: number): Promise<TvDetails | null>;
-  getTrending(): Promise<TvShow[]>;
-  getPopular(): Promise<TvShow[]>;
-  getTopRated(): Promise<TvShow[]>;
-  search(query: string): Promise<TvShow[]>;
-  discover(filters: TvDiscoverFilters): Promise<TvDiscoverResult>;
+  getTrending(): Promise<Media[]>;
+  getPopular(): Promise<Media[]>;
+  getTopRated(): Promise<Media[]>;
+  search(query: string): Promise<Media[]>;
+  discover(
+    filters: TvDiscoverFilters,
+    options?: DiscoverOptions
+  ): Promise<TvDiscoverResult>;
 }

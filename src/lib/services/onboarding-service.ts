@@ -1,13 +1,13 @@
-import { movieRepository } from '@/lib/repositories';
+import { tmdbMovieRepository } from '@/lib/repositories';
 
 export async function getOnboardingCandidates() {
   const [popular, trending] = await Promise.all([
-    movieRepository.getPopular(),
-    movieRepository.getTrending(),
+    tmdbMovieRepository.getPopular(),
+    tmdbMovieRepository.getTrending(),
   ]);
 
   const movies = new Map(
-    [...popular, ...trending].map((movie) => [movie.id, movie])
+    [...popular, ...trending].map((movie) => [movie.tmdbId, movie])
   );
 
   return Array.from(movies.values()).slice(0, 24);
