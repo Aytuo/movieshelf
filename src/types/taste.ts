@@ -1,3 +1,5 @@
+import { MediaType } from '@/lib/media';
+
 /* ========================================================================== */
 /*                                  TASTE                                     */
 /* ========================================================================== */
@@ -19,28 +21,30 @@ export type RatingDistributionItem = {
   count: number;
 };
 
-export type TasteProfile = {
-  totalMovies: number;
-  watchedMovies: number;
-  watchlistMovies: number;
-  favoriteMovies: number;
-  ratedMovies: number;
+export type TasteMedia = {
+  id: string;
+  tmdbId: number;
+  type: MediaType;
+  title: string;
+  posterPath: string | null;
+  rating: number;
+};
+
+export type TasteStats = {
+  total: number;
+  watched: number;
+  watchlist: number;
+  favorite: number;
+  rated: number;
   averageRating: number | null;
   topGenres: TasteGenre[];
   favoriteDecades: TasteDecade[];
   ratingDistribution: RatingDistributionItem[];
-  highestRatedMovies: {
-    id: string;
-    tmdbId: number;
-    title: string;
-    posterPath: string | null;
-    rating: number;
-  }[];
-  lowestRatedMovies: {
-    id: string;
-    tmdbId: number;
-    title: string;
-    posterPath: string | null;
-    rating: number;
-  }[];
+  highestRated: TasteMedia[];
+  lowestRated: TasteMedia[];
+};
+
+export type TasteProfile = {
+  movie: TasteStats;
+  tv: TasteStats;
 };

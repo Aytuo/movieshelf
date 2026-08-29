@@ -1,33 +1,23 @@
-import type { Media, MediaDetails, MovieDetails, TvDetails } from '@/lib/media';
+import type { Media, MediaDetails, MediaType } from '@/lib/media';
 import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
 import {
   getMediaByTmdbId,
   upsertMedia,
 } from '@/lib/repositories/media-repository';
 
+function getMediaRepository(type: MediaType) {
+  return type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;
+}
+
 /* ========================================================================== */
 /*                                 GET DETAILS                                */
 /* ========================================================================== */
 
 export async function getMediaDetails(
-  type: 'movie',
-  tmdbId: number
-): Promise<MovieDetails>;
-
-export async function getMediaDetails(
-  type: 'tv',
-  tmdbId: number
-): Promise<TvDetails>;
-
-export async function getMediaDetails(
-  type: 'movie' | 'tv',
+  type: MediaType,
   tmdbId: number
 ): Promise<MediaDetails> {
-  if (type === 'movie') {
-    return tmdbMovieRepository.getById(tmdbId);
-  }
-
-  return tmdbTvRepository.getById(tmdbId);
+  return getMediaRepository(type).getById(tmdbId);
 }
 
 /* ========================================================================== */
@@ -35,7 +25,7 @@ export async function getMediaDetails(
 /* ========================================================================== */
 
 export async function getOrCreateMedia(
-  type: 'movie' | 'tv',
+  type: MediaType,
   tmdbId: number
 ): Promise<Media> {
   const existing = await getMediaByTmdbId(tmdbId, type);
@@ -44,10 +34,7 @@ export async function getOrCreateMedia(
     return existing;
   }
 
-  const details =
-    type === 'movie'
-      ? await tmdbMovieRepository.getById(tmdbId)
-      : await tmdbTvRepository.getById(tmdbId);
+  const details = await getMediaRepository(type).getById(tmdbId);
 
   await upsertMedia({
     tmdbId: details.tmdbId,

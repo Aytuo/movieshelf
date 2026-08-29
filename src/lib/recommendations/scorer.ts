@@ -2,12 +2,12 @@ import type { MediaRecommendation } from '@/types';
 import type { Media } from '../media';
 import type { RecommendationCandidate } from './candidate-generator';
 
-type RatedMedia = {
+export type RatedMedia = {
   media: Media;
   rating: number;
 };
 
-type TasteSignals = {
+export type TasteSignals = {
   genreAffinity: Map<number, number>;
   decadeAffinity: Map<string, number>;
   averageRating: number | null;
@@ -15,6 +15,7 @@ type TasteSignals = {
 
 export function buildTasteSignals(ratedMedia: RatedMedia[]): TasteSignals {
   const genreSums = new Map<number, { total: number; count: number }>();
+
   const decadeSums = new Map<string, { total: number; count: number }>();
 
   let ratingTotal = 0;
@@ -72,11 +73,11 @@ export function buildTasteSignals(ratedMedia: RatedMedia[]): TasteSignals {
 export function scoreCandidate({
   candidate,
   signals,
-  sourceMovieTitle,
+  sourceMediaTitle,
 }: {
   candidate: RecommendationCandidate;
   signals: TasteSignals;
-  sourceMovieTitle?: string;
+  sourceMediaTitle?: string;
 }): MediaRecommendation {
   const media = candidate.media;
 
@@ -144,7 +145,7 @@ export function scoreCandidate({
     genreScore,
     similarityScore,
     decadeScore,
-    sourceMovieTitle,
+    sourceMediaTitle,
   });
 
   const reasonType =
@@ -167,16 +168,16 @@ function getReason({
   genreScore,
   similarityScore,
   decadeScore,
-  sourceMovieTitle,
+  sourceMediaTitle,
 }: {
   media: Media;
   genreScore: number;
   similarityScore: number;
   decadeScore: number;
-  sourceMovieTitle?: string;
+  sourceMediaTitle?: string;
 }) {
-  if (sourceMovieTitle && similarityScore >= 0.7) {
-    return `Because you liked ${sourceMovieTitle}`;
+  if (sourceMediaTitle && similarityScore >= 0.7) {
+    return `Because you liked ${sourceMediaTitle}`;
   }
 
   if (genreScore >= 0.65 && media.genres.length > 0) {

@@ -1,5 +1,9 @@
+import { sql } from 'drizzle-orm';
 import {
+  boolean,
+  check,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -30,7 +34,10 @@ export const review = pgTable(
     mediaId: uuid('media_id')
       .notNull()
       .references(() => media.id, { onDelete: 'cascade' }),
+    title: text('title'),
     content: text('content').notNull(),
+    rating: integer('rating').notNull(),
+    containsSpoilers: boolean('contains_spoilers').notNull().default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()
@@ -41,6 +48,7 @@ export const review = pgTable(
     uniqueIndex('user_media_review_idx').on(table.userId, table.mediaId),
     index('review_media_idx').on(table.mediaId),
     index('review_user_idx').on(table.userId),
+    check('review_rating_range_check', sql`${table.rating} BETWEEN 1 AND 10`),
   ]
 );
 

@@ -1,17 +1,17 @@
 import { db } from '@/lib/db';
+import { review } from '@/lib/db/schema';
 import type { ReviewInput } from '@/lib/validations/review';
 import { and, eq } from 'drizzle-orm';
-import { review } from '../db/schema';
 
 export async function upsertReview(
   userId: string,
-  movieId: string,
+  mediaId: string,
   input: ReviewInput
 ) {
   const existing = await db
     .select()
     .from(review)
-    .where(and(eq(review.userId, userId), eq(review.movieId, movieId)))
+    .where(and(eq(review.userId, userId), eq(review.mediaId, mediaId)))
     .limit(1);
 
   if (existing[0]) {
@@ -34,7 +34,7 @@ export async function upsertReview(
     .insert(review)
     .values({
       userId,
-      movieId,
+      mediaId,
       title: input.title || null,
       content: input.content,
       rating: input.rating,

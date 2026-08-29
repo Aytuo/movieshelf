@@ -1,19 +1,20 @@
-import type { Media } from '@/lib/media';
-import { tmdbMovieRepository } from '@/lib/repositories';
+import type { Media, MediaKey, MediaType } from '@/lib/media';
+import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
+
+export type RecommendationSeed = {
+  tmdbId: number;
+  type: MediaType;
+  rating: number;
+};
 
 export type RecommendationCandidate = {
   media: Media;
   similarityScore: number;
-  sourceMovieId: number | null;
-};
-
-type SeedMovie = {
-  tmdbId: number;
-  rating: number;
+  sourceMediaKey: MediaKey | null;
 };
 
 export async function generateCandidates(
-  seeds: SeedMovie[]
+  seeds: RecommendationSeed[]
 ): Promise<RecommendationCandidate[]> {
   const limitedSeeds = seeds.slice(0, 3);
 
@@ -24,11 +25,11 @@ export async function generateCandidates(
   const details = await Promise.all(
     limitedSeeds.map(async (seed) => ({
       seed,
-      media: await tmdbMovieRepository.getById(seed.tmdbId),
+      media: await getRepository(seed.type).getById(seed.tmdbId),
     }))
   );
 
-  const candidates = new Map<number, RecommendationCandidate>();
+  const candidates = new Map<string, RecommendationCandidate>();
 
   for (const { seed, media } of details) {
     if (!media) {
@@ -43,24 +44,38 @@ export async function generateCandidates(
   return Array.from(candidates.values());
 }
 
+function getRepository(type: MediaType) {
+  return type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;
+}
+
 function addCandidates(
-  target: Map<number, RecommendationCandidate>,
+  target: Map<string, RecommendationCandidate>,
   media: Media[],
-  seed: SeedMovie,
+  seed: RecommendationSeed,
   sourceWeight: number
 ) {
   media.forEach((item, index) => {
+    // Never allow the recommendation engine to cross the Movie / TV boundary.
+    if (item.type !== seed.type) {
+      return;
+    }
+
     const rankScore = Math.max(0, 1 - index / Math.max(media.length, 1));
 
     const similarityScore = rankScore * sourceWeight;
 
-    const existing = target.get(item.tmdbId);
+    const key = `${item.type}:${item.tmdbId}`;
+
+    const existing = target.get(key);
 
     if (!existing) {
-      target.set(item.tmdbId, {
+      target.set(key, {
         media: item,
         similarityScore,
-        sourceMovieId: seed.tmdbId,
+        sourceMediaKey: {
+          tmdbId: seed.tmdbId,
+          type: seed.type,
+        },
       });
 
       return;

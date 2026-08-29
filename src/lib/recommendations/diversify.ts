@@ -15,7 +15,6 @@ export function diversifyRecommendations(
 
     for (let index = 0; index < remaining.length; index++) {
       const candidate = remaining[index];
-
       const primaryGenre = candidate.media.genres[0];
 
       if (!primaryGenre) {

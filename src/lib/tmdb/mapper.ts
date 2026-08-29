@@ -1,4 +1,5 @@
 import type {
+  Media,
   MediaCastMember,
   MediaCrewMember,
   MediaGenre,
@@ -16,6 +17,7 @@ import type {
   TmdbCreditCrew,
   TmdbMovieBundle,
   TmdbMovieResult,
+  TmdbMultiSearchResult,
   TmdbTvAggregateCast,
   TmdbTvBundle,
   TmdbTvResult,
@@ -201,4 +203,19 @@ export function mapTmdbTvDetails(tv: TmdbTvBundle): TvDetails {
       .slice(0, 6)
       .map(mapTvResult),
   };
+}
+
+export function mapTmdbMultiSearchResult(
+  result: TmdbMultiSearchResult
+): Media | null {
+  switch (result.media_type) {
+    case 'movie':
+      return mapMovieResult(result);
+
+    case 'tv':
+      return mapTvResult(result);
+
+    case 'person':
+      return null;
+  }
 }

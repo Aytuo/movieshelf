@@ -1,68 +1,67 @@
-import { MediaRecommendation } from '@/types';
-import { desc, eq } from 'drizzle-orm';
-import { db } from '../db';
-import { movie, userMovie } from '../db/schema/tables';
-import { generateCandidates } from '../recommendations/candidate-generator';
-import { diversifyRecommendations } from '../recommendations/diversify';
-import { excludeKnownMovies } from '../recommendations/exclusions';
-import { buildTasteSignals, scoreCandidate } from '../recommendations/scorer';
+import { db } from '@/lib/db';
+import { media, mediaInteraction } from '@/lib/db/schema';
+import type { Media, MediaType } from '@/lib/media';
+import {
+  generateCandidates,
+  type RecommendationSeed,
+} from '@/lib/recommendations/candidate-generator';
+import { diversifyRecommendations } from '@/lib/recommendations/diversify';
+import {
+  excludeKnownMedia,
+  getMediaKey,
+} from '@/lib/recommendations/exclusions';
+import {
+  buildTasteSignals,
+  scoreCandidate,
+} from '@/lib/recommendations/scorer';
+import type { MediaRecommendation } from '@/types';
+import type { InferSelectModel } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
+
+type DbMedia = InferSelectModel<typeof media>;
 
 export async function getRecommendationsForUser(
-  userId: string
+  userId: string,
+  type: MediaType
 ): Promise<MediaRecommendation[]> {
   const shelf = await db
     .select({
-      movie,
-      shelf: userMovie,
+      media,
+      interaction: mediaInteraction,
     })
-    .from(userMovie)
-    .innerJoin(movie, eq(movie.id, userMovie.movieId))
-    .where(eq(userMovie.userId, userId))
-    .orderBy(desc(userMovie.updatedAt));
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(and(eq(mediaInteraction.userId, userId), eq(media.type, type)))
+    .orderBy(desc(mediaInteraction.updatedAt));
 
-  // Known movies: The database is still movie-only, so the user's shelf gives us the collection of TMDB movie IDs that should be excluded from recommendations.
+  // Known media: Only media of the requested type are loaded above, so Movie recommendations never see TV entries and vice versa.
 
-  const knownTmdbIds = new Set(shelf.map(({ movie }) => movie.tmdbId));
+  const knownMediaKeys = new Set(shelf.map(({ media }) => getMediaKey(media)));
 
-  // Rated movies: The DB schema remains movie-only, but the recommendation engine works with the new Media model.
+  // Rated media.
 
-  const ratedMovies = shelf
-    .filter(({ shelf }) => shelf.rating !== null)
-    .map(({ movie, shelf }) => ({
-      media: {
-        tmdbId: movie.tmdbId,
-        type: 'movie' as const,
-        title: movie.title,
-        originalTitle: movie.originalTitle,
-        overview: movie.overview ?? '',
-        posterPath: movie.posterPath,
-        backdropPath: movie.backdropPath,
-        releaseDate: movie.releaseDate ?? null,
-        rating: Number(movie.tmdbRating ?? 0),
-        voteCount: movie.tmdbVoteCount ?? 0,
-        originalLanguage: movie.originalLanguage ?? '',
-        genres: (movie.genres ?? []).map((genre) => ({
-          id: genre.id,
-          name: genre.name,
-        })),
-      },
-      rating: Number(shelf.rating),
+  const ratedMedia = shelf
+    .filter(({ interaction }) => interaction.rating !== null)
+    .map(({ media, interaction }) => ({
+      media: toRecommendationMedia(media),
+      rating: interaction.rating!,
     }))
     .sort((a, b) => b.rating - a.rating);
 
-  //  Cold start:We need at least a few strong signals before trying to personalize aggressively.
+  // Cold start.
 
-  if (ratedMovies.length < 3) {
+  if (ratedMedia.length < 3) {
     return [];
   }
 
-  // Recommendation seeds: Only strongly-rated movies are used as sources for personalized recommendations.
+  // Seeds: Only strongly-rated media are used recommendation sources.
 
-  const seeds = ratedMovies
+  const seeds: RecommendationSeed[] = ratedMedia
     .filter(({ rating }) => rating >= 8)
     .slice(0, 3)
     .map(({ media, rating }) => ({
       tmdbId: media.tmdbId,
+      type: media.type,
       rating,
     }));
 
@@ -70,41 +69,61 @@ export async function getRecommendationsForUser(
     return [];
   }
 
-  // Taste signals: These are used to score candidates.
+  // Taste signals.
 
-  const signals = buildTasteSignals(ratedMovies);
+  const signals = buildTasteSignals(ratedMedia);
 
-  // Candidate generation: We generate candidates for each seed movie.
+  // Candidate generation.
 
   const candidates = await generateCandidates(seeds);
 
-  // Source movie titles: These are used to provide context to the user.
+  // Source media titles.
 
-  const seedTitles = new Map<number, string>();
+  const seedTitles = new Map<string, string>();
+
   for (const seed of seeds) {
-    const ratedMovie = ratedMovies.find(
-      ({ media }) => media.tmdbId === seed.tmdbId
+    const rated = ratedMedia.find(
+      ({ media }) => media.tmdbId === seed.tmdbId && media.type === seed.type
     );
-    if (ratedMovie) {
-      seedTitles.set(seed.tmdbId, ratedMovie.media.title);
+
+    if (rated) {
+      seedTitles.set(getMediaKey(seed), rated.media.title);
     }
   }
 
-  // Scoring: We score the candidates.
+  // Scoring.
 
   const scored = candidates.map((candidate) =>
     scoreCandidate({
       candidate,
       signals,
-      sourceMovieTitle: seedTitles.get(candidate.sourceMovieId ?? -1),
+      sourceMediaTitle: candidate.sourceMediaKey
+        ? seedTitles.get(getMediaKey(candidate.sourceMediaKey))
+        : undefined,
     })
   );
 
-  // Exclusions: We exclude known movies.
+  // Exclusions.
+  const filtered = excludeKnownMedia(scored, knownMediaKeys);
 
-  const filtered = excludeKnownMovies(scored, knownTmdbIds);
-
-  // Diversification: We diversify the recommendations.
+  // Diversification.
 
   return diversifyRecommendations(filtered, 12);
+}
+
+function toRecommendationMedia(media: DbMedia): Media {
+  return {
+    tmdbId: media.tmdbId,
+    type: media.type,
+    title: media.title,
+    originalTitle: media.originalTitle,
+    overview: media.overview,
+    posterPath: media.posterPath,
+    backdropPath: media.backdropPath,
+    releaseDate: media.releaseDate,
+    rating: Number(media.tmdbRating ?? 0),
+    voteCount: media.tmdbVoteCount,
+    originalLanguage: media.originalLanguage,
+    genres: media.genres,
+  };
 }

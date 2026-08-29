@@ -19,6 +19,7 @@ export const tmdbMovieRepository: MovieRepository = {
 
   async getPopular() {
     const response = await discoverMovies({
+      type: 'movie',
       page: 1,
       sortBy: 'popularity.desc',
     });
@@ -34,6 +35,7 @@ export const tmdbMovieRepository: MovieRepository = {
 
   async getTopPicks() {
     const response = await discoverMovies({
+      type: 'movie',
       page: 1,
       sortBy: 'vote_average.desc',
       minRating: 7.5,
@@ -49,25 +51,32 @@ export const tmdbMovieRepository: MovieRepository = {
     return response.results.map(mapTmdbMovie).slice(0, 20);
   },
 
-  async search(query) {
-    const response = await searchMovies(query, 1);
+  async search(query, options) {
+    const page = options?.page ?? 1;
 
-    return response.results.map(mapTmdbMovie);
+    const response = await searchMovies(query, page);
+
+    return {
+      media: response.results.map(mapTmdbMovie),
+      page: response.page,
+      totalPages: response.total_pages,
+      totalResults: response.total_results,
+    };
   },
 
   async discover(filters, options) {
     const appPage = filters.page ?? 1;
 
-    const requestedCount = options?.maxMovies ?? appPage * DISCOVER_PAGE_SIZE;
+    const requestedCount = options?.maxResults ?? appPage * DISCOVER_PAGE_SIZE;
 
-    const uniqueMovies = new Map<number, Movie>();
+    const uniqueMedia = new Map<number, Movie>();
 
     let tmdbPage = 1;
     let totalResults = 0;
     let totalPages = 1;
 
     while (
-      uniqueMovies.size < requestedCount &&
+      uniqueMedia.size < requestedCount &&
       tmdbPage <= 50 &&
       tmdbPage <= totalPages
     ) {
@@ -82,7 +91,7 @@ export const tmdbMovieRepository: MovieRepository = {
       for (const result of response.results) {
         const mapped = mapTmdbMovie(result);
 
-        uniqueMovies.set(mapped.tmdbId, mapped);
+        uniqueMedia.set(mapped.tmdbId, mapped);
       }
 
       if (tmdbPage >= totalPages) {
@@ -93,7 +102,7 @@ export const tmdbMovieRepository: MovieRepository = {
     }
 
     return {
-      movies: Array.from(uniqueMovies.values()),
+      media: Array.from(uniqueMedia.values()),
       page: appPage,
       totalResults,
       totalPages: Math.max(1, Math.ceil(totalResults / DISCOVER_PAGE_SIZE)),

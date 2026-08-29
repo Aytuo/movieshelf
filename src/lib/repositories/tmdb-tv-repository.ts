@@ -5,6 +5,8 @@ import {
   searchTv,
 } from '@/lib/tmdb/client';
 import { mapTmdbTv, mapTmdbTvDetails } from '@/lib/tmdb/mapper';
+import { DISCOVER_PAGE_SIZE } from '../discover/pagination';
+import { TvShow } from '../media';
 import { TvRepository } from './types';
 
 export const tmdbTvRepository: TvRepository = {
@@ -22,6 +24,7 @@ export const tmdbTvRepository: TvRepository = {
 
   async getPopular() {
     const result = await discoverTv({
+      type: 'tv',
       page: 1,
       sortBy: 'popularity.desc',
     });
@@ -31,6 +34,7 @@ export const tmdbTvRepository: TvRepository = {
 
   async getTopRated() {
     const result = await discoverTv({
+      type: 'tv',
       page: 1,
       sortBy: 'vote_average.desc',
       minRating: 8,
@@ -41,20 +45,61 @@ export const tmdbTvRepository: TvRepository = {
       .filter((show) => show.voteCount >= 1000);
   },
 
-  async search(query) {
-    const result = await searchTv(query);
+  async search(query, options) {
+    const page = options?.page ?? 1;
 
-    return result.results.map(mapTmdbTv);
-  },
-
-  async discover(filters) {
-    const result = await discoverTv(filters);
+    const response = await searchTv(query, page);
 
     return {
-      shows: result.results.map(mapTmdbTv),
-      page: result.page,
-      totalPages: result.total_pages,
-      totalResults: result.total_results,
+      media: response.results.map(mapTmdbTv),
+      page: response.page,
+      totalPages: response.total_pages,
+      totalResults: response.total_results,
+    };
+  },
+
+  async discover(filters, options) {
+    const appPage = filters.page ?? 1;
+
+    const requestedCount = options?.maxResults ?? appPage * DISCOVER_PAGE_SIZE;
+
+    const uniqueMedia = new Map<number, TvShow>();
+
+    let tmdbPage = 1;
+    let totalResults = 0;
+    let totalPages = 1;
+
+    while (
+      uniqueMedia.size < requestedCount &&
+      tmdbPage <= 500 &&
+      tmdbPage <= totalPages
+    ) {
+      const response = await discoverTv({
+        ...filters,
+        page: tmdbPage,
+      });
+
+      totalResults = response.total_results;
+      totalPages = response.total_pages;
+
+      for (const result of response.results) {
+        const mapped = mapTmdbTv(result);
+
+        uniqueMedia.set(mapped.tmdbId, mapped);
+      }
+
+      if (tmdbPage >= totalPages) {
+        break;
+      }
+
+      tmdbPage += 1;
+    }
+
+    return {
+      media: Array.from(uniqueMedia.values()),
+      page: appPage,
+      totalResults,
+      totalPages: Math.max(1, Math.ceil(totalResults / DISCOVER_PAGE_SIZE)),
     };
   },
 };

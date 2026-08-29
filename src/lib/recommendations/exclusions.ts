@@ -1,10 +1,15 @@
-import { MediaRecommendation } from '@/types';
+import type { MediaKey } from '@/lib/media';
+import type { MediaRecommendation } from '@/types';
 
-export function excludeKnownMovies(
+export function excludeKnownMedia(
   recommendations: MediaRecommendation[],
-  knownMediaIds: Set<number>
+  knownMediaKeys: Set<string>
 ) {
   return recommendations.filter(
-    ({ media }) => !knownMediaIds.has(media.tmdbId)
+    ({ media }) => !knownMediaKeys.has(getMediaKey(media))
   );
+}
+
+export function getMediaKey(media: MediaKey) {
+  return `${media.type}:${media.tmdbId}`;
 }

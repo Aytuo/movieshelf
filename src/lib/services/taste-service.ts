@@ -1,14 +1,21 @@
 import { db } from '@/lib/db';
-import { movie, userMovie } from '@/lib/db/schema';
-import {
+import { media, mediaInteraction } from '@/lib/db/schema';
+import type {
   RatingDistributionItem,
   TasteDecade,
   TasteGenre,
+  TasteMedia,
   TasteProfile,
+  TasteStats,
 } from '@/types';
 import { desc, eq } from 'drizzle-orm';
 
-function getDecade(releaseDate: string | null) {
+type TasteItem = {
+  media: typeof media.$inferSelect;
+  interaction: typeof mediaInteraction.$inferSelect;
+};
+
+function getDecade(releaseDate: string | null): string | null {
   if (!releaseDate) {
     return null;
   }
@@ -22,29 +29,21 @@ function getDecade(releaseDate: string | null) {
   return `${Math.floor(year / 10) * 10}s`;
 }
 
-export async function getTasteProfile(userId: string): Promise<TasteProfile> {
-  const shelf = await db
-    .select({
-      movie,
-      shelf: userMovie,
-    })
-    .from(userMovie)
-    .innerJoin(movie, eq(movie.id, userMovie.movieId))
-    .where(eq(userMovie.userId, userId))
-    .orderBy(desc(userMovie.addedAt));
+function buildTasteStats(items: TasteItem[]): TasteStats {
+  const total = items.length;
 
-  const totalMovies = shelf.length;
-
-  const watchedMovies = shelf.filter(({ shelf }) => shelf.status === 'watched');
-
-  const watchlistMovies = shelf.filter(
-    ({ shelf }) => shelf.status === 'watchlist'
+  const watched = items.filter(
+    ({ interaction }) => interaction.status === 'watched'
   );
 
-  const favoriteMovies = shelf.filter(({ shelf }) => shelf.favorite);
+  const watchlist = items.filter(
+    ({ interaction }) => interaction.status === 'watchlist'
+  );
 
-  const ratings = watchedMovies
-    .map(({ shelf }) => shelf.rating)
+  const favorite = items.filter(({ interaction }) => interaction.favorite);
+
+  const ratings = watched
+    .map(({ interaction }) => interaction.rating)
     .filter((rating): rating is number => rating !== null);
 
   const averageRating =
@@ -56,15 +55,15 @@ export async function getTasteProfile(userId: string): Promise<TasteProfile> {
         )
       : null;
 
-  /* ------------------------------------------------------------------------ */
-  /* Genres                                                                   */
-  /* ------------------------------------------------------------------------ */
+  /* ========================================================================== */
+  /*                                 GENRES                                     */
+  /* ========================================================================== */
 
   const genreCounts = new Map<string, number>();
 
-  for (const { movie } of watchedMovies) {
-    for (const genre of movie.genres ?? []) {
-      genreCounts.set(genre, (genreCounts.get(genre) ?? 0) + 1);
+  for (const { media } of watched) {
+    for (const genre of media.genres) {
+      genreCounts.set(genre.name, (genreCounts.get(genre.name) ?? 0) + 1);
     }
   }
 
@@ -85,14 +84,14 @@ export async function getTasteProfile(userId: string): Promise<TasteProfile> {
     .sort((a, b) => b.count - a.count)
     .slice(0, 6);
 
-  /* ------------------------------------------------------------------------ */
-  /* Decades                                                                  */
-  /* ------------------------------------------------------------------------ */
+  /* ========================================================================== */
+  /*                                 DECADES                                    */
+  /* ========================================================================== */
 
   const decadeCounts = new Map<string, number>();
 
-  for (const { movie } of watchedMovies) {
-    const decade = getDecade(movie.releaseDate);
+  for (const { media } of watched) {
+    const decade = getDecade(media.releaseDate);
 
     if (!decade) {
       continue;
@@ -101,7 +100,10 @@ export async function getTasteProfile(userId: string): Promise<TasteProfile> {
     decadeCounts.set(decade, (decadeCounts.get(decade) ?? 0) + 1);
   }
 
-  const totalDecadeEntries = watchedMovies.length;
+  const totalDecadeEntries = Array.from(decadeCounts.values()).reduce(
+    (sum, count) => sum + count,
+    0
+  );
 
   const favoriteDecades: TasteDecade[] = Array.from(decadeCounts.entries())
     .map(([decade, count]) => ({
@@ -115,9 +117,9 @@ export async function getTasteProfile(userId: string): Promise<TasteProfile> {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  /* ------------------------------------------------------------------------ */
-  /* Rating distribution                                                      */
-  /* ------------------------------------------------------------------------ */
+  /* ========================================================================== */
+  /*                          RATING DISTRIBUTION                               */
+  /* ========================================================================== */
 
   const distributionMap = new Map<number, number>();
 
@@ -125,57 +127,70 @@ export async function getTasteProfile(userId: string): Promise<TasteProfile> {
     distributionMap.set(rating, (distributionMap.get(rating) ?? 0) + 1);
   }
 
-  const ratingDistribution: RatingDistributionItem[] = Array.from({
-    length: 10,
-  }).map((_, index) => {
-    const rating = index + 1;
+  const ratingDistribution: RatingDistributionItem[] = Array.from(
+    { length: 10 },
+    (_, index) => {
+      const rating = index + 1;
 
-    return {
-      rating,
-      count: distributionMap.get(rating) ?? 0,
-    };
+      return {
+        rating,
+        count: distributionMap.get(rating) ?? 0,
+      };
+    }
+  );
+
+  /* ========================================================================== */
+  /*                         HIGHEST / LOWEST RATED                             */
+  /* ========================================================================== */
+
+  const rated = watched
+    .filter(({ interaction }) => interaction.rating !== null)
+    .sort((a, b) => (b.interaction.rating ?? 0) - (a.interaction.rating ?? 0));
+
+  const toTasteMedia = ({ media, interaction }: TasteItem): TasteMedia => ({
+    id: media.id,
+    tmdbId: media.tmdbId,
+    type: media.type,
+    title: media.title,
+    posterPath: media.posterPath,
+    rating: interaction.rating!,
   });
 
-  /* ------------------------------------------------------------------------ */
-  /* Highest / lowest rated                                                   */
-  /* ------------------------------------------------------------------------ */
+  const highestRated = rated.slice(0, 5).map(toTasteMedia);
 
-  const ratedMovies = watchedMovies
-    .filter(({ shelf }) => shelf.rating !== null)
-    .sort((a, b) => (b.shelf.rating ?? 0) - (a.shelf.rating ?? 0));
-
-  const highestRatedMovies = ratedMovies
-    .slice(0, 5)
-    .map(({ movie, shelf }) => ({
-      id: movie.id,
-      tmdbId: movie.tmdbId,
-      title: movie.title,
-      posterPath: movie.posterPath,
-      rating: shelf.rating!,
-    }));
-
-  const lowestRatedMovies = [...ratedMovies]
-    .reverse()
-    .slice(0, 5)
-    .map(({ movie, shelf }) => ({
-      id: movie.id,
-      tmdbId: movie.tmdbId,
-      title: movie.title,
-      posterPath: movie.posterPath,
-      rating: shelf.rating!,
-    }));
+  const lowestRated = [...rated].reverse().slice(0, 5).map(toTasteMedia);
 
   return {
-    totalMovies,
-    watchedMovies: watchedMovies.length,
-    watchlistMovies: watchlistMovies.length,
-    favoriteMovies: favoriteMovies.length,
-    ratedMovies: ratings.length,
+    total,
+    watched: watched.length,
+    watchlist: watchlist.length,
+    favorite: favorite.length,
+    rated: ratings.length,
     averageRating,
     topGenres,
     favoriteDecades,
     ratingDistribution,
-    highestRatedMovies,
-    lowestRatedMovies,
+    highestRated,
+    lowestRated,
+  };
+}
+
+export async function getTasteProfile(userId: string): Promise<TasteProfile> {
+  const items = await db
+    .select({
+      media,
+      interaction: mediaInteraction,
+    })
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(eq(mediaInteraction.userId, userId))
+    .orderBy(desc(mediaInteraction.createdAt));
+
+  const movieItems = items.filter(({ media }) => media.type === 'movie');
+  const tvItems = items.filter(({ media }) => media.type === 'tv');
+
+  return {
+    movie: buildTasteStats(movieItems),
+    tv: buildTasteStats(tvItems),
   };
 }

@@ -1,14 +1,29 @@
-import { tmdbMovieRepository } from '@/lib/repositories';
+import type { Media, MediaType } from '@/lib/media';
+import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
 
-export async function getOnboardingCandidates() {
+export async function getOnboardingCandidates(
+  type: MediaType
+): Promise<Media[]> {
+  const repository = type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;
+
   const [popular, trending] = await Promise.all([
-    tmdbMovieRepository.getPopular(),
-    tmdbMovieRepository.getTrending(),
+    repository.getPopular(),
+    repository.getTrending(),
   ]);
 
-  const movies = new Map(
-    [...popular, ...trending].map((movie) => [movie.tmdbId, movie])
-  );
+  const uniqueMedia = new Map<string, Media>();
 
-  return Array.from(movies.values()).slice(0, 24);
+  for (const item of [...popular, ...trending]) {
+    if (item.type !== type) {
+      continue;
+    }
+
+    const key = `${item.type}:${item.tmdbId}`;
+
+    if (!uniqueMedia.has(key)) {
+      uniqueMedia.set(key, item);
+    }
+  }
+
+  return Array.from(uniqueMedia.values()).slice(0, 24);
 }

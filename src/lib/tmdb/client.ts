@@ -1,4 +1,4 @@
-import { MovieDiscoverFilters, TvDiscoverFilters } from '@/types';
+import { DiscoverFilters, TvDiscoverFilters } from '@/types';
 import {
   TmdbMovieBundle,
   TmdbMovieResult,
@@ -78,7 +78,7 @@ export async function searchMovies(
   });
 }
 
-export async function discoverMovies(filters: MovieDiscoverFilters = {}) {
+export async function discoverMovies(filters: DiscoverFilters) {
   return tmdbFetch<TmdbPagedResponse<TmdbMovieResult>>('/discover/movie', {
     page: String(filters.page ?? 1),
     language: 'en-US',
@@ -292,7 +292,7 @@ export async function searchTv(
   });
 }
 
-export async function discoverTv(filters: TvDiscoverFilters = {}) {
+export async function discoverTv(filters: TvDiscoverFilters) {
   return tmdbFetch<TmdbPagedResponse<TmdbTvResult>>('/discover/tv', {
     page: String(filters.page ?? 1),
     language: 'en-US',

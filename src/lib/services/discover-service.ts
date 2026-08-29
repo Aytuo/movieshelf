@@ -1,60 +1,88 @@
 import { db } from '@/lib/db';
-import { movie, userMovie } from '@/lib/db/schema';
+import { media, mediaInteraction } from '@/lib/db/schema';
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
-import { MovieDiscoverFilters } from '@/types';
+import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
+import type { DiscoverFilters } from '@/types';
 import { eq } from 'drizzle-orm';
-import { tmdbMovieRepository } from '../repositories';
+import { Media } from '../media';
+
+function getMediaKey(media: Pick<Media, 'tmdbId' | 'type'>) {
+  return `${media.type}:${media.tmdbId}`;
+}
+
+async function discoverMedia(filters: DiscoverFilters, maxResults: number) {
+  switch (filters.type) {
+    case 'movie':
+      return tmdbMovieRepository.discover(filters, {
+        maxResults,
+      });
+
+    case 'tv':
+      return tmdbTvRepository.discover(filters, {
+        maxResults,
+      });
+  }
+}
 
 export async function discoverForUser(
   userId: string,
-  filters: MovieDiscoverFilters
+  filters: DiscoverFilters
 ) {
   const page = filters.page ?? 1;
 
+  // We request enough candidates to build the requested application page after removing media already present on the user's shelf.
+
   const requiredCount = page * DISCOVER_PAGE_SIZE;
 
-  const existing = filters.hideOnShelf
+  // Known media.
+
+  const knownMedia = filters.hideOnShelf
     ? await db
         .select({
-          tmdbId: movie.tmdbId,
+          tmdbId: media.tmdbId,
+          type: media.type,
         })
-        .from(userMovie)
-        .innerJoin(movie, eq(movie.id, userMovie.movieId))
-        .where(eq(userMovie.userId, userId))
+        .from(mediaInteraction)
+        .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+        .where(eq(mediaInteraction.userId, userId))
     : [];
 
-  const knownIds = new Set(existing.map((item) => item.tmdbId));
+  const knownMediaKeys = new Set(knownMedia.map(getMediaKey));
 
-  let result = await tmdbMovieRepository.discover(filters, {
-    maxMovies: requiredCount,
-  });
+  // Fetch candidates.
 
-  let filtered = result.movies.filter((item) => !knownIds.has(item.tmdbId));
+  let result = await discoverMedia(filters, requiredCount);
+
+  const filterKnownMedia = (items: Media[]) =>
+    items.filter((item) => !knownMediaKeys.has(getMediaKey(item)));
+
+  let filtered = filterKnownMedia(result.media);
+
+  // Fetch additional candidates.
 
   while (
     filters.hideOnShelf &&
     filtered.length < requiredCount &&
-    result.movies.length < 200
+    result.media.length < 200
   ) {
-    const nextCandidateCount = result.movies.length + DISCOVER_PAGE_SIZE;
+    const nextCandidateCount = result.media.length + DISCOVER_PAGE_SIZE;
 
-    result = await tmdbMovieRepository.discover(filters, {
-      maxMovies: nextCandidateCount,
-    });
+    result = await discoverMedia(filters, nextCandidateCount);
 
-    filtered = result.movies.filter((item) => !knownIds.has(item.tmdbId));
+    filtered = filterKnownMedia(result.media);
 
-    if (result.movies.length >= result.totalResults) {
+    if (result.media.length >= result.totalResults) {
       break;
     }
   }
 
-  const start = (page - 1) * DISCOVER_PAGE_SIZE;
+  // Application pagination.
 
+  const start = (page - 1) * DISCOVER_PAGE_SIZE;
   const end = start + DISCOVER_PAGE_SIZE;
 
   return {
     ...result,
-    movies: filtered.slice(start, end),
+    media: filtered.slice(start, end),
   };
 }

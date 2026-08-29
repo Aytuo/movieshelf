@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, review, userMovie, watchHistory } from '@/lib/db/schema';
+import { media, mediaInteraction, review, watchHistory } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 export type ActivityItem =
@@ -7,33 +7,33 @@ export type ActivityItem =
       type: 'watched';
       id: string;
       createdAt: Date;
-      movie: typeof movie.$inferSelect;
+      media: typeof media.$inferSelect;
       watchedAt: Date;
     }
   | {
       type: 'review';
       id: string;
       createdAt: Date;
-      movie: typeof movie.$inferSelect;
+      media: typeof media.$inferSelect;
       review: typeof review.$inferSelect;
     }
   | {
       type: 'shelf';
       id: string;
       createdAt: Date;
-      movie: typeof movie.$inferSelect;
-      shelf: typeof userMovie.$inferSelect;
+      media: typeof media.$inferSelect;
+      interaction: typeof mediaInteraction.$inferSelect;
     };
 
-export async function getUserActivity(userId: string) {
+export async function getUserActivity(userId: string): Promise<ActivityItem[]> {
   const [watches, reviews, shelves] = await Promise.all([
     db
       .select({
         history: watchHistory,
-        movie,
+        media,
       })
       .from(watchHistory)
-      .innerJoin(movie, eq(movie.id, watchHistory.movieId))
+      .innerJoin(media, eq(media.id, watchHistory.mediaId))
       .where(eq(watchHistory.userId, userId))
       .orderBy(desc(watchHistory.watchedAt))
       .limit(50),
@@ -41,49 +41,49 @@ export async function getUserActivity(userId: string) {
     db
       .select({
         review,
-        movie,
+        media,
       })
       .from(review)
-      .innerJoin(movie, eq(movie.id, review.movieId))
+      .innerJoin(media, eq(media.id, review.mediaId))
       .where(eq(review.userId, userId))
       .orderBy(desc(review.createdAt))
       .limit(50),
 
     db
       .select({
-        shelf: userMovie,
-        movie,
+        interaction: mediaInteraction,
+        media,
       })
-      .from(userMovie)
-      .innerJoin(movie, eq(movie.id, userMovie.movieId))
-      .where(eq(userMovie.userId, userId))
-      .orderBy(desc(userMovie.updatedAt))
+      .from(mediaInteraction)
+      .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+      .where(eq(mediaInteraction.userId, userId))
+      .orderBy(desc(mediaInteraction.updatedAt))
       .limit(50),
   ]);
 
   return [
-    ...watches.map(({ history, movie }) => ({
+    ...watches.map(({ history, media }) => ({
       type: 'watched' as const,
       id: history.id,
       createdAt: history.watchedAt,
-      movie,
+      media,
       watchedAt: history.watchedAt,
     })),
 
-    ...reviews.map(({ review, movie }) => ({
+    ...reviews.map(({ review, media }) => ({
       type: 'review' as const,
       id: review.id,
       createdAt: review.createdAt,
-      movie,
+      media,
       review,
     })),
 
-    ...shelves.map(({ shelf, movie }) => ({
+    ...shelves.map(({ interaction, media }) => ({
       type: 'shelf' as const,
-      id: `${shelf.userId}:${shelf.movieId}`,
-      createdAt: shelf.updatedAt,
-      movie,
-      shelf,
+      id: `${interaction.userId}:${interaction.mediaId}`,
+      createdAt: interaction.updatedAt,
+      media,
+      interaction,
     })),
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }

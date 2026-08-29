@@ -16,7 +16,14 @@ export type TvDiscoverSort =
   | 'first_air_date.asc'
   | 'vote_count.desc';
 
-export interface MovieDiscoverFilters {
+/* -------------------------------------------------------------------------- */
+/*                           SHARED FILTERS                                   */
+/* -------------------------------------------------------------------------- */
+
+export type DiscoverMediaType = 'movie' | 'tv';
+
+export interface BaseDiscoverFilters {
+  type: DiscoverMediaType;
   genre?: number;
   yearFrom?: number;
   yearTo?: number;
@@ -24,22 +31,28 @@ export interface MovieDiscoverFilters {
   maxRating?: number;
   minRuntime?: number;
   maxRuntime?: number;
-  minVoteCount?: number;
   language?: string;
-  sortBy?: MovieDiscoverSort;
   page?: number;
+  minVoteCount?: number;
   hideOnShelf?: boolean;
 }
 
-export type TvDiscoverFilters = {
-  genre?: number;
-  yearFrom?: number;
-  yearTo?: number;
-  minRating?: number;
-  maxRating?: number;
-  minRuntime?: number;
-  maxRuntime?: number;
-  language?: string;
+/* -------------------------------------------------------------------------- */
+/*                       MEDIA-SPECIFIC FILTERS                               */
+/* -------------------------------------------------------------------------- */
+
+export interface MovieDiscoverFilters extends BaseDiscoverFilters {
+  type: 'movie';
+  sortBy?: MovieDiscoverSort;
+}
+
+export interface TvDiscoverFilters extends BaseDiscoverFilters {
+  type: 'tv';
   sortBy?: TvDiscoverSort;
-  page?: number;
-};
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         APPLICATION FILTERS                                */
+/* -------------------------------------------------------------------------- */
+
+export type DiscoverFilters = MovieDiscoverFilters | TvDiscoverFilters;
