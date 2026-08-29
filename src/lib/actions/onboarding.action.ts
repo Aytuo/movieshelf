@@ -2,14 +2,13 @@
 
 import { requireSession } from '@/lib/auth/require-session';
 import { completeOnboarding } from '@/lib/repositories/profile-repository';
-import { ensureMovieExists } from '@/lib/services/movie-service';
-import { setRating } from '@/lib/services/user-movie-service';
-import { revalidatePath } from 'next/cache';
-
+import { setRating } from '@/lib/services/media-interaction-service';
 import {
   onboardingRatingsSchema,
   type OnboardingRatingsInput,
 } from '@/lib/validations/onboarding';
+import { revalidatePath } from 'next/cache';
+import { getOrCreateMediaRecord } from '../services/media-service';
 
 export async function completeTasteOnboarding(input: OnboardingRatingsInput) {
   const session = await requireSession();
@@ -21,9 +20,9 @@ export async function completeTasteOnboarding(input: OnboardingRatingsInput) {
   }
 
   for (const item of parsed.data.ratings) {
-    const movie = await ensureMovieExists(item.movieId);
+    const media = await getOrCreateMediaRecord(item.type, item.tmdbId);
 
-    await setRating(session.user.id, movie.id, item.rating);
+    await setRating(session.user.id, media.id, item.rating);
   }
 
   await completeOnboarding(session.user.id);

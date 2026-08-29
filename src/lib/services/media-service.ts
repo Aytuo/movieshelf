@@ -1,9 +1,13 @@
-import type { Media, MediaDetails, MediaType } from '@/lib/media';
+import { media } from '@/lib/db/schema';
+import type { MediaDetails, MediaType } from '@/lib/media';
 import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
 import {
-  getMediaByTmdbId,
+  getMediaRecordByTmdbId,
   upsertMedia,
 } from '@/lib/repositories/media-repository';
+import type { InferSelectModel } from 'drizzle-orm';
+
+type MediaRecord = InferSelectModel<typeof media>;
 
 function getMediaRepository(type: MediaType) {
   return type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;
@@ -21,14 +25,14 @@ export async function getMediaDetails(
 }
 
 /* ========================================================================== */
-/*                                GET OR CREATE                               */
+/*                          GET OR CREATE MEDIA RECORD                        */
 /* ========================================================================== */
 
-export async function getOrCreateMedia(
+export async function getOrCreateMediaRecord(
   type: MediaType,
   tmdbId: number
-): Promise<Media> {
-  const existing = await getMediaByTmdbId(tmdbId, type);
+): Promise<MediaRecord> {
+  const existing = await getMediaRecordByTmdbId(tmdbId, type);
 
   if (existing) {
     return existing;
@@ -36,7 +40,7 @@ export async function getOrCreateMedia(
 
   const details = await getMediaRepository(type).getById(tmdbId);
 
-  await upsertMedia({
+  return upsertMedia({
     tmdbId: details.tmdbId,
     type: details.type,
     title: details.title,
@@ -52,12 +56,4 @@ export async function getOrCreateMedia(
     tmdbVoteCount: details.voteCount,
     tagline: details.tagline,
   });
-
-  const created = await getMediaByTmdbId(tmdbId, type);
-
-  if (!created) {
-    throw new Error('Failed to create media.');
-  }
-
-  return created;
 }

@@ -9,7 +9,7 @@ import {
   rateMovie,
   removeMovieFromShelf,
   toggleMovieFavorite,
-} from '@/lib/actions/user-movie.action';
+} from '@/lib/actions/media-interaction.action';
 
 type MovieActionsProps = {
   movieId: number;

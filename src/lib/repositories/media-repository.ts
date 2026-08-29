@@ -35,6 +35,19 @@ export async function getMediaByTmdbId(
   return result[0] ? mapDbMediaToMedia(result[0]) : null;
 }
 
+export async function getMediaRecordByTmdbId(
+  tmdbId: number,
+  type: MediaType
+): Promise<DbMedia | null> {
+  const result = await db
+    .select()
+    .from(media)
+    .where(and(eq(media.tmdbId, tmdbId), eq(media.type, type)))
+    .limit(1);
+
+  return result[0] ?? null;
+}
+
 export async function createMedia(
   data: Omit<typeof media.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>
 ) {
