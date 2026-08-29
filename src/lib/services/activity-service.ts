@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, review, userMovie, watchHistory } from '@/lib/db/schema/tables';
+import { movie, review, userMovie, watchHistory } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 export type ActivityItem =

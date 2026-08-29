@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema/tables';
+import { profile } from '@/lib/db/schema';
 import { ensureProfile } from '@/lib/services/profile-service';
 import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';

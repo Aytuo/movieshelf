@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movie, userMovie } from '@/lib/db/schema/tables';
+import { movie, userMovie } from '@/lib/db/schema';
 import {
   RatingDistributionItem,
   TasteDecade,

@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema/tables';
+import { profile } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 function createBaseUsername(name: string | null | undefined, email: string) {

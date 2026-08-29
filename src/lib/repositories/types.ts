@@ -26,7 +26,7 @@ export interface DiscoverOptions {
 }
 
 export interface MovieRepository {
-  getById(id: number): Promise<MovieDetails | null>;
+  getById(id: number): Promise<MovieDetails>;
   getPopular(): Promise<Media[]>;
   getTrending(): Promise<Media[]>;
   getTopPicks(): Promise<Media[]>;
@@ -39,7 +39,7 @@ export interface MovieRepository {
 }
 
 export interface TvRepository {
-  getById(id: number): Promise<TvDetails | null>;
+  getById(id: number): Promise<TvDetails>;
   getTrending(): Promise<Media[]>;
   getPopular(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
