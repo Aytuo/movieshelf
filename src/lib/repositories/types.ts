@@ -29,11 +29,16 @@ export interface SearchRepository {
 
 export interface MovieRepository {
   getById(id: number): Promise<MovieDetails>;
+
   getPopular(): Promise<Media[]>;
   getTrending(): Promise<Media[]>;
-  getTopPicks(): Promise<Media[]>;
+  getNowPlaying(): Promise<Media[]>;
   getUpcoming(): Promise<Media[]>;
+  getTopPicks(): Promise<Media[]>;
+  getTopRated(): Promise<Media[]>;
+
   search(query: string, options?: SearchOptions): Promise<SearchResult>;
+
   discover(
     filters: MovieDiscoverFilters,
     options?: DiscoverOptions
@@ -42,10 +47,15 @@ export interface MovieRepository {
 
 export interface TvRepository {
   getById(id: number): Promise<TvDetails>;
-  getTrending(): Promise<Media[]>;
+
   getPopular(): Promise<Media[]>;
+  getTrending(): Promise<Media[]>;
+  getAiringToday(): Promise<Media[]>;
+  getOnTheAir(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
+
   search(query: string, options?: SearchOptions): Promise<SearchResult>;
+
   discover(
     filters: TvDiscoverFilters,
     options?: DiscoverOptions

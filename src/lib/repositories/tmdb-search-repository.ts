@@ -1,6 +1,6 @@
-import { searchMulti } from '@/lib/tmdb/client';
 import { mapTmdbMultiSearchResult } from '@/lib/tmdb/mapper';
 import { Media } from '../media';
+import { searchMulti } from '../tmdb/search-api';
 import type { SearchRepository } from './types';
 
 function isMedia(

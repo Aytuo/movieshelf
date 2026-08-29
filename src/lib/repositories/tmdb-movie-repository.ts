@@ -1,66 +1,110 @@
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
-import {
-  discoverMovies,
-  getMovieDetails,
-  getTrendingMovies,
-  getUpcomingMovies,
-  searchMovies,
-} from '@/lib/tmdb/client';
+import type { Movie } from '@/lib/media';
 import { mapTmdbMovie, mapTmdbMovieDetails } from '@/lib/tmdb/mapper';
-import { Movie } from '../media';
-import type { MovieRepository } from './types';
+import {
+  discover,
+  getMovie,
+  getPopular,
+  getTrending,
+  search,
+} from '@/lib/tmdb/movie-api';
+import { MovieDiscoverFilters } from '@/types';
+import { MovieRepository } from './types';
 
 export const tmdbMovieRepository: MovieRepository = {
   async getById(id) {
-    const movie = await getMovieDetails(id);
+    const result = await getMovie(id);
 
-    return mapTmdbMovieDetails(movie);
+    return mapTmdbMovieDetails(result);
   },
 
   async getPopular() {
-    const response = await discoverMovies({
-      type: 'movie',
-      page: 1,
-      sortBy: 'popularity.desc',
-    });
+    const result = await getPopular();
 
-    return response.results.map(mapTmdbMovie);
+    return result.results.map(mapTmdbMovie);
   },
 
   async getTrending() {
-    const response = await getTrendingMovies('week');
+    const result = await getTrending('week');
 
-    return response.results.map(mapTmdbMovie);
+    return result.results.map(mapTmdbMovie);
   },
 
-  async getTopPicks() {
-    const response = await discoverMovies({
-      type: 'movie',
+  async getNowPlaying() {
+    const today = new Date();
+
+    const pastDate = new Date(today);
+    pastDate.setDate(pastDate.getDate() - 42);
+
+    const minDate = toDateString(pastDate);
+    const maxDate = toDateString(today);
+
+    const result = await discover({
       page: 1,
-      sortBy: 'vote_average.desc',
-      minRating: 7.5,
-      minVoteCount: 500,
+      sortBy: 'popularity.desc',
+      withReleaseType: '2|3',
+      primaryReleaseDateGte: minDate,
+      primaryReleaseDateLte: maxDate,
     });
 
-    return response.results.map(mapTmdbMovie).slice(0, 20);
+    return result.results.map(mapTmdbMovie).slice(0, 20);
   },
 
   async getUpcoming() {
-    const response = await getUpcomingMovies();
+    const today = new Date();
 
-    return response.results.map(mapTmdbMovie).slice(0, 20);
+    const futureDate = new Date(today);
+    futureDate.setMonth(futureDate.getMonth() + 3);
+
+    const minDate = toDateString(today);
+    const maxDate = toDateString(futureDate);
+
+    const result = await discover({
+      page: 1,
+      sortBy: 'popularity.desc',
+      withReleaseType: '2|3',
+      primaryReleaseDateGte: minDate,
+      primaryReleaseDateLte: maxDate,
+    });
+
+    return result.results.map(mapTmdbMovie).slice(0, 20);
+  },
+
+  async getTopPicks() {
+    const result = await discover({
+      page: 1,
+      sortBy: 'vote_average.desc',
+      voteAverageGte: 7.5,
+      voteCountGte: 500,
+    });
+
+    return result.results.map(mapTmdbMovie).slice(0, 20);
+  },
+
+  async getTopRated() {
+    const today = toDateString(new Date());
+
+    const result = await discover({
+      page: 1,
+      sortBy: 'vote_average.desc',
+      withoutGenres: '99,10755',
+      voteCountGte: 10_000,
+      primaryReleaseDateLte: today,
+    });
+
+    return result.results.map(mapTmdbMovie).slice(0, 20);
   },
 
   async search(query, options) {
     const page = options?.page ?? 1;
 
-    const response = await searchMovies(query, page);
+    const result = await search(query, page);
 
     return {
-      media: response.results.map(mapTmdbMovie),
-      page: response.page,
-      totalPages: response.total_pages,
-      totalResults: response.total_results,
+      media: result.results.map(mapTmdbMovie),
+      page: result.page,
+      totalPages: result.total_pages,
+      totalResults: result.total_results,
     };
   },
 
@@ -69,29 +113,27 @@ export const tmdbMovieRepository: MovieRepository = {
 
     const requestedCount = options?.maxResults ?? appPage * DISCOVER_PAGE_SIZE;
 
-    const uniqueMedia = new Map<number, Movie>();
+    const uniqueMovies = new Map<number, Movie>();
 
     let tmdbPage = 1;
     let totalResults = 0;
     let totalPages = 1;
 
     while (
-      uniqueMedia.size < requestedCount &&
+      uniqueMovies.size < requestedCount &&
       tmdbPage <= 50 &&
       tmdbPage <= totalPages
     ) {
-      const response = await discoverMovies({
-        ...filters,
-        page: tmdbPage,
-      });
+      const result = await discover(toTmdbDiscoverParams(filters, tmdbPage));
 
-      totalResults = response.total_results;
-      totalPages = response.total_pages;
+      totalResults = result.total_results;
 
-      for (const result of response.results) {
-        const mapped = mapTmdbMovie(result);
+      totalPages = result.total_pages;
 
-        uniqueMedia.set(mapped.tmdbId, mapped);
+      for (const item of result.results) {
+        const movie = mapTmdbMovie(item);
+
+        uniqueMovies.set(movie.tmdbId, movie);
       }
 
       if (tmdbPage >= totalPages) {
@@ -102,10 +144,75 @@ export const tmdbMovieRepository: MovieRepository = {
     }
 
     return {
-      media: Array.from(uniqueMedia.values()),
+      media: Array.from(uniqueMovies.values()),
       page: appPage,
       totalResults,
       totalPages: Math.max(1, Math.ceil(totalResults / DISCOVER_PAGE_SIZE)),
     };
   },
 };
+
+function toTmdbDiscoverParams(filters: MovieDiscoverFilters, page: number) {
+  return {
+    page,
+    sortBy: filters.sortBy ?? 'popularity.desc',
+
+    ...(filters.genre !== undefined
+      ? {
+          withGenres: String(filters.genre),
+        }
+      : {}),
+
+    ...(filters.yearFrom !== undefined
+      ? {
+          primaryReleaseDateGte: `${filters.yearFrom}-01-01`,
+        }
+      : {}),
+
+    ...(filters.yearTo !== undefined
+      ? {
+          primaryReleaseDateLte: `${filters.yearTo}-12-31`,
+        }
+      : {}),
+
+    ...(filters.minRating !== undefined
+      ? {
+          voteAverageGte: filters.minRating,
+        }
+      : {}),
+
+    ...(filters.maxRating !== undefined
+      ? {
+          voteAverageLte: filters.maxRating,
+        }
+      : {}),
+
+    ...(filters.minVoteCount !== undefined
+      ? {
+          voteCountGte: filters.minVoteCount,
+        }
+      : {}),
+
+    ...(filters.minRuntime !== undefined
+      ? {
+          runtimeGte: filters.minRuntime,
+        }
+      : {}),
+
+    ...(filters.maxRuntime !== undefined
+      ? {
+          runtimeLte: filters.maxRuntime,
+        }
+      : {}),
+
+    ...(filters.language
+      ? {
+          originalLanguage: filters.language,
+        }
+      : {}),
+  };
+}
+
+function toDateString(date: Date) {
+  return date.toISOString().split('T')[0];
+}
