@@ -3,6 +3,7 @@ import { MovieDiscoverFilters, TvDiscoverFilters } from '@/types';
 
 interface SearchOptions {
   page?: number;
+  year?: number;
 }
 
 interface SearchResult {

@@ -1,8 +1,20 @@
-import { tmdbSearchRepository } from '@/lib/repositories';
+import {
+  tmdbMovieRepository,
+  tmdbSearchRepository,
+  tmdbTvRepository,
+} from '@/lib/repositories';
 import { getSearchPagesNeeded, getSearchSlice } from '@/lib/search/pagination';
+import type { SearchFilters } from '@/types/search';
 
-export async function searchGlobal(query: string, page: number) {
+export async function search({
+  query,
+  filters,
+}: {
+  query: string;
+  filters: SearchFilters;
+}) {
   const normalized = query.trim();
+  const page = filters.page ?? 1;
 
   if (!normalized) {
     return {
@@ -13,46 +25,66 @@ export async function searchGlobal(query: string, page: number) {
     };
   }
 
-  const firstResponse = await tmdbSearchRepository.search(normalized, {
-    page: 1,
-  });
+  // Global search: CTRL+K and /search?type=all use TMDB multi-search endpoint; results contain both Movie and TV.
 
-  const totalResults = firstResponse.totalResults;
+  if (filters.type === 'all') {
+    const firstResponse = await tmdbSearchRepository.search(normalized, {
+      page: 1,
+    });
 
-  const totalPages = firstResponse.totalPages;
+    const totalResults = firstResponse.totalResults;
 
-  if (totalResults === 0 || page > totalPages) {
+    const totalPages = firstResponse.totalPages;
+
+    if (totalResults === 0 || page > totalPages) {
+      return {
+        media: [],
+        page,
+        totalResults,
+        totalPages,
+      };
+    }
+
+    const pagesNeeded = Math.min(getSearchPagesNeeded(page), totalPages);
+
+    const responses = [
+      firstResponse,
+      ...(pagesNeeded > 1
+        ? await Promise.all(
+            Array.from(
+              {
+                length: pagesNeeded - 1,
+              },
+              (_, index) =>
+                tmdbSearchRepository.search(normalized, {
+                  page: index + 2,
+                })
+            )
+          )
+        : []),
+    ];
+
+    const candidates = responses.flatMap((response) => response.media);
+
+    const { start, end } = getSearchSlice(page);
+
     return {
-      media: [],
+      media: candidates.slice(start, end),
       page,
       totalResults,
       totalPages,
     };
   }
 
-  const pagesNeeded = Math.min(getSearchPagesNeeded(page), totalPages);
+  // Type-specific search: /search?type=movie AND /search?type=tv; the selected repository is responsible for translating the application-level year filter to the correct TMDB parameter.
 
-  const responses = [
-    firstResponse,
-    ...(pagesNeeded > 1
-      ? await Promise.all(
-          Array.from({ length: pagesNeeded - 1 }, (_, index) =>
-            tmdbSearchRepository.search(normalized, {
-              page: index + 2,
-            })
-          )
-        )
-      : []),
-  ];
+  const repository =
+    filters.type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;
 
-  const candidates = responses.flatMap((response) => response.media);
-
-  const { start, end } = getSearchSlice(page);
-
-  return {
-    media: candidates.slice(start, end),
+  const response = await repository.search(normalized, {
     page,
-    totalResults,
-    totalPages,
-  };
+    year: filters.year,
+  });
+
+  return response;
 }
