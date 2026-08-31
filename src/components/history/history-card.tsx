@@ -35,7 +35,7 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
   const MediaIcon = media.type === 'movie' ? Film : Tv;
 
   const watchLabel =
-    watchNumber === 1 ? 'First watch' : `Rewatch #${watchNumber}`;
+    watchNumber === 1 ? 'Watch #1' : `Rewatch #${watchNumber - 1}`;
 
   return (
     <Link href={href} className="group flex gap-4 rounded-2xl p-4 surface">

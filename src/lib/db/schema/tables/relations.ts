@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { account, session, user } from './auth';
 import { media } from './media';
+import { mediaActivity } from './media-activity';
 import { mediaInteraction } from './media-interaction';
 import { profile } from './profile';
 import { comment, post, reaction, review } from './social';
@@ -17,6 +18,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   mediaInteractions: many(mediaInteraction),
   reviews: many(review),
   watchHistory: many(watchHistory),
+  mediaActivities: many(mediaActivity),
   posts: many(post),
   comments: many(comment),
   reactions: many(reaction),
@@ -52,6 +54,7 @@ export const mediaRelations = relations(media, ({ many }) => ({
   interactions: many(mediaInteraction),
   reviews: many(review),
   watchHistory: many(watchHistory),
+  activities: many(mediaActivity),
   posts: many(post),
 }));
 
@@ -73,6 +76,27 @@ export const mediaInteractionRelations = relations(
     }),
   })
 );
+
+/* ========================================================================== */
+/*                          RELATIONS: MEDIA ACTIVITY                         */
+/* ========================================================================== */
+
+export const mediaActivityRelations = relations(mediaActivity, ({ one }) => ({
+  user: one(user, {
+    fields: [mediaActivity.userId],
+    references: [user.id],
+  }),
+
+  media: one(media, {
+    fields: [mediaActivity.mediaId],
+    references: [media.id],
+  }),
+
+  review: one(review, {
+    fields: [mediaActivity.reviewId],
+    references: [review.id],
+  }),
+}));
 
 /* ========================================================================== */
 /*                              RELATIONS: REVIEW                             */

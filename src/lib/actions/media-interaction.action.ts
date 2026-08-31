@@ -4,9 +4,11 @@ import { requireSession } from '@/lib/auth/require-session';
 import type { MediaType } from '@/lib/media';
 import {
   addToWatchlist,
+  markAsDropped,
   markAsWatched,
   removeFromShelf,
   setRating,
+  startWatching,
   toggleFavorite,
 } from '@/lib/services/media-interaction-service';
 import { getOrCreateMediaRecord } from '@/lib/services/media-service';
@@ -23,24 +25,48 @@ async function getContext(type: MediaType, tmdbId: number) {
   };
 }
 
+function getMediaPath(type: MediaType, tmdbId: number) {
+  return `/${type === 'movie' ? 'movie' : 'tv'}/${tmdbId}`;
+}
+
 export async function addMediaToWatchlist(type: MediaType, tmdbId: number) {
   const { userId, media } = await getContext(type, tmdbId);
 
   await addToWatchlist(userId, media.id);
 
   revalidatePath('/shelf');
-  revalidatePath(`/media/${type}/${tmdbId}`);
+  revalidatePath(getMediaPath(type, tmdbId));
+}
+
+export async function startMediaWatching(type: MediaType, tmdbId: number) {
+  const { userId, media } = await getContext(type, tmdbId);
+
+  await startWatching(userId, media.id);
+
+  revalidatePath('/shelf');
+  revalidatePath(getMediaPath(type, tmdbId));
 }
 
 export async function markMediaAsWatched(type: MediaType, tmdbId: number) {
   const { userId, media } = await getContext(type, tmdbId);
 
-  await markAsWatched(userId, media.id);
+  const watchNumber = await markAsWatched(userId, media.id);
 
   revalidatePath('/shelf');
   revalidatePath('/history');
   revalidatePath('/activity');
-  revalidatePath(`/media/${type}/${tmdbId}`);
+  revalidatePath(getMediaPath(type, tmdbId));
+
+  return watchNumber;
+}
+
+export async function markMediaAsDropped(type: MediaType, tmdbId: number) {
+  const { userId, media } = await getContext(type, tmdbId);
+
+  await markAsDropped(userId, media.id);
+
+  revalidatePath('/shelf');
+  revalidatePath(getMediaPath(type, tmdbId));
 }
 
 export async function removeMediaFromShelf(type: MediaType, tmdbId: number) {
@@ -49,7 +75,7 @@ export async function removeMediaFromShelf(type: MediaType, tmdbId: number) {
   await removeFromShelf(userId, media.id);
 
   revalidatePath('/shelf');
-  revalidatePath(`/media/${type}/${tmdbId}`);
+  revalidatePath(getMediaPath(type, tmdbId));
 }
 
 export async function toggleMediaFavorite(type: MediaType, tmdbId: number) {
@@ -58,7 +84,7 @@ export async function toggleMediaFavorite(type: MediaType, tmdbId: number) {
   await toggleFavorite(userId, media.id);
 
   revalidatePath('/shelf');
-  revalidatePath(`/media/${type}/${tmdbId}`);
+  revalidatePath(getMediaPath(type, tmdbId));
 }
 
 export async function rateMedia(
@@ -75,5 +101,6 @@ export async function rateMedia(
   await setRating(userId, media.id, rating);
 
   revalidatePath('/shelf');
-  revalidatePath(`/media/${type}/${tmdbId}`);
+  revalidatePath('/activity');
+  revalidatePath(getMediaPath(type, tmdbId));
 }

@@ -1,7 +1,15 @@
 'use client';
 
 import { authClient } from '@/lib/auth/client';
-import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
+import {
+  Activity,
+  Bookmark,
+  ChevronDown,
+  Clock3,
+  LogOut,
+  Settings,
+  User,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -112,6 +120,7 @@ const UserMenu = ({ user, profile }: UserMenuProps) => {
           role="menu"
           className="absolute top-[calc(100%+0.5rem)] right-0 z-50 w-64 overflow-hidden rounded-xl border border-border bg-background/95 p-2 shadow-[0_20px_70px_rgb(0_0_0_/_45%)] backdrop-blur-xl"
         >
+          {/* User information */}
           <div className="border-b border-border/60 px-3 py-3">
             <p className="truncate text-sm font-semibold">{displayName}</p>
 
@@ -124,6 +133,7 @@ const UserMenu = ({ user, profile }: UserMenuProps) => {
             </p>
           </div>
 
+          {/* Profile & library */}
           <div className="py-1">
             <Link
               href={`/profile/${profile.username}`}
@@ -136,6 +146,39 @@ const UserMenu = ({ user, profile }: UserMenuProps) => {
             </Link>
 
             <Link
+              href="/shelf"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+            >
+              <Bookmark className="size-4" />
+              My Shelf
+            </Link>
+
+            <Link
+              href="/activity"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+            >
+              <Activity className="size-4" />
+              Activity
+            </Link>
+
+            <Link
+              href="/history"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+            >
+              <Clock3 className="size-4" />
+              Watch history
+            </Link>
+          </div>
+
+          {/* Settings */}
+          <div className="border-t border-border/60 pt-1">
+            <Link
               href="/settings/profile"
               role="menuitem"
               onClick={() => setOpen(false)}
@@ -146,6 +189,7 @@ const UserMenu = ({ user, profile }: UserMenuProps) => {
             </Link>
           </div>
 
+          {/* Sign out */}
           <div className="border-t border-border/60 pt-1">
             <button
               type="button"

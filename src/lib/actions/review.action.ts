@@ -7,6 +7,10 @@ import { deleteReview, upsertReview } from '@/lib/services/review-service';
 import { reviewSchema, type ReviewInput } from '@/lib/validations/review';
 import { revalidatePath } from 'next/cache';
 
+function getMediaPath(type: MediaType, tmdbId: number) {
+  return `/${type === 'movie' ? 'movie' : 'tv'}/${tmdbId}`;
+}
+
 export async function saveMediaReview(
   type: MediaType,
   tmdbId: number,
@@ -24,8 +28,9 @@ export async function saveMediaReview(
 
   await upsertReview(session.user.id, media.id, parsed.data);
 
-  revalidatePath(`/media/${type}/${tmdbId}`);
-  revalidatePath(`/profile/${session.user.id}`);
+  revalidatePath(getMediaPath(type, tmdbId));
+  revalidatePath('/activity');
+  revalidatePath('/profile');
 }
 
 export async function removeMediaReview(reviewId: string) {
@@ -33,5 +38,5 @@ export async function removeMediaReview(reviewId: string) {
 
   await deleteReview(session.user.id, reviewId);
 
-  revalidatePath('/home');
+  revalidatePath('/activity');
 }
