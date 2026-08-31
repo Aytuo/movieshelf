@@ -34,6 +34,7 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
       mediaInteraction={data.mediaInteraction}
       existingReview={data.existingReview}
       reviews={data.reviews}
+      watchNumber={data.watchNumber}
     />
   );
 };

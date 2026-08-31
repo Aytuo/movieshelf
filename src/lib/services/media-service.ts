@@ -12,6 +12,7 @@ import {
   upsertMedia,
 } from '@/lib/repositories/media-repository';
 import type { InferSelectModel } from 'drizzle-orm';
+import { getMediaWatchCountForUser } from './watch-history-service';
 
 type MediaRecord = InferSelectModel<typeof media>;
 
@@ -39,9 +40,9 @@ export async function getMediaDetailsPageData(
   tmdbId: number,
   userId: string
 ) {
-  const details = await getMediaDetails(type, tmdbId);
+  const mediaDetails = await getMediaDetails(type, tmdbId);
 
-  const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, details);
+  const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, mediaDetails);
 
   const [mediaInteraction, existingReview, reviews] = await Promise.all([
     getUserMediaInteraction(userId, mediaRecord.id),
@@ -49,9 +50,15 @@ export async function getMediaDetailsPageData(
     getMediaReviews(mediaRecord.id),
   ]);
 
+  const watchNumber =
+    mediaInteraction?.status === 'watched'
+      ? await getMediaWatchCountForUser(userId, mediaRecord.id)
+      : null;
+
   return {
-    media: details,
+    media: mediaDetails,
     mediaInteraction,
+    watchNumber,
     existingReview,
     reviews,
   };

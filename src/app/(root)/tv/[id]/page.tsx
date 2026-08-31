@@ -34,6 +34,7 @@ const TvDetailsPage = async ({ params }: TvDetailsPageProps) => {
       mediaInteraction={data.mediaInteraction}
       existingReview={data.existingReview}
       reviews={data.reviews}
+      watchNumber={data.watchNumber}
     />
   );
 };

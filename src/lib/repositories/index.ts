@@ -1,3 +1,4 @@
+export * from './media-activity-repository';
 export * from './media-interaction-repository';
 export * from './media-repository';
 export * from './profile-repository';

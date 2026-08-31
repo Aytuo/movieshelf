@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Profile, User } from '@/types';
-import { Bookmark, Film, Menu, X } from 'lucide-react';
+import { Film, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -20,11 +20,11 @@ const navLinks = [
   //   href: '/trending',
   //   icon: Flame,
   // },
-  {
-    label: 'My Shelf',
-    href: '/shelf',
-    icon: Bookmark,
-  },
+  // {
+  //   label: 'My Shelf',
+  //   href: '/shelf',
+  //   icon: Bookmark,
+  // },
   // {
   //   label: 'Favorites',
   //   href: '/favorites',

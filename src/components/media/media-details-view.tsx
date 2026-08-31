@@ -44,6 +44,8 @@ type MediaDetailsViewProps = {
       avatarUrl: string | null;
     };
   }[];
+
+  watchNumber: number | null;
 };
 
 function getYear(releaseDate: string | null): number | null {
@@ -61,6 +63,7 @@ const MediaDetailsView = ({
   mediaInteraction,
   existingReview,
   reviews,
+  watchNumber,
 }: MediaDetailsViewProps) => {
   const poster = tmdbImage(media.posterPath, 'w500');
 
@@ -84,6 +87,8 @@ const MediaDetailsView = ({
     favorite: mediaInteraction?.favorite ?? false,
 
     rating: mediaInteraction?.rating ?? null,
+
+    watchNumber,
   };
 
   const directors =
@@ -289,17 +294,6 @@ const MediaDetailsView = ({
                   initialState={initialState}
                 />
               </div>
-
-              {/* Current user interaction */}
-              {isWatched && (
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {mediaInteraction?.rating !== null
-                    ? `You rated this ${mediaInteraction.rating}/10.`
-                    : media.type === 'movie'
-                      ? "You've watched this movie."
-                      : "You've watched this TV series."}
-                </p>
-              )}
             </div>
           </div>
         </div>

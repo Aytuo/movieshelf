@@ -48,7 +48,7 @@ export async function getWatchHistoryPage({
             ${watchHistory.watchedAt} asc,
             ${watchHistory.createdAt} asc,
             ${watchHistory.id} asc
-        )
+        )::int
       `,
     })
     .from(watchHistory)
