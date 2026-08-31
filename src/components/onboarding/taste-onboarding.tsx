@@ -1,58 +1,104 @@
 'use client';
 
 import {
-  completeTasteOnboarding,
+  finishTasteOnboarding,
+  saveTasteRatings,
   skipTasteOnboarding,
 } from '@/lib/actions/onboarding.action';
-import { Media } from '@/lib/media';
+import type { Media } from '@/lib/media';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 import RatingStep from './rating-step';
 import SelectionStep from './selection-step';
 
 type TasteOnboardingProps = {
-  movies: Media[];
+  movieMedia: Media[];
+  tvMedia: Media[];
 };
 
+type OnboardingType = 'movie' | 'tv';
 type Step = 'selection' | 'rating';
 
-const TasteOnboarding = ({ movies }: TasteOnboardingProps) => {
+const MIN_SELECTIONS = 5;
+const MAX_SELECTIONS = 10;
+const DEFAULT_RATING = 8;
+
+const TasteOnboarding = ({ movieMedia, tvMedia }: TasteOnboardingProps) => {
   const router = useRouter();
+
+  const [type, setType] = useState<OnboardingType>('movie');
   const [step, setStep] = useState<Step>('selection');
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [ratings, setRatings] = useState<Record<number, number>>({});
+  const [movieSelectedIds, setMovieSelectedIds] = useState<number[]>([]);
+  const [tvSelectedIds, setTvSelectedIds] = useState<number[]>([]);
+  const [movieRatings, setMovieRatings] = useState<Record<number, number>>({});
+  const [tvRatings, setTvRatings] = useState<Record<number, number>>({});
   const [error, setError] = useState<string | null>(null);
+
   const [isPending, startTransition] = useTransition();
 
-  const selectedMovies = useMemo(
-    () => movies.filter((movie) => selectedIds.includes(movie.tmdbId)),
-    [movies, selectedIds]
+  const media = type === 'movie' ? movieMedia : tvMedia;
+
+  const selectedIds = type === 'movie' ? movieSelectedIds : tvSelectedIds;
+
+  const ratings = type === 'movie' ? movieRatings : tvRatings;
+
+  const selectedMedia = useMemo(
+    () => media.filter((item) => selectedIds.includes(item.tmdbId)),
+    [media, selectedIds]
   );
 
-  function toggleMovie(movieId: number) {
+  function setSelectedIds(
+    update: number[] | ((current: number[]) => number[])
+  ) {
+    if (type === 'movie') {
+      setMovieSelectedIds(update);
+    } else {
+      setTvSelectedIds(update);
+    }
+  }
+
+  function setCurrentRatings(
+    update:
+      | Record<number, number>
+      | ((current: Record<number, number>) => Record<number, number>)
+  ) {
+    if (type === 'movie') {
+      setMovieRatings(update);
+    } else {
+      setTvRatings(update);
+    }
+  }
+
+  function toggleMedia(tmdbId: number) {
     setSelectedIds((current) => {
-      if (current.includes(movieId)) {
-        return current.filter((id) => id !== movieId);
+      if (current.includes(tmdbId)) {
+        return current.filter((id) => id !== tmdbId);
       }
 
-      if (current.length >= 10) {
+      if (current.length >= MAX_SELECTIONS) {
         return current;
       }
 
-      return [...current, movieId];
+      return [...current, tmdbId];
     });
   }
 
   function beginRatings() {
     setError(null);
 
-    if (selectedIds.length < 5) {
-      setError('Choose at least 5 movies to continue.');
+    if (selectedIds.length < MIN_SELECTIONS) {
+      setError(
+        `Choose at least ${MIN_SELECTIONS} ${
+          type === 'movie' ? 'movies' : 'TV series'
+        } to continue.`
+      );
 
       return;
     }
 
-    setRatings(Object.fromEntries(selectedIds.map((movieId) => [movieId, 8])));
+    setCurrentRatings(
+      Object.fromEntries(selectedIds.map((tmdbId) => [tmdbId, DEFAULT_RATING]))
+    );
 
     setStep('rating');
   }
@@ -62,26 +108,37 @@ const TasteOnboarding = ({ movies }: TasteOnboardingProps) => {
     setStep('selection');
   }
 
-  function updateRating(movieId: number, rating: number) {
-    setRatings((current) => ({
+  function updateRating(tmdbId: number, rating: number) {
+    setCurrentRatings((current) => ({
       ...current,
-      [movieId]: rating,
+      [tmdbId]: rating,
     }));
   }
 
-  function complete() {
+  function completeCurrentType() {
     setError(null);
 
     const payload = {
-      ratings: selectedIds.map((movieId) => ({
-        movieId,
-        rating: ratings[movieId] ?? 8,
+      ratings: selectedIds.map((tmdbId) => ({
+        tmdbId,
+        type,
+        rating: ratings[tmdbId] ?? DEFAULT_RATING,
       })),
     };
 
     startTransition(async () => {
       try {
-        await completeTasteOnboarding(payload);
+        await saveTasteRatings(payload);
+
+        if (type === 'movie') {
+          setType('tv');
+          setStep('selection');
+          setError(null);
+
+          return;
+        }
+
+        await finishTasteOnboarding();
 
         router.replace('/home');
         router.refresh();
@@ -97,19 +154,28 @@ const TasteOnboarding = ({ movies }: TasteOnboardingProps) => {
 
   function skip() {
     startTransition(async () => {
-      await skipTasteOnboarding();
+      try {
+        await skipTasteOnboarding();
 
-      router.replace('/home');
-      router.refresh();
+        router.replace('/home');
+        router.refresh();
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : 'Something went wrong. Please try again.'
+        );
+      }
     });
   }
 
   if (step === 'selection') {
     return (
       <SelectionStep
-        movies={movies}
+        media={media}
+        type={type}
         selectedIds={selectedIds}
-        onToggle={toggleMovie}
+        onToggle={toggleMedia}
         onContinue={beginRatings}
         onSkip={skip}
         error={error}
@@ -120,11 +186,12 @@ const TasteOnboarding = ({ movies }: TasteOnboardingProps) => {
 
   return (
     <RatingStep
-      movies={selectedMovies}
+      media={selectedMedia}
+      type={type}
       ratings={ratings}
       onRating={updateRating}
       onBack={goBack}
-      onComplete={complete}
+      onComplete={completeCurrentType}
       error={error}
       isPending={isPending}
     />

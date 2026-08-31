@@ -7,10 +7,11 @@ const SearchEmptyState = () => {
         <Search className="size-5 text-muted-foreground" />
       </div>
 
-      <p className="mt-4 text-sm font-medium">Find a movie</p>
+      <p className="mt-4 text-sm font-medium">Find something to watch</p>
 
       <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
-        Start typing a title and MovieShelf will show matching movies instantly.
+        Start typing a movie or TV series title and MovieShelf will show
+        matching results instantly.
       </p>
     </div>
   );

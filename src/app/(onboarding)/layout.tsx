@@ -22,9 +22,10 @@ const OnboardingLayout = async ({
     redirect('/home');
   }
 
-  if (profile.onboardingCompleted) {
-    redirect('/home');
-  }
+  // TODO: Add CTA to complete onboarding
+  // if (profile.onboardingCompleted) {
+  //   redirect('/home');
+  // }
 
   return <main className="min-h-screen bg-background">{children}</main>;
 };

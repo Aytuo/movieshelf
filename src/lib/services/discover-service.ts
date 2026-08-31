@@ -1,10 +1,8 @@
-import { db } from '@/lib/db';
-import { media, mediaInteraction } from '@/lib/db/schema';
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
+import type { Media } from '@/lib/media';
 import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
+import { getUserMediaKeys } from '@/lib/repositories/media-interaction-repository';
 import type { DiscoverFilters } from '@/types';
-import { eq } from 'drizzle-orm';
-import { Media } from '../media';
 
 function getMediaKey(media: Pick<Media, 'tmdbId' | 'type'>) {
   return `${media.type}:${media.tmdbId}`;
@@ -36,16 +34,7 @@ export async function discoverForUser(
 
   // Known media.
 
-  const knownMedia = filters.hideOnShelf
-    ? await db
-        .select({
-          tmdbId: media.tmdbId,
-          type: media.type,
-        })
-        .from(mediaInteraction)
-        .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
-        .where(eq(mediaInteraction.userId, userId))
-    : [];
+  const knownMedia = filters.hideOnShelf ? await getUserMediaKeys(userId) : [];
 
   const knownMediaKeys = new Set(knownMedia.map(getMediaKey));
 
@@ -63,17 +52,14 @@ export async function discoverForUser(
   while (
     filters.hideOnShelf &&
     filtered.length < requiredCount &&
-    result.media.length < 200
+    result.media.length < 200 &&
+    result.media.length < result.totalResults
   ) {
     const nextCandidateCount = result.media.length + DISCOVER_PAGE_SIZE;
 
     result = await discoverMedia(filters, nextCandidateCount);
 
     filtered = filterKnownMedia(result.media);
-
-    if (result.media.length >= result.totalResults) {
-      break;
-    }
   }
 
   // Application pagination.

@@ -1,41 +1,70 @@
 import SearchPagination from '@/components/search/search-pagination';
-import { searchMoviesForPage } from '@/lib/services/search-service';
+import { search } from '@/lib/services/search-service';
 import { tmdbImage } from '@/lib/tmdb/images';
+import type { SearchMediaType } from '@/types/search';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 
 type SearchPageProps = {
   searchParams: Promise<{
     q?: string;
+    type?: string;
     year?: string;
     page?: string;
   }>;
 };
 
+function parseSearchType(value: string | undefined): SearchMediaType {
+  if (value === 'movie' || value === 'tv') {
+    return value;
+  }
+
+  return 'all';
+}
+
+function parseYear(value: string | undefined) {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function parsePage(value: string | undefined) {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+}
+
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const params = await searchParams;
+
   const query = params.q?.trim() ?? '';
-  const parsedYear = Number(params.year);
-  const year =
-    Number.isInteger(parsedYear) && parsedYear > 0 ? parsedYear : undefined;
-  const parsedPage = Number(params.page);
-  const currentPage =
-    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  let results = {
-    movies: [] as Awaited<ReturnType<typeof searchMoviesForPage>>['movies'],
-    page: 1,
-    totalResults: 0,
-    totalPages: 0,
-  };
+  const type = parseSearchType(params.type);
 
-  if (query) {
-    results = await searchMoviesForPage({
-      query,
-      page: currentPage,
-      year,
-    });
-  }
+  const year = parseYear(params.year);
+
+  const page = parsePage(params.page);
+
+  const results = query
+    ? await search({
+        query,
+        filters: {
+          type,
+          year: type === 'all' ? undefined : year,
+          page,
+        },
+      })
+    : {
+        media: [],
+        page: 1,
+        totalResults: 0,
+        totalPages: 0,
+      };
+
+  const mediaLabel =
+    type === 'movie' ? 'movie' : type === 'tv' ? 'TV series' : 'title';
+
+  const currentYear = new Date().getFullYear();
 
   return (
     <section className="container-content py-10 lg:py-14">
@@ -44,35 +73,42 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
           <p className="eyebrow">Search</p>
 
           <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-            Find a movie
+            Find {mediaLabel}
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Search by title, then narrow down the exact result you&apos;re
-            looking for.
+            Search by title and narrow down the result by media type or release
+            year.
           </p>
         </div>
 
-        <form className="grid gap-3 sm:grid-cols-[1fr_140px_auto]">
+        <form className="grid gap-3 sm:grid-cols-[1fr_160px_140px_auto]">
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
             <input
               name="q"
               defaultValue={query}
-              placeholder="Search movie title..."
+              placeholder="Search titles..."
               className="input h-12 pl-10"
             />
           </div>
+
+          <select name="type" defaultValue={type} className="input h-12">
+            <option value="all">All</option>
+            <option value="movie">Movies</option>
+            <option value="tv">TV Series</option>
+          </select>
 
           <input
             name="year"
             type="number"
             min="1888"
-            max={new Date().getFullYear()}
+            max={currentYear}
             defaultValue={year ?? ''}
             placeholder="Year"
-            className="input h-12"
+            disabled={type === 'all'}
+            className="input h-12 disabled:cursor-not-allowed disabled:opacity-50"
           />
 
           <button
@@ -83,6 +119,12 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
           </button>
         </form>
 
+        {type === 'all' && year !== undefined && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            The year filter is available when searching Movies or TV Series.
+          </p>
+        )}
+
         {!query ? (
           <div className="mt-16 rounded-2xl border border-dashed border-border px-6 py-24 text-center">
             <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-surface">
@@ -90,12 +132,12 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
             </div>
 
             <h2 className="mt-5 font-heading text-xl font-semibold">
-              What movie are you looking for?
+              What are you looking for?
             </h2>
 
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Search for a title or add a release year to narrow down the
-              results.
+              Search for a movie or TV series by title, with an optional year
+              filter.
             </p>
           </div>
         ) : (
@@ -120,16 +162,25 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
               </Link>
             </div>
 
-            {results.movies.length > 0 ? (
+            {results.media.length > 0 ? (
               <>
                 <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                  {results.movies.map((movie) => {
-                    const poster = tmdbImage(movie.posterPath, 'w500');
+                  {results.media.map((item) => {
+                    const poster = tmdbImage(item.posterPath, 'w500');
+
+                    const year = item.releaseDate
+                      ? new Date(item.releaseDate).getFullYear()
+                      : null;
+
+                    const href =
+                      item.type === 'movie'
+                        ? `/movie/${item.tmdbId}`
+                        : `/tv/${item.tmdbId}`;
 
                     return (
                       <Link
-                        key={movie.tmdbId}
-                        href={`/movie/${movie.tmdbId}`}
+                        key={`${item.type}:${item.tmdbId}`}
+                        href={href}
                         className="group"
                       >
                         <article>
@@ -137,20 +188,24 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                             {poster && (
                               <img
                                 src={poster}
-                                alt={`${movie.title} poster`}
+                                alt={`${item.title} poster`}
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                               />
                             )}
                           </div>
 
-                          <h3 className="mt-3 line-clamp-1 text-sm font-semibold group-hover:text-primary">
-                            {movie.title}
-                          </h3>
+                          <div className="mt-3 flex items-start gap-2">
+                            <h3 className="line-clamp-1 flex-1 text-sm font-semibold group-hover:text-primary">
+                              {item.title}
+                            </h3>
+
+                            <span className="shrink-0 text-[9px] font-semibold tracking-wide text-muted-foreground uppercase">
+                              {item.type === 'movie' ? 'Movie' : 'TV'}
+                            </span>
+                          </div>
 
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {movie.releaseDate
-                              ? new Date(movie.releaseDate).getFullYear()
-                              : '—'}
+                            {year ?? '—'}
                           </p>
                         </article>
                       </Link>
@@ -162,7 +217,8 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                   page={results.page}
                   totalPages={results.totalPages}
                   query={query}
-                  year={year}
+                  type={type}
+                  year={type === 'all' ? undefined : year}
                 />
               </>
             ) : (
@@ -172,7 +228,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                 </h2>
 
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                  Try a different title or remove the year filter.
+                  Try a different title or adjust your search filters.
                 </p>
               </div>
             )}

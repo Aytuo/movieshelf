@@ -4,10 +4,11 @@ import {
   DISCOVER_SORT_OPTIONS,
   LANGUAGE_OPTIONS,
   MOVIE_GENRES,
+  TV_GENRES,
 } from '@/constants';
 import { useDebounce } from '@/hooks/use-debounce';
 import { RotateCcw, SlidersHorizontal } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 type FilterState = {
@@ -47,10 +48,19 @@ function readFilters(params: URLSearchParams): FilterState {
 
 const DiscoverFilters = () => {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const urlString = searchParams.toString();
+
+  const type = searchParams.get('type') === 'tv' ? 'tv' : 'movie';
+
+  const genres = type === 'movie' ? MOVIE_GENRES : TV_GENRES;
+
+  const sortOptions = DISCOVER_SORT_OPTIONS.filter((option) =>
+    type === 'movie'
+      ? !option.value.startsWith('first_air_date')
+      : !option.value.startsWith('primary_release_date')
+  );
 
   const [draft, setDraft] = useState<FilterState>(() =>
     readFilters(new URLSearchParams(urlString))
@@ -70,7 +80,6 @@ const DiscoverFilters = () => {
     setDraft(readFilters(new URLSearchParams(urlString)));
 
     dirtyRef.current = false;
-
     lastAppliedUrl.current = urlString;
   }, [urlString]);
 
@@ -119,16 +128,24 @@ const DiscoverFilters = () => {
 
     params.delete('page');
 
+    // Preserve the currently selected Movie / TV type.
+
+    if (type === 'tv') {
+      params.set('type', 'tv');
+    } else {
+      params.delete('type');
+    }
+
     const query = params.toString();
 
     lastAppliedUrl.current = query;
 
     dirtyRef.current = false;
 
-    router.replace(query ? `${pathname}?${query}` : pathname, {
+    router.replace(query ? `/discover?${query}` : '/discover', {
       scroll: false,
     });
-  }, [debouncedDraft, pathname, router, urlString]);
+  }, [debouncedDraft, router, type, urlString]);
 
   function update(key: keyof FilterState, value: string) {
     setDraft((current) => ({
@@ -170,7 +187,6 @@ const DiscoverFilters = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="size-4 text-primary" />
-
           <span className="text-sm font-semibold">Filters</span>
         </div>
 
@@ -197,7 +213,7 @@ const DiscoverFilters = () => {
           >
             <option value="">All genres</option>
 
-            {MOVIE_GENRES.map((genre) => (
+            {genres.map((genre) => (
               <option key={genre.id} value={genre.id}>
                 {genre.name}
               </option>
@@ -299,7 +315,7 @@ const DiscoverFilters = () => {
             onChange={(event) => update('sort', event.target.value)}
             className="input"
           >
-            {DISCOVER_SORT_OPTIONS.map((option) => (
+            {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -320,12 +336,12 @@ const DiscoverFilters = () => {
 
             <span>
               <span className="block text-sm font-medium">
-                Hide movies on my shelf
+                Hide media on my shelf
               </span>
 
               <span className="mt-1 block text-xs leading-5 text-muted-foreground">
-                Only show movies you haven&apos;t already added to your
-                collection.
+                Only show {type === 'movie' ? 'movies' : 'TV series'} you
+                haven&apos;t already added to your collection.
               </span>
             </span>
           </label>

@@ -21,7 +21,7 @@ const TV_DISCOVER_SORTS = [
   'vote_count.desc',
 ] satisfies readonly TvDiscoverSort[];
 
-function parseNumber(value: string | null): number | undefined {
+function parseNumber(value: string | null) {
   if (value === null || value === '') {
     return undefined;
   }
@@ -31,7 +31,15 @@ function parseNumber(value: string | null): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-function parseBoolean(value: string | null): boolean | undefined {
+function parsePositiveInteger(value: string | null) {
+  const parsed = parseNumber(value);
+
+  return parsed !== undefined && Number.isInteger(parsed) && parsed > 0
+    ? parsed
+    : undefined;
+}
+
+function parseBoolean(value: string | null) {
   if (value === 'true') {
     return true;
   }
@@ -71,16 +79,15 @@ export function parseDiscoverFilters(params: URLSearchParams): DiscoverFilters {
   const type = parseMediaType(params.get('type'));
 
   const base = {
-    genre: parseNumber(params.get('genre')),
-    yearFrom: parseNumber(params.get('yearFrom')),
-    yearTo: parseNumber(params.get('yearTo')),
-    minRating: parseNumber(params.get('minRating')),
-    maxRating: parseNumber(params.get('maxRating')),
-    minRuntime: parseNumber(params.get('minRuntime')),
-    maxRuntime: parseNumber(params.get('maxRuntime')),
-    minVoteCount: parseNumber(params.get('minVoteCount')),
-    language: params.get('language') || undefined,
-    page: parseNumber(params.get('page')) ?? 1,
+    genre: parsePositiveInteger(params.get('genre')),
+    yearFrom: parsePositiveInteger(params.get('yearFrom')),
+    yearTo: parsePositiveInteger(params.get('yearTo')),
+    minRating: parseNumber(params.get('rating')),
+    minRuntime: undefined,
+    maxRuntime: parsePositiveInteger(params.get('runtime')),
+    language: params.get('language')?.trim() || undefined,
+    page: parsePositiveInteger(params.get('page')) ?? 1,
+    minVoteCount: undefined,
     hideOnShelf: parseBoolean(params.get('hideOnShelf')),
   };
 
@@ -88,13 +95,13 @@ export function parseDiscoverFilters(params: URLSearchParams): DiscoverFilters {
     return {
       ...base,
       type: 'movie',
-      sortBy: parseMovieSort(params.get('sort')),
+      sortBy: parseMovieSort(params.get('sort')) ?? 'popularity.desc',
     };
   }
 
   return {
     ...base,
     type: 'tv',
-    sortBy: parseTvSort(params.get('sort')),
+    sortBy: parseTvSort(params.get('sort')) ?? 'popularity.desc',
   };
 }

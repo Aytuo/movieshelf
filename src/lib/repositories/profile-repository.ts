@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { and, eq, ne } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { profile } from '../db/schema';
 
 export async function getProfileByUserId(userId: string) {
@@ -22,21 +22,22 @@ export async function getProfileByUsername(username: string) {
   return result[0] ?? null;
 }
 
-export async function isUsernameAvailable(
-  username: string,
-  currentUserId: string
-) {
+export async function usernameExists(username: string) {
   const result = await db
     .select({
       userId: profile.userId,
     })
     .from(profile)
-    .where(
-      and(eq(profile.username, username), ne(profile.userId, currentUserId))
-    )
+    .where(eq(profile.username, username))
     .limit(1);
 
-  return !result[0];
+  return result.length > 0;
+}
+
+export async function createProfile(data: typeof profile.$inferInsert) {
+  const [created] = await db.insert(profile).values(data).returning();
+
+  return created;
 }
 
 export async function updateProfile(

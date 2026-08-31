@@ -1,23 +1,29 @@
-import { Media } from '@/lib/media';
+import type { Media, MediaType } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 
+type RatingStepProps = {
+  media: Media[];
+  type: MediaType;
+  ratings: Record<number, number>;
+  onRating: (tmdbId: number, rating: number) => void;
+  onBack: () => void;
+  onComplete: () => void;
+  error: string | null;
+  isPending: boolean;
+};
+
 const RatingStep = ({
-  movies,
+  media,
+  type,
   ratings,
   onRating,
   onBack,
   onComplete,
   error,
   isPending,
-}: {
-  movies: Media[];
-  ratings: Record<number, number>;
-  onRating: (movieId: number, rating: number) => void;
-  onBack: () => void;
-  onComplete: () => void;
-  error: string | null;
-  isPending: boolean;
-}) => {
+}: RatingStepProps) => {
+  const isMovie = type === 'movie';
+
   return (
     <div className="min-h-screen">
       <div className="container-content py-8 sm:py-10">
@@ -30,7 +36,9 @@ const RatingStep = ({
             ← Back
           </button>
 
-          <span className="text-xs text-muted-foreground">2 of 2</span>
+          <span className="text-xs text-muted-foreground">
+            {isMovie ? '1 of 2' : '2 of 2'}
+          </span>
         </div>
 
         <div className="mx-auto max-w-3xl py-16">
@@ -43,19 +51,19 @@ const RatingStep = ({
           </h1>
 
           <p className="mt-5 text-sm leading-7 text-muted-foreground sm:text-base">
-            Your ratings give us the first signals we need to understand your
-            cinematic taste.
+            Your ratings give us the first signals we need to understand your{' '}
+            {isMovie ? 'movie taste' : 'TV taste'}.
           </p>
 
           <div className="mt-10 space-y-3">
-            {movies.map((movie) => {
-              const poster = tmdbImage(movie.posterPath, 'w185');
+            {media.map((item) => {
+              const poster = tmdbImage(item.posterPath, 'w185');
 
-              const currentRating = ratings[movie.tmdbId] ?? 8;
+              const currentRating = ratings[item.tmdbId] ?? 8;
 
               return (
                 <div
-                  key={movie.tmdbId}
+                  key={`${item.type}:${item.tmdbId}`}
                   className="flex items-center gap-4 rounded-xl p-3 surface sm:p-4"
                 >
                   <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-surface-hover">
@@ -70,12 +78,12 @@ const RatingStep = ({
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
-                      {movie.title}
+                      {item.title}
                     </p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {movie.releaseDate
-                        ? new Date(movie.releaseDate).getFullYear()
+                      {item.releaseDate
+                        ? new Date(item.releaseDate).getFullYear()
                         : ''}
                     </p>
                   </div>
@@ -87,7 +95,7 @@ const RatingStep = ({
                           key={value}
                           type="button"
                           aria-label={`Rate ${value} out of 10`}
-                          onClick={() => onRating(movie.tmdbId, value)}
+                          onClick={() => onRating(item.tmdbId, value)}
                           className={[
                             'flex size-7 items-center justify-center rounded-md text-[10px] font-semibold transition-colors',
                             currentRating === value
@@ -126,7 +134,11 @@ const RatingStep = ({
               disabled={isPending}
               className="mt-6 w-full rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-[0_12px_40px_var(--primary-glow)] transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isPending ? 'Building your shelf...' : 'Enter MovieShelf'}
+              {isPending
+                ? 'Saving your ratings...'
+                : isMovie
+                  ? 'Continue to TV Series'
+                  : 'Enter MovieShelf'}
             </button>
           </div>
         </div>

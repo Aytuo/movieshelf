@@ -1,6 +1,15 @@
 import { db } from '@/lib/db';
 import { mediaInteraction, watchHistory } from '@/lib/db/schema';
+import { getUserShelf as getUserShelfRepository } from '@/lib/repositories';
 import { and, eq } from 'drizzle-orm';
+
+/* ========================================================================== */
+/*                                GET USER SHELF                              */
+/* ========================================================================== */
+
+export async function getUserShelf(userId: string) {
+  return getUserShelfRepository(userId);
+}
 
 /* ========================================================================== */
 /*                               ADD TO WATCHLIST                             */

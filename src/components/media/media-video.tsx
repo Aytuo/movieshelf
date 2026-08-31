@@ -1,10 +1,10 @@
-import { MediaVideo } from '@/lib/media';
+import type { MediaVideo } from '@/lib/media';
 
-type MovieVideoProps = {
+type MediaVideoProps = {
   video: MediaVideo | null;
 };
 
-const MovieVideo = ({ video }: MovieVideoProps) => {
+const MediaVideo = ({ video }: MediaVideoProps) => {
   if (!video || video.site !== 'YouTube') {
     return null;
   }
@@ -35,4 +35,4 @@ const MovieVideo = ({ video }: MovieVideoProps) => {
   );
 };
 
-export default MovieVideo;
+export default MediaVideo;

@@ -2,14 +2,12 @@
 
 import { requireSession } from '@/lib/auth/require-session';
 import {
-  isUsernameAvailable,
-  updateProfile,
-} from '@/lib/repositories/profile-repository';
-import {
   profileUpdateSchema,
   type ProfileUpdateInput,
 } from '@/lib/validations/profile';
 import { revalidatePath } from 'next/cache';
+import { updateProfile } from '../repositories';
+import { isUsernameAvailable } from '../services/profile-service';
 
 export type ProfileActionResult = {
   success: boolean;

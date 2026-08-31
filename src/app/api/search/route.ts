@@ -1,6 +1,5 @@
 import { auth } from '@/lib/auth';
-import { searchMovies } from '@/lib/tmdb/client';
-import { mapTmdbMovie } from '@/lib/tmdb/mapper';
+import { search } from '@/lib/services/search-service';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -21,29 +20,32 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-
   const query = url.searchParams.get('q')?.trim() ?? '';
 
   if (query.length < 2) {
     return NextResponse.json({
-      movies: [],
+      media: [],
       totalResults: 0,
     });
   }
 
   try {
-    const response = await searchMovies(query, 1);
-
-    const movies = response.results.slice(0, 6).map(mapTmdbMovie);
+    const result = await search({
+      query,
+      filters: {
+        type: 'all',
+        page: 1,
+      },
+    });
 
     return NextResponse.json({
-      movies,
-      totalResults: response.total_results,
+      media: result.media.slice(0, 6),
+      totalResults: result.totalResults,
     });
   } catch {
     return NextResponse.json(
       {
-        error: 'Unable to search movies.',
+        error: 'Unable to search.',
       },
       {
         status: 500,

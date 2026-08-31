@@ -6,9 +6,10 @@ import {
   getPopular,
   getTrending,
   getTv,
-  search,
+  search as searchTv,
 } from '@/lib/tmdb/tv-api';
 import { TvDiscoverFilters } from '@/types';
+import { paginateSearchResults } from '../search/pagination';
 import { TvRepository } from './types';
 
 export const tmdbTvRepository: TvRepository = {
@@ -74,15 +75,15 @@ export const tmdbTvRepository: TvRepository = {
   },
 
   async search(query, options) {
-    const page = options?.page ?? 1;
-
-    const result = await search(query, page);
+    const result = await paginateSearchResults(options?.page ?? 1, (page) =>
+      searchTv(query, page, options?.year)
+    );
 
     return {
-      media: result.results.map(mapTmdbTv),
+      media: result.media.map(mapTmdbTv),
       page: result.page,
-      totalPages: result.total_pages,
-      totalResults: result.total_results,
+      totalResults: result.totalResults,
+      totalPages: result.totalPages,
     };
   },
 

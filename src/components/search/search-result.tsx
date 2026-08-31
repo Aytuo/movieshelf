@@ -1,4 +1,4 @@
-import { Media } from '@/lib/media';
+import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -12,13 +12,18 @@ const SearchResults = ({
 }) => {
   return (
     <div className="py-2">
-      {results.map((movie) => {
-        const poster = tmdbImage(movie.posterPath, 'w185');
+      {results.map((media) => {
+        const poster = tmdbImage(media.posterPath, 'w185');
+
+        const href =
+          media.type === 'movie'
+            ? `/movie/${media.tmdbId}`
+            : `/tv/${media.tmdbId}`;
 
         return (
           <Link
-            key={movie.tmdbId}
-            href={`/movie/${movie.tmdbId}`}
+            key={`${media.type}:${media.tmdbId}`}
+            href={href}
             onClick={onResultClick}
             className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-hover"
           >
@@ -33,19 +38,23 @@ const SearchResults = ({
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{movie.title}</p>
+              <p className="truncate text-sm font-semibold">{media.title}</p>
 
               <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                {movie.releaseDate && (
-                  <span>{new Date(movie.releaseDate).getFullYear()}</span>
+                {media.releaseDate && (
+                  <span>{new Date(media.releaseDate).getFullYear()}</span>
                 )}
 
-                {movie.rating > 0 && (
+                <span className="text-[10px] font-semibold tracking-wide uppercase">
+                  {media.type === 'movie' ? 'Movie' : 'TV Series'}
+                </span>
+
+                {media.rating > 0 && (
                   <>
                     <span>•</span>
 
                     <span className="text-rating">
-                      ★ {movie.rating.toFixed(1)}
+                      ★ {media.rating.toFixed(1)}
                     </span>
                   </>
                 )}

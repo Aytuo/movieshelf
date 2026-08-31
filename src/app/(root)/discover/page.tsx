@@ -1,13 +1,11 @@
 import DiscoverFilters from '@/components/discover/discover-filters';
 import DiscoverPagination from '@/components/discover/discover-pagination';
-import MovieSearch from '@/components/discover/movie-search';
 import ResetPageButton from '@/components/discover/reset-page-button';
-import MovieGrid from '@/components/movies/movie-grid';
+import MediaGrid from '@/components/media/media-grid';
 import { requireSession } from '@/lib/auth/require-session';
 import { parseDiscoverFilters } from '@/lib/discover/parse-filters';
 import { discoverForUser } from '@/lib/services/discover-service';
-import { searchWithFilters } from '@/lib/services/search-service';
-import { MovieDiscoverFilters } from '@/types';
+import type { DiscoverFilters as DiscoverFiltersType } from '@/types';
 import Link from 'next/link';
 
 function FilterChip({ label }: { label: string }) {
@@ -18,19 +16,15 @@ function FilterChip({ label }: { label: string }) {
   );
 }
 
-function EmptyDiscoverState({ query }: { query: string }) {
+function EmptyDiscoverState() {
   return (
     <div className="rounded-2xl border border-dashed border-border px-6 py-20 text-center">
       <h2 className="font-heading text-xl font-semibold">
-        {query
-          ? 'Nothing matched your search'
-          : 'Nothing matched those filters'}
+        Nothing matched those filters
       </h2>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-        {query
-          ? 'Try a different title or relax one of the filters.'
-          : 'Try relaxing one or two filters and search again.'}
+        Try relaxing one or two filters and explore again.
       </p>
 
       <Link
@@ -43,14 +37,16 @@ function EmptyDiscoverState({ query }: { query: string }) {
   );
 }
 
-function hasActiveDiscoverFilters(filters: MovieDiscoverFilters) {
+function hasActiveDiscoverFilters(filters: DiscoverFiltersType) {
   return Boolean(
     filters.genre ||
     filters.yearFrom ||
     filters.yearTo ||
     filters.minRating !== undefined ||
     filters.maxRating !== undefined ||
+    filters.minRuntime !== undefined ||
     filters.maxRuntime !== undefined ||
+    filters.minVoteCount !== undefined ||
     filters.language ||
     filters.sortBy !== 'popularity.desc' ||
     filters.hideOnShelf
@@ -59,7 +55,7 @@ function hasActiveDiscoverFilters(filters: MovieDiscoverFilters) {
 
 type DiscoverPageProps = {
   searchParams: Promise<{
-    q?: string;
+    type?: string;
     genre?: string;
     yearFrom?: string;
     yearTo?: string;
@@ -72,49 +68,74 @@ type DiscoverPageProps = {
   }>;
 };
 
+function toURLSearchParams(params: Awaited<DiscoverPageProps['searchParams']>) {
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) {
+      searchParams.set(key, value);
+    }
+  }
+
+  return searchParams;
+}
+
 const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
   const session = await requireSession();
 
   const params = await searchParams;
 
-  const query = params.q?.trim() ?? '';
+  const filters = parseDiscoverFilters(toURLSearchParams(params));
 
-  const filters = parseDiscoverFilters(params);
+  const result = await discoverForUser(session.user.id, filters);
 
-  const page = filters.page ?? 1;
+  const isMovie = filters.type === 'movie';
 
-  const result = query
-    ? await searchWithFilters({
-        query,
-        filters,
-        page,
-      })
-    : await discoverForUser(session.user.id, filters);
+  const mediaLabel = isMovie ? 'movies' : 'TV series';
+
+  const hasFilters = hasActiveDiscoverFilters(filters);
 
   return (
     <section className="container-content py-10 lg:py-14">
       <div className="mb-8">
-        <p className="eyebrow">{query ? 'Search' : 'Explore'}</p>
+        <p className="eyebrow">Discover</p>
 
         <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-          {query ? 'Search results' : 'Discover movies'}
+          Discover {mediaLabel}
         </h1>
 
-        {query ? (
-          <div className="mt-4">
-            <p className="text-sm text-muted-foreground">Showing results for</p>
-
-            <p className="mt-1 text-lg font-semibold">&quot;{query}&quot;</p>
-          </div>
-        ) : (
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Find your next movie, explore genres and discover films that deserve
-            a place on your shelf.
-          </p>
-        )}
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Explore {mediaLabel}, browse genres, and find something that deserves
+          a place on your shelf.
+        </p>
       </div>
 
-      <MovieSearch />
+      {/* Media type */}
+      <div className="mb-6 flex gap-2">
+        <Link
+          href="/discover"
+          className={[
+            'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+            isMovie
+              ? 'border-primary/30 bg-primary-muted text-primary'
+              : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
+          ].join(' ')}
+        >
+          Movies
+        </Link>
+
+        <Link
+          href="/discover?type=tv"
+          className={[
+            'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+            !isMovie
+              ? 'border-primary/30 bg-primary-muted text-primary'
+              : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
+          ].join(' ')}
+        >
+          TV Series
+        </Link>
+      </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[250px_1fr]">
         <DiscoverFilters />
@@ -123,15 +144,15 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                {query && <FilterChip label={`Search: "${query}"`} />}
+                {hasFilters && <FilterChip label="Filters active" />}
 
-                {filters.genre && <FilterChip label="Genre" />}
+                {filters.genre !== undefined && <FilterChip label="Genre" />}
 
-                {filters.yearFrom && (
+                {filters.yearFrom !== undefined && (
                   <FilterChip label={`From ${filters.yearFrom}`} />
                 )}
 
-                {filters.yearTo && (
+                {filters.yearTo !== undefined && (
                   <FilterChip label={`Until ${filters.yearTo}`} />
                 )}
 
@@ -141,23 +162,37 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
                   />
                 )}
 
+                {filters.maxRating !== undefined && (
+                  <FilterChip
+                    label={`Up to ${filters.maxRating.toFixed(1)} rating`}
+                  />
+                )}
+
+                {filters.maxRuntime !== undefined && (
+                  <FilterChip label={`Up to ${filters.maxRuntime} min`} />
+                )}
+
                 {filters.language && (
                   <FilterChip label={filters.language.toUpperCase()} />
                 )}
+
+                {filters.hideOnShelf && <FilterChip label="Hide on shelf" />}
               </div>
 
               <p className="mt-4 text-xs text-muted-foreground">
                 {result.totalResults.toLocaleString()}{' '}
-                {result.totalResults === 1 ? 'movie' : 'movies'}
+                {result.totalResults === 1
+                  ? mediaLabel.slice(0, -1)
+                  : mediaLabel}
               </p>
             </div>
 
-            {page > 1 && <ResetPageButton />}
+            {result.page > 1 && <ResetPageButton />}
           </div>
 
-          {result.movies.length > 0 ? (
+          {result.media.length > 0 ? (
             <>
-              <MovieGrid movies={result.movies} />
+              <MediaGrid media={result.media} />
 
               <DiscoverPagination
                 page={result.page}
@@ -165,7 +200,7 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
               />
             </>
           ) : (
-            <EmptyDiscoverState query={query} />
+            <EmptyDiscoverState />
           )}
         </div>
       </div>

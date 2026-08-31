@@ -1,18 +1,18 @@
-import { Media } from '@/lib/media';
-import MovieCard from './movie-card';
+import type { Media } from '@/lib/media';
+import MediaCard from './media-card';
 
-type MovieRecommendationsProps = {
-  movies: Media[];
+type MediaRecommendationsProps = {
+  media: Media[];
   title?: string;
   eyebrow?: string;
 };
 
-const MovieRecommendations = ({
-  movies,
+const MediaRecommendations = ({
+  media,
   title = 'You might also like',
   eyebrow = 'Keep exploring',
-}: MovieRecommendationsProps) => {
-  if (movies.length === 0) {
+}: MediaRecommendationsProps) => {
+  if (media.length === 0) {
     return null;
   }
 
@@ -27,12 +27,12 @@ const MovieRecommendations = ({
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {movies.slice(0, 6).map((movie) => (
-          <MovieCard key={movie.tmdbId} movie={movie} />
+        {media.slice(0, 6).map((item) => (
+          <MediaCard key={`${item.type}:${item.tmdbId}`} media={item} />
         ))}
       </div>
     </section>
   );
 };
 
-export default MovieRecommendations;
+export default MediaRecommendations;

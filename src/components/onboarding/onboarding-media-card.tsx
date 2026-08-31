@@ -1,25 +1,25 @@
 'use client';
 
-import { Media } from '@/lib/media';
+import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 
-type OnboardingMovieCardProps = {
-  movie: Media;
+type OnboardingMediaCardProps = {
+  media: Media;
   selected: boolean;
-  onToggle: (movieId: number) => void;
+  onToggle: (tmdbId: number) => void;
 };
 
-const OnboardingMovieCard = ({
-  movie,
+const OnboardingMediaCard = ({
+  media,
   selected,
   onToggle,
-}: OnboardingMovieCardProps) => {
-  const poster = tmdbImage(movie.posterPath, 'w342');
+}: OnboardingMediaCardProps) => {
+  const poster = tmdbImage(media.posterPath, 'w342');
 
   return (
     <button
       type="button"
-      onClick={() => onToggle(movie.tmdbId)}
+      onClick={() => onToggle(media.tmdbId)}
       aria-pressed={selected}
       className={[
         'group relative overflow-hidden rounded-xl text-left transition-all duration-200',
@@ -32,7 +32,7 @@ const OnboardingMovieCard = ({
         {poster && (
           <img
             src={poster}
-            alt={`${movie.title} poster`}
+            alt={`${media.title} poster`}
             className={[
               'h-full w-full object-cover transition-all duration-300',
               selected ? 'scale-[1.02]' : 'group-hover:scale-[1.03]',
@@ -51,15 +51,15 @@ const OnboardingMovieCard = ({
 
       <div className="absolute inset-x-0 bottom-0 p-3">
         <p className="line-clamp-1 text-xs font-semibold text-white">
-          {movie.title}
+          {media.title}
         </p>
 
         <p className="mt-1 text-[10px] text-white/55">
-          {movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : ''}
+          {media.releaseDate ? new Date(media.releaseDate).getFullYear() : ''}
         </p>
       </div>
     </button>
   );
 };
 
-export default OnboardingMovieCard;
+export default OnboardingMediaCard;

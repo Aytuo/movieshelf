@@ -1,23 +1,25 @@
 'use client';
 
-import { saveMovieReview } from '@/lib/actions/review.action';
+import { saveMediaReview } from '@/lib/actions/review.action';
+import type { MediaType } from '@/lib/media';
 import { reviewSchema, type ReviewInput } from '@/lib/validations/review';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 type ReviewFormProps = {
-  movieId: number;
+  type: MediaType;
+  tmdbId: number;
   initialValues?: Partial<ReviewInput>;
 };
 
-const ReviewForm = ({ movieId, initialValues }: ReviewFormProps) => {
+const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
   const [isPending, startTransition] = useTransition();
+
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<ReviewInput>({
     resolver: zodResolver(reviewSchema),
-
     defaultValues: {
       title: initialValues?.title ?? '',
       content: initialValues?.content ?? '',
@@ -31,7 +33,7 @@ const ReviewForm = ({ movieId, initialValues }: ReviewFormProps) => {
 
     startTransition(async () => {
       try {
-        await saveMovieReview(movieId, values);
+        await saveMediaReview(type, tmdbId, values);
 
         form.reset(values);
       } catch {
@@ -39,6 +41,8 @@ const ReviewForm = ({ movieId, initialValues }: ReviewFormProps) => {
       }
     });
   }
+
+  const mediaLabel = type === 'movie' ? 'movie' : 'TV series';
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -54,7 +58,7 @@ const ReviewForm = ({ movieId, initialValues }: ReviewFormProps) => {
           id="review-title"
           {...form.register('title')}
           className="input"
-          placeholder="A few words about it..."
+          placeholder={`A few words about this ${mediaLabel}...`}
         />
 
         {form.formState.errors.title && (
@@ -111,6 +115,12 @@ const ReviewForm = ({ movieId, initialValues }: ReviewFormProps) => {
             </button>
           ))}
         </div>
+
+        {form.formState.errors.rating && (
+          <p className="mt-2 text-xs text-destructive">
+            {form.formState.errors.rating.message}
+          </p>
+        )}
       </div>
 
       <label className="flex items-center gap-3 text-sm text-muted-foreground">

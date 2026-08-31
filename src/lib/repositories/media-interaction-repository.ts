@@ -17,6 +17,14 @@ export async function getUserMediaInteraction(userId: string, mediaId: string) {
   return result[0] ?? null;
 }
 
+export async function getUserMediaKeys(userId: string) {
+  return db
+    .select({ tmdbId: media.tmdbId, type: media.type })
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(eq(mediaInteraction.userId, userId));
+}
+
 export async function getUserShelf(userId: string) {
   return db
     .select({

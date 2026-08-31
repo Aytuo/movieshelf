@@ -1,45 +1,58 @@
 import Hero from '@/components/home/hero';
-import MovieCarousel from '@/components/home/movie-carousel';
-import RankedMovieList from '@/components/home/ranked-movie-list';
+import MediaCarousel from '@/components/media/media-carousel';
+import RankedMediaList from '@/components/media/ranked-media-list';
 import TastePreview from '@/components/profile/taste-preview';
 import RecommendationSection from '@/components/recommendations/recommendation-section';
 import { requireSession } from '@/lib/auth/require-session';
 import { getColdStartRecommendations } from '@/lib/recommendations/cold-start';
-import { getProfileByUserId } from '@/lib/repositories/profile-repository';
-import { getHomeMovieSections } from '@/lib/services/home-service';
+import { getProfileByUserId } from '@/lib/repositories';
+import { getHomeSections } from '@/lib/services/home-service';
 import { getRecommendationsForUser } from '@/lib/services/recommendation-service';
 import { getTasteProfile } from '@/lib/services/taste-service';
-import { redirect } from 'next/navigation';
 
 export default async function HomePage() {
   const session = await requireSession();
 
   const profile = await getProfileByUserId(session.user.id);
 
-  if (profile && !profile.onboardingCompleted) {
-    redirect('/onboarding');
-  }
+  // TODO: Add CTA to complete onboarding
+  // if (profile && !profile.onboardingCompleted) {
+  //   redirect('/onboarding');
+  // }
 
-  const [personalized, taste, sections] = await Promise.all([
-    getRecommendationsForUser(session.user.id),
-    getTasteProfile(session.user.id),
-    getHomeMovieSections(),
-  ]);
+  const [personalizedMovies, personalizedTv, taste, sections] =
+    await Promise.all([
+      getRecommendationsForUser(session.user.id, 'movie'),
+      getRecommendationsForUser(session.user.id, 'tv'),
+      getTasteProfile(session.user.id),
+      getHomeSections(),
+    ]);
 
-  const recommendations =
-    personalized.length > 0
-      ? personalized
-      : await getColdStartRecommendations();
+  // Cold start remains a fallback only: Movies and TV should be handled independently so that having enough movie signals does not affect TV recommendations, and vice versa.
 
-  const isPersonalized = personalized.length > 0;
+  const movieRecommendations =
+    personalizedMovies.length > 0
+      ? personalizedMovies
+      : await getColdStartRecommendations('movie');
 
-  const topTen = sections.trending.slice(0, 10);
+  const tvRecommendations =
+    personalizedTv.length > 0
+      ? personalizedTv
+      : await getColdStartRecommendations('tv');
+
+  const hasMovieRecommendations = personalizedMovies.length > 0;
+
+  const hasTvRecommendations = personalizedTv.length > 0;
 
   return (
     <>
       <Hero />
 
       <main>
+        {/* ---------------------------------------------------------------- */}
+        {/* Taste                                                            */}
+        {/* ---------------------------------------------------------------- */}
+
         <section className="border-b border-border/60">
           <div className="container-content py-14 lg:py-16">
             <div className="mb-7">
@@ -57,82 +70,140 @@ export default async function HomePage() {
 
             <TastePreview
               taste={taste}
-              username={profile?.username ?? session.user.name}
+              username={profile?.username ?? session.user.name ?? 'profile'}
             />
           </div>
         </section>
 
+        {/* ---------------------------------------------------------------- */}
+        {/* Personalized movies                                             */}
+        {/* ---------------------------------------------------------------- */}
+
         <RecommendationSection
-          recommendations={recommendations}
+          recommendations={movieRecommendations}
           title={
-            isPersonalized
+            hasMovieRecommendations
               ? 'Picked for you'
-              : 'Popular while we learn your taste'
+              : 'Popular movies while we learn your taste'
           }
           description={
-            isPersonalized
+            hasMovieRecommendations
               ? "Based on the movies you've rated and collected."
-              : "Rate a few movies and we'll start tailoring this space to you."
+              : "Rate a few movies and we'll start tailoring your movie recommendations."
           }
         />
 
-        <MovieCarousel
-          eyebrow="Handpicked Selections"
-          title="Recommended by TMDB"
-          description="Popular picks and highly rated films curated by TMDB's global community."
-          movies={sections.recommended.slice(0, 20)}
-          href="/discover?sort=popularity"
+        {/* ---------------------------------------------------------------- */}
+        {/* Personalized TV                                                 */}
+        {/* ---------------------------------------------------------------- */}
+
+        <RecommendationSection
+          recommendations={tvRecommendations}
+          title={
+            hasTvRecommendations
+              ? 'TV picks for you'
+              : 'Popular series while we learn your taste'
+          }
+          description={
+            hasTvRecommendations
+              ? "Based on the TV series you've rated and collected."
+              : "Rate a few TV series and we'll start tailoring your series recommendations."
+          }
         />
 
-        <MovieCarousel
+        {/* ---------------------------------------------------------------- */}
+        {/* Movie discovery                                                  */}
+        {/* ---------------------------------------------------------------- */}
+
+        <MediaCarousel
+          eyebrow="Audience favorites"
+          title="Popular Movies"
+          description="A broader look at the movies attracting attention across TMDB."
+          media={sections.movies.popular.slice(0, 20)}
+          href="/discover?type=movie&sort=popularity"
+        />
+
+        <MediaCarousel
           eyebrow="In the spotlight"
-          title="Trending this week"
+          title="Trending Movies"
           description="The movies gaining the most momentum across TMDB right now."
-          movies={sections.trending.slice(0, 20)}
-          href="/discover?sort=popularity"
+          media={sections.movies.trending.slice(0, 20)}
+          href="/discover?type=movie&sort=popularity"
         />
 
-        <MovieCarousel
-          eyebrow="Critics' shelf"
-          title="Top picks"
-          description="Highly rated movies with enough votes to make the signal meaningful."
-          movies={sections.topPicks}
-          href="/discover?sort=rating"
-        />
-
-        <MovieCarousel
+        <MediaCarousel
           eyebrow="Currently in cinemas"
           title="Now Playing"
           description="Movies currently making their way through cinemas."
-          movies={sections.nowPlaying}
-          href="/discover"
+          media={sections.movies.nowPlaying.slice(0, 20)}
+          href="/discover?type=movie"
         />
 
-        <MovieCarousel
+        <MediaCarousel
           eyebrow="Coming soon"
-          title="Upcoming"
+          title="Upcoming Movies"
           description="Movies arriving soon that might deserve a place on your shelf."
-          movies={sections.upcoming}
-          href="/discover"
+          media={sections.movies.upcoming.slice(0, 20)}
+          href="/discover?type=movie"
         />
 
-        <RankedMovieList movies={topTen} />
-
-        <MovieCarousel
-          eyebrow="Audience Favorites"
-          title="Popular right now"
-          description="A broader look at the movies attracting attention across TMDB."
-          movies={sections.popular.slice(0, 20)}
-          href="/discover?sort=popularity"
-        />
-
-        <MovieCarousel
+        <MediaCarousel
           eyebrow="Hall of Fame"
-          title="Top Rated"
-          description="Some of the most acclaimed movies ever made."
-          movies={sections.topRated.slice(0, 20)}
-          href="/discover?sort=popularity"
+          title="Top Rated Movies"
+          description="Some of the most acclaimed movies in the TMDB catalog."
+          media={sections.movies.topRated.slice(0, 20)}
+          href="/discover?type=movie&sort=rating"
         />
+
+        {/* ---------------------------------------------------------------- */}
+        {/* TV discovery                                                     */}
+        {/* ---------------------------------------------------------------- */}
+
+        <MediaCarousel
+          eyebrow="Audience favorites"
+          title="Popular TV"
+          description="A broader look at the series attracting attention across TMDB."
+          media={sections.tv.popular.slice(0, 20)}
+          href="/discover?type=tv&sort=popularity"
+        />
+
+        <MediaCarousel
+          eyebrow="In the spotlight"
+          title="Trending TV"
+          description="The TV series gaining the most momentum across TMDB right now."
+          media={sections.tv.trending.slice(0, 20)}
+          href="/discover?type=tv&sort=popularity"
+        />
+
+        <MediaCarousel
+          eyebrow="On air today"
+          title="Airing Today"
+          description="Series with new episodes airing today."
+          media={sections.tv.airingToday.slice(0, 20)}
+          href="/discover?type=tv"
+        />
+
+        <MediaCarousel
+          eyebrow="Currently on air"
+          title="On the Air"
+          description="Series currently airing and worth keeping an eye on."
+          media={sections.tv.onTheAir.slice(0, 20)}
+          href="/discover?type=tv"
+        />
+
+        <MediaCarousel
+          eyebrow="Hall of Fame"
+          title="Top Rated TV"
+          description="Some of the most acclaimed TV series in the TMDB catalog."
+          media={sections.tv.topRated.slice(0, 20)}
+          href="/discover?type=tv&sort=rating"
+        />
+
+        {/* ---------------------------------------------------------------- */}
+        {/* Global weekly chart                                              */}
+        {/* ---------------------------------------------------------------- */}
+
+        <RankedMediaList media={sections.movies.topPicks} />
       </main>
     </>
   );

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { media, watchHistory } from '@/lib/db/schema';
-import { and, count, desc, eq } from 'drizzle-orm';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 export async function createWatchHistoryEntry({
   userId,
@@ -36,11 +36,25 @@ export async function getWatchHistoryPage({
     .select({
       history: watchHistory,
       media,
+
+      // Number of this particular watch for the user/media pair; We number watches chronologically: 1 = first watch, 2 = first re-watch, 3 = second etc.
+
+      watchNumber: sql<number>`
+        row_number() over (
+          partition by
+            ${watchHistory.userId},
+            ${watchHistory.mediaId}
+          order by
+            ${watchHistory.watchedAt} asc,
+            ${watchHistory.createdAt} asc,
+            ${watchHistory.id} asc
+        )
+      `,
     })
     .from(watchHistory)
     .innerJoin(media, eq(media.id, watchHistory.mediaId))
     .where(eq(watchHistory.userId, userId))
-    .orderBy(desc(watchHistory.watchedAt))
+    .orderBy(desc(watchHistory.watchedAt), desc(watchHistory.createdAt))
     .limit(limit)
     .offset(offset);
 }

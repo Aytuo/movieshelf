@@ -1,19 +1,19 @@
 'use client';
 
+import {
+  addMediaToWatchlist,
+  markMediaAsWatched,
+  rateMedia,
+  removeMediaFromShelf,
+  toggleMediaFavorite,
+} from '@/lib/actions/media-interaction.action';
+import type { MediaType } from '@/lib/media';
 import { Bookmark, Check, Heart, Star, Trash2 } from 'lucide-react';
 import { useState, useTransition } from 'react';
 
-import {
-  addMovieToWatchlist,
-  markMovieAsWatched,
-  rateMovie,
-  removeMovieFromShelf,
-  toggleMovieFavorite,
-} from '@/lib/actions/media-interaction.action';
-
-type MovieActionsProps = {
-  movieId: number;
-
+type MediaActionsProps = {
+  type: MediaType;
+  tmdbId: number;
   initialState: {
     inShelf: boolean;
     status: 'watchlist' | 'watched' | null;
@@ -22,19 +22,28 @@ type MovieActionsProps = {
   };
 };
 
-const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
+const MediaActions = ({ type, tmdbId, initialState }: MediaActionsProps) => {
   const [state, setState] = useState(initialState);
 
   const [isPending, startTransition] = useTransition();
 
   function run(action: () => Promise<void>) {
     startTransition(async () => {
-      await action();
+      try {
+        await action();
+      } catch (error) {
+        console.error(error);
+      }
     });
+  }
+
+  function getMediaLabel() {
+    return type === 'movie' ? 'movie' : 'TV series';
   }
 
   return (
     <div className="space-y-5">
+      {/* Shelf actions */}
       <div className="flex flex-wrap gap-3">
         {state.inShelf ? (
           <button
@@ -42,7 +51,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
             disabled={isPending}
             onClick={() => {
               run(async () => {
-                await removeMovieFromShelf(movieId);
+                await removeMediaFromShelf(type, tmdbId);
 
                 setState({
                   ...state,
@@ -64,7 +73,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
             disabled={isPending}
             onClick={() => {
               run(async () => {
-                await addMovieToWatchlist(movieId);
+                await addMediaToWatchlist(type, tmdbId);
 
                 setState({
                   ...state,
@@ -86,7 +95,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
             disabled={isPending}
             onClick={() => {
               run(async () => {
-                await markMovieAsWatched(movieId);
+                await markMediaAsWatched(type, tmdbId);
 
                 setState({
                   ...state,
@@ -98,8 +107,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:opacity-50"
           >
             <Check className="size-4" />
-
-            {state.status === 'watched' ? 'Watched again' : 'Mark as watched'}
+            Mark as watched
           </button>
         ) : null}
 
@@ -108,7 +116,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
           disabled={isPending}
           onClick={() => {
             run(async () => {
-              await toggleMovieFavorite(movieId);
+              await toggleMediaFavorite(type, tmdbId);
 
               setState({
                 ...state,
@@ -133,6 +141,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
         </button>
       </div>
 
+      {/* Rating */}
       <div className="border-t border-border/60 pt-5">
         <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
           Your rating
@@ -146,7 +155,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
               disabled={isPending}
               onClick={() => {
                 run(async () => {
-                  await rateMovie(movieId, value);
+                  await rateMedia(type, tmdbId, value);
 
                   setState({
                     ...state,
@@ -156,6 +165,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
                   });
                 });
               }}
+              aria-label={`Rate ${getMediaLabel()} ${value} out of 10`}
               className={[
                 'flex size-9 items-center justify-center rounded-lg border text-xs font-semibold transition-all',
                 state.rating === value
@@ -168,7 +178,7 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
           ))}
         </div>
 
-        {state.rating && (
+        {state.rating !== null && (
           <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-rating">
             <Star className="size-4 fill-current" />
             You rated this {state.rating}/10
@@ -179,4 +189,4 @@ const MovieActions = ({ movieId, initialState }: MovieActionsProps) => {
   );
 };
 
-export default MovieActions;
+export default MediaActions;

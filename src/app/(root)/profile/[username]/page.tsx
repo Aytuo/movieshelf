@@ -1,12 +1,7 @@
 import TastePreview from '@/components/profile/taste-preview';
-import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
-import { getUserReviews } from '@/lib/repositories/review-repository';
-import { getUserShelf } from '@/lib/repositories/user-movie-repository';
-import { getTasteProfile } from '@/lib/services/taste-service';
+import { getPublicProfile } from '@/lib/services/profile-service';
 import { tmdbImage } from '@/lib/tmdb/images';
-import { eq } from 'drizzle-orm';
-import { Bookmark, Film, Heart, Star } from 'lucide-react';
+import { Film, Star } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
 type ProfilePageProps = {
@@ -18,52 +13,45 @@ type ProfilePageProps = {
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const { username } = await params;
 
-  const result = await db
-    .select()
-    .from(profile)
-    .where(eq(profile.username, username))
-    .limit(1);
+  const data = await getPublicProfile(username);
 
-  const userProfile = result[0];
-
-  if (!userProfile) {
+  if (!data) {
     notFound();
   }
 
-  const shelf = await getUserShelf(userProfile.userId);
+  const { profile, shelf, reviews, taste } = data;
 
-  const reviews = await getUserReviews(userProfile.userId);
+  const movieShelf = shelf.filter(({ media }) => media.type === 'movie');
 
-  const watched = shelf.filter(({ shelf }) => shelf.status === 'watched');
+  const tvShelf = shelf.filter(({ media }) => media.type === 'tv');
 
-  const favorites = shelf.filter(({ shelf }) => shelf.favorite);
+  const movieWatched = taste.movie.watched;
 
-  const ratings = shelf
-    .map(({ shelf }) => shelf.rating)
-    .filter((rating): rating is number => rating !== null);
+  const tvWatched = taste.tv.watched;
 
-  const averageRating =
-    ratings.length > 0
-      ? (
-          ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
-        ).toFixed(1)
-      : '—';
+  const movieFavorites = movieShelf.filter(
+    ({ interaction }) => interaction.favorite
+  );
 
-  const taste = await getTasteProfile(userProfile.userId);
+  const tvFavorites = tvShelf.filter(({ interaction }) => interaction.favorite);
 
   return (
     <main className="container-content py-12 lg:py-16">
+      {/* ------------------------------------------------------------------ */}
+      {/* Profile header                                                     */}
+      {/* ------------------------------------------------------------------ */}
+
       <header className="border-b border-border/60 pb-10">
         <div className="flex flex-col gap-7 sm:flex-row sm:items-end">
           <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-2xl font-bold">
-            {userProfile.avatarUrl ? (
+            {profile.avatarUrl ? (
               <img
-                src={userProfile.avatarUrl}
+                src={profile.avatarUrl}
                 alt=""
                 className="h-full w-full object-cover"
               />
             ) : (
-              userProfile.username.slice(0, 1).toUpperCase()
+              profile.username.slice(0, 1).toUpperCase()
             )}
           </div>
 
@@ -71,97 +59,183 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             <p className="eyebrow">MovieShelf profile</p>
 
             <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight">
-              {userProfile.displayName || `@${userProfile.username}`}
+              {profile.displayName || `@${profile.username}`}
             </h1>
 
             <p className="mt-1 text-sm text-muted-foreground">
-              @{userProfile.username}
+              @{profile.username}
             </p>
 
-            {userProfile.bio && (
+            {profile.bio && (
               <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {userProfile.bio}
+                {profile.bio}
               </p>
             )}
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl p-4 surface">
-            <Film className="size-4 text-primary" />
+        {/* ---------------------------------------------------------------- */}
+        {/* Media statistics                                                 */}
+        {/* ---------------------------------------------------------------- */}
 
-            <p className="mt-4 text-2xl font-bold">{watched.length}</p>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <section className="rounded-2xl p-5 surface">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Film className="size-4 text-primary" />
 
-            <p className="mt-1 text-xs text-muted-foreground">watched</p>
-          </div>
+                <p className="text-sm font-semibold">Movies</p>
+              </div>
 
-          <div className="rounded-xl p-4 surface">
-            <Bookmark className="size-4 text-primary" />
+              <span className="text-xs text-muted-foreground">
+                {taste.movie.total} total
+              </span>
+            </div>
 
-            <p className="mt-4 text-2xl font-bold">{shelf.length}</p>
+            <div className="mt-5 grid grid-cols-4 gap-3">
+              <div>
+                <p className="text-2xl font-bold">{movieWatched}</p>
 
-            <p className="mt-1 text-xs text-muted-foreground">on shelf</p>
-          </div>
+                <p className="mt-1 text-xs text-muted-foreground">watched</p>
+              </div>
 
-          <div className="rounded-xl p-4 surface">
-            <Heart className="size-4 text-primary" />
+              <div>
+                <p className="text-2xl font-bold">{taste.movie.rated}</p>
 
-            <p className="mt-4 text-2xl font-bold">{favorites.length}</p>
+                <p className="mt-1 text-xs text-muted-foreground">rated</p>
+              </div>
 
-            <p className="mt-1 text-xs text-muted-foreground">favorites</p>
-          </div>
+              <div>
+                <p className="text-2xl font-bold">{movieFavorites.length}</p>
 
-          <div className="rounded-xl p-4 surface">
-            <Star className="size-4 text-rating" />
+                <p className="mt-1 text-xs text-muted-foreground">favorites</p>
+              </div>
 
-            <p className="mt-4 text-2xl font-bold">{averageRating}</p>
+              <div>
+                <div className="flex items-center gap-1">
+                  <Star className="size-3.5 fill-current text-rating" />
 
-            <p className="mt-1 text-xs text-muted-foreground">average rating</p>
-          </div>
+                  <p className="text-2xl font-bold">
+                    {taste.movie.averageRating ?? '—'}
+                  </p>
+                </div>
+
+                <p className="mt-1 text-xs text-muted-foreground">average</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl p-5 surface">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Film className="size-4 text-primary" />
+
+                <p className="text-sm font-semibold">TV Series</p>
+              </div>
+
+              <span className="text-xs text-muted-foreground">
+                {taste.tv.total} total
+              </span>
+            </div>
+
+            <div className="mt-5 grid grid-cols-4 gap-3">
+              <div>
+                <p className="text-2xl font-bold">{tvWatched}</p>
+
+                <p className="mt-1 text-xs text-muted-foreground">watched</p>
+              </div>
+
+              <div>
+                <p className="text-2xl font-bold">{taste.tv.rated}</p>
+
+                <p className="mt-1 text-xs text-muted-foreground">rated</p>
+              </div>
+
+              <div>
+                <p className="text-2xl font-bold">{tvFavorites.length}</p>
+
+                <p className="mt-1 text-xs text-muted-foreground">favorites</p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-1">
+                  <Star className="size-3.5 fill-current text-rating" />
+
+                  <p className="text-2xl font-bold">
+                    {taste.tv.averageRating ?? '—'}
+                  </p>
+                </div>
+
+                <p className="mt-1 text-xs text-muted-foreground">average</p>
+              </div>
+            </div>
+          </section>
         </div>
       </header>
 
+      {/* ------------------------------------------------------------------ */}
+      {/* Favorites                                                          */}
+      {/* ------------------------------------------------------------------ */}
+
       <section className="py-12">
-        <div className="mb-7 flex items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow">From the shelf</p>
+        <div className="mb-7">
+          <p className="eyebrow">From the shelf</p>
 
-            <h2 className="mt-2 font-heading text-2xl font-bold">Favorites</h2>
+          <h2 className="mt-2 font-heading text-2xl font-bold">Favorites</h2>
+        </div>
+
+        {movieFavorites.length + tvFavorites.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            {[...movieFavorites, ...tvFavorites]
+              .slice(0, 6)
+              .map(({ media }) => {
+                const poster = tmdbImage(media.posterPath, 'w500');
+
+                return (
+                  <div key={`${media.type}:${media.tmdbId}`}>
+                    {poster && (
+                      <img
+                        src={poster}
+                        alt={media.title}
+                        className="aspect-[2/3] w-full rounded-xl object-cover"
+                      />
+                    )}
+
+                    <div className="mt-2">
+                      <p className="line-clamp-1 text-sm font-medium">
+                        {media.title}
+                      </p>
+
+                      <p className="mt-1 text-[10px] tracking-wide text-muted-foreground uppercase">
+                        {media.type === 'movie' ? 'Movie' : 'TV Series'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-          {favorites.slice(0, 6).map(({ movie }) => {
-            const poster = tmdbImage(movie.posterPath, 'w500');
-
-            return (
-              <div key={movie.id}>
-                {poster && (
-                  <img
-                    src={poster}
-                    alt={movie.title}
-                    className="aspect-[2/3] w-full rounded-xl object-cover"
-                  />
-                )}
-
-                <p className="mt-2 line-clamp-1 text-sm font-medium">
-                  {movie.title}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No favorites yet.</p>
+        )}
       </section>
 
+      {/* ------------------------------------------------------------------ */}
+      {/* Taste                                                              */}
+      {/* ------------------------------------------------------------------ */}
+
       <section className="border-t border-border/60 py-12">
-        <div className="mb-6">
+        <div className="mb-7">
           <p className="eyebrow">Cinematic identity</p>
 
           <h2 className="mt-2 font-heading text-2xl font-bold">Your Taste</h2>
         </div>
 
-        <TastePreview taste={taste} username={userProfile.username} />
+        <TastePreview taste={taste} username={profile.username} />
       </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Reviews                                                            */}
+      {/* ------------------------------------------------------------------ */}
 
       <section className="border-t border-border/60 py-12">
         <div className="mb-7">
@@ -172,9 +246,15 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
         {reviews.length > 0 ? (
           <div className="grid gap-4 lg:grid-cols-2">
-            {reviews.slice(0, 6).map(({ review, movie }) => (
+            {reviews.slice(0, 6).map(({ review, media }) => (
               <article key={review.id} className="rounded-2xl p-5 surface">
-                <p className="text-xs text-muted-foreground">{movie.title}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">{media.title}</p>
+
+                  <span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+                    {media.type === 'movie' ? 'Movie' : 'TV Series'}
+                  </span>
+                </div>
 
                 {review.title && (
                   <h3 className="mt-2 font-heading text-lg font-semibold">
@@ -186,7 +266,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
                   {review.content}
                 </p>
 
-                {review.rating && (
+                {review.rating !== null && (
                   <p className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-rating">
                     <Star className="size-3.5 fill-current" />
                     {review.rating}/10

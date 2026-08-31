@@ -6,9 +6,10 @@ import {
   getMovie,
   getPopular,
   getTrending,
-  search,
+  search as searchMovies,
 } from '@/lib/tmdb/movie-api';
 import { MovieDiscoverFilters } from '@/types';
+import { paginateSearchResults } from '../search/pagination';
 import { MovieRepository } from './types';
 
 export const tmdbMovieRepository: MovieRepository = {
@@ -96,15 +97,15 @@ export const tmdbMovieRepository: MovieRepository = {
   },
 
   async search(query, options) {
-    const page = options?.page ?? 1;
-
-    const result = await search(query, page);
+    const result = await paginateSearchResults(options?.page ?? 1, (page) =>
+      searchMovies(query, page, options?.year)
+    );
 
     return {
-      media: result.results.map(mapTmdbMovie),
+      media: result.media.map(mapTmdbMovie),
       page: result.page,
-      totalPages: result.total_pages,
-      totalResults: result.total_results,
+      totalResults: result.totalResults,
+      totalPages: result.totalPages,
     };
   },
 

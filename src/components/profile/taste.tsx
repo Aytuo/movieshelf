@@ -1,10 +1,15 @@
+'use client';
+
 import { getTasteSummary } from '@/lib/taste/taste-summary';
-import { TasteProfile } from '@/types';
+import type { TasteProfile, TasteStats } from '@/types';
 import { Star } from 'lucide-react';
+import { useState } from 'react';
 
 type TasteProfileProps = {
   taste: TasteProfile;
 };
+
+type TasteType = 'movie' | 'tv';
 
 function Stat({
   label,
@@ -30,17 +35,56 @@ function Stat({
 }
 
 const Taste = ({ taste }: TasteProfileProps) => {
-  const summary = getTasteSummary(taste);
+  const [type, setType] = useState<TasteType>('movie');
+
+  const stats: TasteStats = type === 'movie' ? taste.movie : taste.tv;
+
+  const summary = getTasteSummary(stats, type);
 
   const maxRatingCount = Math.max(
-    ...taste.ratingDistribution.map((item) => item.count),
+    ...stats.ratingDistribution.map((item) => item.count),
     1
   );
 
-  const tasteProgress = Math.min(taste.watchedMovies / 50, 1);
+  const tasteProgress = Math.min(stats.watched / 50, 1);
+
+  const label = type === 'movie' ? 'movies' : 'TV series';
 
   return (
     <div className="space-y-6">
+      {/* Media type selector */}
+      <section className="flex justify-center">
+        <div className="inline-flex rounded-lg border border-border bg-surface p-1">
+          <button
+            type="button"
+            onClick={() => setType('movie')}
+            aria-pressed={type === 'movie'}
+            className={[
+              'rounded-md px-4 py-2 text-xs font-semibold transition-colors',
+              type === 'movie'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground',
+            ].join(' ')}
+          >
+            Movies
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setType('tv')}
+            aria-pressed={type === 'tv'}
+            className={[
+              'rounded-md px-4 py-2 text-xs font-semibold transition-colors',
+              type === 'tv'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground',
+            ].join(' ')}
+          >
+            TV Series
+          </button>
+        </div>
+      </section>
+
       {/* Summary */}
       <section className="relative overflow-hidden rounded-2xl border border-primary/15 bg-primary-muted p-6 sm:p-8">
         <div className="pointer-events-none absolute top-[-35%] right-[-10%] size-72 rounded-full bg-primary/10 blur-[90px]" />
@@ -60,17 +104,17 @@ const Taste = ({ taste }: TasteProfileProps) => {
 
       {/* Overview */}
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="Watched" value={taste.watchedMovies} />
+        <Stat label="Watched" value={stats.watched} />
 
-        <Stat label="Rated" value={taste.ratedMovies} />
+        <Stat label="Rated" value={stats.rated} />
 
-        <Stat label="Favorites" value={taste.favoriteMovies} />
+        <Stat label="Favorites" value={stats.favorite} />
 
         <Stat
           label="Average"
-          value={taste.averageRating ? taste.averageRating : '—'}
+          value={stats.averageRating ?? '—'}
           icon={
-            taste.averageRating ? (
+            stats.averageRating !== null ? (
               <Star className="size-3.5 fill-current text-rating" />
             ) : undefined
           }
@@ -84,16 +128,16 @@ const Taste = ({ taste }: TasteProfileProps) => {
             <p className="text-sm font-medium">Taste profile</p>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              {taste.watchedMovies < 10
-                ? 'Your cinematic identity is just getting started.'
-                : taste.watchedMovies < 30
+              {stats.watched < 10
+                ? `Your ${type === 'movie' ? 'cinematic' : 'TV'} identity is just getting started.`
+                : stats.watched < 30
                   ? "We're starting to see your patterns."
                   : 'Your taste is becoming very distinctive.'}
             </p>
           </div>
 
           <span className="text-xs text-muted-foreground">
-            {taste.watchedMovies} films
+            {stats.watched} {label}
           </span>
         </div>
 
@@ -115,8 +159,8 @@ const Taste = ({ taste }: TasteProfileProps) => {
           </p>
 
           <div className="mt-7 space-y-4">
-            {taste.topGenres.length > 0 ? (
-              taste.topGenres.map((genre) => (
+            {stats.topGenres.length > 0 ? (
+              stats.topGenres.map((genre) => (
                 <div key={genre.name}>
                   <div className="mb-2 flex items-center justify-between gap-4 text-xs">
                     <span className="font-medium">{genre.name}</span>
@@ -138,7 +182,9 @@ const Taste = ({ taste }: TasteProfileProps) => {
               ))
             ) : (
               <p className="text-sm text-muted-foreground">
-                Rate a few movies to see your favorite genres.
+                {type === 'movie'
+                  ? 'Rate a few movies to see your favorite genres.'
+                  : 'Rate a few TV series to see your favorite genres.'}
               </p>
             )}
           </div>
@@ -150,8 +196,8 @@ const Taste = ({ taste }: TasteProfileProps) => {
           </p>
 
           <div className="mt-7 space-y-4">
-            {taste.favoriteDecades.length > 0 ? (
-              taste.favoriteDecades.map((decade) => (
+            {stats.favoriteDecades.length > 0 ? (
+              stats.favoriteDecades.map((decade) => (
                 <div key={decade.decade}>
                   <div className="mb-2 flex items-center justify-between gap-4 text-xs">
                     <span className="font-medium">{decade.decade}</span>
@@ -188,12 +234,12 @@ const Taste = ({ taste }: TasteProfileProps) => {
           </p>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            How you score the movies you watch.
+            How you score the {label} you watch.
           </p>
         </div>
 
         <div className="mt-8 flex h-48 items-end gap-2 sm:gap-3">
-          {taste.ratingDistribution.map((item) => {
+          {stats.ratingDistribution.map((item) => {
             const height =
               item.count === 0
                 ? 4

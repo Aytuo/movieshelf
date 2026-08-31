@@ -1,11 +1,11 @@
-import { MediaCastMember } from '@/lib/media';
+import type { MediaCastMember } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 
-type MovieCastProps = {
+type MediaCastProps = {
   cast: MediaCastMember[];
 };
 
-const MovieCast = ({ cast }: MovieCastProps) => {
+const MediaCast = ({ cast }: MediaCastProps) => {
   if (cast.length === 0) {
     return null;
   }
@@ -55,4 +55,4 @@ const MovieCast = ({ cast }: MovieCastProps) => {
   );
 };
 
-export default MovieCast;
+export default MediaCast;

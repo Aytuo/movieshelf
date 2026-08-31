@@ -91,11 +91,10 @@ const GlobalSearch = () => {
         }
 
         const data = (await response.json()) as {
-          movies: Media[];
+          media: Media[];
           totalResults: number;
         };
-
-        setResults(data.movies);
+        setResults(data.media);
         setTotalResults(data.totalResults);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -161,12 +160,12 @@ const GlobalSearch = () => {
       <button
         type="button"
         onClick={openSearch}
-        aria-label="Search movies"
+        aria-label="Search"
         className="hover:border-border-strong hidden h-10 w-64 items-center gap-3 rounded-lg border border-border bg-surface/80 px-3 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-hover lg:flex xl:w-72"
       >
         <Search className="size-4 shrink-0" />
 
-        <span className="flex-1">Search movies...</span>
+        <span className="flex-1">Search...</span>
 
         <kbd className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
           <Command className="size-2.5" />K
@@ -176,7 +175,7 @@ const GlobalSearch = () => {
       <button
         type="button"
         onClick={openSearch}
-        aria-label="Search movies"
+        aria-label="Search"
         className="inline-flex size-10 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground lg:hidden"
       >
         <Search className="size-4" />
@@ -209,7 +208,7 @@ const GlobalSearch = () => {
                   ref={inputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search movies..."
+                  placeholder="Search movies & TV series..."
                   className="h-16 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/60 sm:text-lg"
                   autoComplete="off"
                   spellCheck={false}
@@ -242,10 +241,10 @@ const GlobalSearch = () => {
                   <SearchResults results={results} onResultClick={close} />
                 ) : !isLoading ? (
                   <div className="px-6 py-12 text-center">
-                    <p className="text-sm font-medium">No movies found.</p>
+                    <p className="text-sm font-medium">No results found.</p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Try another title.
+                      Try a different movie or TV series title.
                     </p>
                   </div>
                 ) : (
@@ -257,7 +256,7 @@ const GlobalSearch = () => {
 
               <div className="flex items-center justify-between gap-4 border-t border-border px-4 py-3">
                 <p className="text-[11px] text-muted-foreground">
-                  Search by movie title
+                  Find a movie or TV series
                 </p>
 
                 {query.trim().length >= 2 && (

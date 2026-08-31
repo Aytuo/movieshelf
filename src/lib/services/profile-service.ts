@@ -1,6 +1,16 @@
-import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import {
+  createProfile,
+  getProfileByUserId,
+  getProfileByUsername,
+  getUserReviews,
+  getUserShelf,
+  usernameExists,
+} from '@/lib/repositories';
+import { getTasteProfile } from '@/lib/services/taste-service';
+
+const USERNAME_MAX_LENGTH = 14;
+const RANDOM_SUFFIX_LENGTH = 4;
+const MAX_USERNAME_GENERATION_ATTEMPTS = 5;
 
 function createBaseUsername(name: string | null | undefined, email: string) {
   const fromName = name
@@ -24,25 +34,31 @@ function createBaseUsername(name: string | null | undefined, email: string) {
 async function generateUniqueUsername(base: string) {
   let username = base;
 
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const existing = await db
-      .select({
-        userId: profile.userId,
-      })
-      .from(profile)
-      .where(eq(profile.username, username))
-      .limit(1);
+  for (let attempt = 0; attempt < MAX_USERNAME_GENERATION_ATTEMPTS; attempt++) {
+    const exists = await usernameExists(username);
 
-    if (!existing[0]) {
+    if (!exists) {
       return username;
     }
 
     const suffix = Math.floor(1000 + Math.random() * 9000);
 
-    username = `${base.slice(0, 14 - 5)}_${suffix}`;
+    username = `${base.slice(
+      0,
+      USERNAME_MAX_LENGTH - RANDOM_SUFFIX_LENGTH - 1
+    )}_${suffix}`;
   }
 
   throw new Error('Unable to generate a unique username.');
+}
+
+export async function isUsernameAvailable(
+  username: string,
+  currentUserId: string
+) {
+  const existing = await getProfileByUsername(username);
+
+  return !existing || existing.userId === currentUserId;
 }
 
 export async function ensureProfile({
@@ -54,28 +70,39 @@ export async function ensureProfile({
   name: string | null | undefined;
   email: string;
 }) {
-  const existing = await db
-    .select()
-    .from(profile)
-    .where(eq(profile.userId, userId))
-    .limit(1);
+  const existing = await getProfileByUserId(userId);
 
-  if (existing[0]) {
-    return existing[0];
+  if (existing) {
+    return existing;
   }
 
   const baseUsername = createBaseUsername(name, email);
-
   const username = await generateUniqueUsername(baseUsername);
 
-  const [created] = await db
-    .insert(profile)
-    .values({
-      userId,
-      username,
-      displayName: name ?? null,
-    })
-    .returning();
+  return createProfile({
+    userId,
+    username,
+    displayName: name ?? null,
+  });
+}
 
-  return created;
+export async function getPublicProfile(username: string) {
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return null;
+  }
+
+  const [shelf, reviews, taste] = await Promise.all([
+    getUserShelf(profile.userId),
+    getUserReviews(profile.userId),
+    getTasteProfile(profile.userId),
+  ]);
+
+  return {
+    profile,
+    shelf,
+    taste,
+    reviews,
+  };
 }

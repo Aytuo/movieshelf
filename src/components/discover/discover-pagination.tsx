@@ -4,13 +4,12 @@ import { buildDiscoverUrl } from '@/lib/discover/build-url';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-const DiscoverPagination = ({
-  page,
-  totalPages,
-}: {
+type DiscoverPaginationProps = {
   page: number;
   totalPages: number;
-}) => {
+};
+
+const DiscoverPagination = ({ page, totalPages }: DiscoverPaginationProps) => {
   const searchParams = useSearchParams();
 
   const previous = page > 1 ? buildDiscoverUrl(searchParams, page - 1) : null;
