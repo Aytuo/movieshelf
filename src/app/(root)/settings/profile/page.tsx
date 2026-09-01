@@ -1,4 +1,4 @@
-import ProfileSettingsForm from '@/components/settings/profile-settings-form';
+import ProfileSettingsForm from '@/components/profile/profile-settings-form';
 import { auth } from '@/lib/auth';
 import { getProfileByUserId } from '@/lib/repositories/profile-repository';
 import { headers } from 'next/headers';

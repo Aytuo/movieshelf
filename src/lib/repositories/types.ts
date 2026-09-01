@@ -33,9 +33,9 @@ export interface MovieRepository {
 
   getPopular(): Promise<Media[]>;
   getTrending(): Promise<Media[]>;
+  getTopPicks(): Promise<Media[]>;
   getNowPlaying(): Promise<Media[]>;
   getUpcoming(): Promise<Media[]>;
-  getTopPicks(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
 
   search(query: string, options?: SearchOptions): Promise<SearchResult>;
@@ -51,6 +51,7 @@ export interface TvRepository {
 
   getPopular(): Promise<Media[]>;
   getTrending(): Promise<Media[]>;
+  getTopPicks(): Promise<Media[]>;
   getAiringToday(): Promise<Media[]>;
   getOnTheAir(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;

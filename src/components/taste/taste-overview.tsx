@@ -5,7 +5,7 @@ import type { TasteProfile, TasteStats } from '@/types';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
 
-type TasteProfileProps = {
+type TasteOverviewProps = {
   taste: TasteProfile;
 };
 
@@ -34,7 +34,7 @@ function Stat({
   );
 }
 
-const Taste = ({ taste }: TasteProfileProps) => {
+const TasteOverview = ({ taste }: TasteOverviewProps) => {
   const [type, setType] = useState<TasteType>('movie');
 
   const stats: TasteStats = type === 'movie' ? taste.movie : taste.tv;
@@ -271,4 +271,4 @@ const Taste = ({ taste }: TasteProfileProps) => {
   );
 };
 
-export default Taste;
+export default TasteOverview;

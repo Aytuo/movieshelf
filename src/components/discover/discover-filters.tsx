@@ -187,6 +187,7 @@ const DiscoverFilters = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="size-4 text-primary" />
+
           <span className="text-sm font-semibold">Filters</span>
         </div>
 
@@ -197,7 +198,7 @@ const DiscoverFilters = () => {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <RotateCcw className="size-3" />
-            Reset filters
+            Reset
           </button>
         )}
       </div>

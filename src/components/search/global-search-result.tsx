@@ -3,7 +3,7 @@ import { tmdbImage } from '@/lib/tmdb/images';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-const SearchResults = ({
+const GlobalSearchResults = ({
   results,
   onResultClick,
 }: {
@@ -69,4 +69,4 @@ const SearchResults = ({
   );
 };
 
-export default SearchResults;
+export default GlobalSearchResults;

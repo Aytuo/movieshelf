@@ -5,9 +5,17 @@ import Link from 'next/link';
 
 type RankedMediaListProps = {
   media: Media[];
+  eyebrow?: string;
+  title?: string;
+  description?: string;
 };
 
-const RankedMediaList = ({ media }: RankedMediaListProps) => {
+const RankedMediaList = ({
+  media,
+  eyebrow,
+  title,
+  description,
+}: RankedMediaListProps) => {
   const rankedMedia = media.slice(0, 10);
 
   if (!rankedMedia.length) {
@@ -15,17 +23,18 @@ const RankedMediaList = ({ media }: RankedMediaListProps) => {
   }
 
   return (
-    <section className="overflow-hidden border-t border-border/60 py-16 lg:py-24">
+    <section className="overflow-hidden border-y border-border/60 py-16 lg:py-24">
       <div className="container-content">
         <div className="mb-12 max-w-2xl">
-          <p className="eyebrow">Weekly chart</p>
+          <p className="eyebrow">{eyebrow ?? 'Weekly chart'}</p>
 
           <h2 className="mt-3 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-            Top 10 this week
+            {title ?? 'Top 10 this week'}
           </h2>
 
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            The media creating the biggest momentum across TMDB this week.
+            {description ??
+              'The media creating the biggest momentum across TMDB this week.'}
           </p>
         </div>
 

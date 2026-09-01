@@ -2,34 +2,29 @@
 
 import { cn } from '@/lib/utils';
 import { Profile, User } from '@/types';
-import { Film, Menu, X } from 'lucide-react';
+import { Compass, Film, Menu, Tv, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import GlobalSearch from '../search/global-search';
-import UserMenu from './user-menu';
+import UserMenu from '../user/user-menu';
 
 const navLinks = [
   {
-    label: 'Discover',
-    href: '/discover',
+    label: 'Movies',
+    href: '/movies',
     icon: Film,
   },
-  // {
-  //   label: 'Trending',
-  //   href: '/trending',
-  //   icon: Flame,
-  // },
-  // {
-  //   label: 'My Shelf',
-  //   href: '/shelf',
-  //   icon: Bookmark,
-  // },
-  // {
-  //   label: 'Favorites',
-  //   href: '/favorites',
-  //   icon: Heart,
-  // },
+  {
+    label: 'TV Series',
+    href: '/tv-series',
+    icon: Tv,
+  },
+  {
+    label: 'Discover',
+    href: '/discover',
+    icon: Compass,
+  },
 ];
 
 type NavbarProps = {
@@ -71,7 +66,8 @@ const Navbar = ({ user, profile }: NavbarProps) => {
             </span>
 
             <span className="text-lg font-bold tracking-tight">
-              Movie<span className="text-primary">Shelf</span>
+              Movie
+              <span className="text-primary">Shelf</span>
             </span>
           </Link>
 
@@ -139,7 +135,6 @@ const Navbar = ({ user, profile }: NavbarProps) => {
                     )}
                   >
                     <Icon className="size-4" />
-
                     {link.label}
                   </Link>
                 );

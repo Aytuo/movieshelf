@@ -71,7 +71,7 @@ const MediaCarousel = ({
   }, [media.length]);
 
   return (
-    <section className="container-content py-10 lg:py-14">
+    <section className="py-10 lg:py-14">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           {eyebrow && <p className="eyebrow">{eyebrow}</p>}

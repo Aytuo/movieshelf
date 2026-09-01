@@ -1,27 +1,12 @@
-import { auth } from '@/lib/auth';
-import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
+import { requireSession } from '@/lib/auth/require-session';
+import { getProfileByUserId } from '@/lib/repositories';
 import { ensureProfile } from '@/lib/services/profile-service';
-import { eq } from 'drizzle-orm';
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 const ProfileIndexPage = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await requireSession();
 
-  if (!session) {
-    redirect('/login');
-  }
-
-  const result = await db
-    .select()
-    .from(profile)
-    .where(eq(profile.userId, session.user.id))
-    .limit(1);
-
-  const currentProfile = result[0];
+  const currentProfile = await getProfileByUserId(session.user.id);
 
   if (!currentProfile) {
     const createdProfile = await ensureProfile({
@@ -30,7 +15,7 @@ const ProfileIndexPage = async () => {
       email: session.user.email,
     });
 
-    redirect(`/profile/${createdProfile.username}`);
+    redirect(`/profile/${createdProfile.username.toLowerCase()}`);
   }
 
   redirect(`/profile/${currentProfile.username.toLowerCase()}`);

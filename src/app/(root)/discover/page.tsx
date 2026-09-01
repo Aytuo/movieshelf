@@ -1,6 +1,5 @@
 import DiscoverFilters from '@/components/discover/discover-filters';
 import DiscoverPagination from '@/components/discover/discover-pagination';
-import ResetPageButton from '@/components/discover/reset-page-button';
 import MediaGrid from '@/components/media/media-grid';
 import { requireSession } from '@/lib/auth/require-session';
 import { parseDiscoverFilters } from '@/lib/discover/parse-filters';
@@ -18,8 +17,8 @@ function FilterChip({ label }: { label: string }) {
 
 function EmptyDiscoverState() {
   return (
-    <div className="rounded-2xl border border-dashed border-border px-6 py-20 text-center">
-      <h2 className="font-heading text-xl font-semibold">
+    <div className="rounded-2xl p-12 text-center surface">
+      <h2 className="mt-0 font-heading text-xl font-semibold">
         Nothing matched those filters
       </h2>
 
@@ -29,7 +28,7 @@ function EmptyDiscoverState() {
 
       <Link
         href="/discover"
-        className="mt-6 inline-flex rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-surface-hover"
+        className="mt-6 inline-flex rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-hover"
       >
         Clear everything
       </Link>
@@ -96,88 +95,96 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
   const hasFilters = hasActiveDiscoverFilters(filters);
 
   return (
-    <section className="container-content py-10 lg:py-14">
-      <div className="mb-8">
-        <p className="eyebrow">Discover</p>
+    <main className="container-content py-12 lg:py-16">
+      {/* Header */}
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="eyebrow">Discover</p>
 
-        <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-          Discover {mediaLabel}
-        </h1>
+          <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+            Discover {mediaLabel}
+          </h1>
 
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Explore {mediaLabel}, browse genres, and find something that deserves
-          a place on your shelf.
-        </p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Explore {mediaLabel}, browse genres, and find something that
+            deserves a place on your shelf.
+          </p>
+        </div>
       </div>
 
-      {/* Media type */}
-      <div className="mb-6 flex gap-2">
-        <Link
-          href="/discover"
-          className={[
-            'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
-            isMovie
-              ? 'border-primary/30 bg-primary-muted text-primary'
-              : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-          ].join(' ')}
-        >
-          Movies
-        </Link>
+      <section className="py-10 lg:py-14">
+        {/* Media type */}
+        <div className="mb-6 flex gap-2">
+          <Link
+            href="/discover"
+            className={[
+              'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+              isMovie
+                ? 'border-primary/30 bg-primary-muted text-primary'
+                : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
+            ].join(' ')}
+          >
+            Movies
+          </Link>
 
-        <Link
-          href="/discover?type=tv"
-          className={[
-            'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
-            !isMovie
-              ? 'border-primary/30 bg-primary-muted text-primary'
-              : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-          ].join(' ')}
-        >
-          TV Series
-        </Link>
-      </div>
+          <Link
+            href="/discover?type=tv"
+            className={[
+              'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+              !isMovie
+                ? 'border-primary/30 bg-primary-muted text-primary'
+                : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
+            ].join(' ')}
+          >
+            TV Series
+          </Link>
+        </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[250px_1fr]">
-        <DiscoverFilters />
+        {/* Filters + results */}
+        <div className="grid gap-8 lg:grid-cols-[250px_1fr]">
+          <DiscoverFilters />
 
-        <div className="min-w-0">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                {hasFilters && <FilterChip label="Filters active" />}
+          <div className="min-w-0">
+            <div className="mb-6">
+              {hasFilters && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Filters active:
+                  </span>
 
-                {filters.genre !== undefined && <FilterChip label="Genre" />}
+                  {filters.genre !== undefined && <FilterChip label="Genre" />}
 
-                {filters.yearFrom !== undefined && (
-                  <FilterChip label={`From ${filters.yearFrom}`} />
-                )}
+                  {filters.yearFrom !== undefined && (
+                    <FilterChip label={`From ${filters.yearFrom}`} />
+                  )}
 
-                {filters.yearTo !== undefined && (
-                  <FilterChip label={`Until ${filters.yearTo}`} />
-                )}
+                  {filters.yearTo !== undefined && (
+                    <FilterChip label={`Until ${filters.yearTo}`} />
+                  )}
 
-                {filters.minRating !== undefined && (
-                  <FilterChip
-                    label={`${filters.minRating.toFixed(1)}+ rating`}
-                  />
-                )}
+                  {filters.minRating !== undefined && (
+                    <FilterChip
+                      label={`${filters.minRating.toFixed(1)}+ rating`}
+                    />
+                  )}
 
-                {filters.maxRating !== undefined && (
-                  <FilterChip
-                    label={`Up to ${filters.maxRating.toFixed(1)} rating`}
-                  />
-                )}
+                  {filters.maxRating !== undefined && (
+                    <FilterChip
+                      label={`Up to ${filters.maxRating.toFixed(1)} rating`}
+                    />
+                  )}
 
-                {filters.maxRuntime !== undefined && (
-                  <FilterChip label={`Up to ${filters.maxRuntime} min`} />
-                )}
+                  {filters.maxRuntime !== undefined && (
+                    <FilterChip label={`Up to ${filters.maxRuntime} min`} />
+                  )}
 
-                {filters.language && (
-                  <FilterChip label={filters.language.toUpperCase()} />
-                )}
+                  {filters.language && (
+                    <FilterChip label={filters.language.toUpperCase()} />
+                  )}
 
-                {filters.hideOnShelf && <FilterChip label="Hide on shelf" />}
-              </div>
+                  {filters.hideOnShelf && <FilterChip label="Hide on shelf" />}
+                </div>
+              )}
 
               <p className="mt-4 text-xs text-muted-foreground">
                 {result.totalResults.toLocaleString()}{' '}
@@ -187,24 +194,22 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
               </p>
             </div>
 
-            {result.page > 1 && <ResetPageButton />}
+            {result.media.length > 0 ? (
+              <>
+                <MediaGrid media={result.media} />
+
+                <DiscoverPagination
+                  page={result.page}
+                  totalPages={result.totalPages}
+                />
+              </>
+            ) : (
+              <EmptyDiscoverState />
+            )}
           </div>
-
-          {result.media.length > 0 ? (
-            <>
-              <MediaGrid media={result.media} />
-
-              <DiscoverPagination
-                page={result.page}
-                totalPages={result.totalPages}
-              />
-            </>
-          ) : (
-            <EmptyDiscoverState />
-          )}
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
   );
 };
 

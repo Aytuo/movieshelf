@@ -31,6 +31,17 @@ export const tmdbMovieRepository: MovieRepository = {
     return result.results.map(mapTmdbMovie);
   },
 
+  async getTopPicks() {
+    const result = await discover({
+      page: 1,
+      sortBy: 'vote_average.desc',
+      voteAverageGte: 7.5,
+      voteCountGte: 500,
+    });
+
+    return result.results.map(mapTmdbMovie).slice(0, 10);
+  },
+
   async getNowPlaying() {
     const today = new Date();
 
@@ -48,7 +59,7 @@ export const tmdbMovieRepository: MovieRepository = {
       primaryReleaseDateLte: maxDate,
     });
 
-    return result.results.map(mapTmdbMovie).slice(0, 20);
+    return result.results.map(mapTmdbMovie);
   },
 
   async getUpcoming() {
@@ -68,18 +79,7 @@ export const tmdbMovieRepository: MovieRepository = {
       primaryReleaseDateLte: maxDate,
     });
 
-    return result.results.map(mapTmdbMovie).slice(0, 20);
-  },
-
-  async getTopPicks() {
-    const result = await discover({
-      page: 1,
-      sortBy: 'vote_average.desc',
-      voteAverageGte: 7.5,
-      voteCountGte: 500,
-    });
-
-    return result.results.map(mapTmdbMovie).slice(0, 20);
+    return result.results.map(mapTmdbMovie);
   },
 
   async getTopRated() {
@@ -93,7 +93,7 @@ export const tmdbMovieRepository: MovieRepository = {
       primaryReleaseDateLte: today,
     });
 
-    return result.results.map(mapTmdbMovie).slice(0, 20);
+    return result.results.map(mapTmdbMovie);
   },
 
   async search(query, options) {

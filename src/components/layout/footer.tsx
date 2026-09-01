@@ -6,10 +6,10 @@ const footerLinks = [
     label: 'Discover',
     href: '/discover',
   },
-  {
-    label: 'My Shelf',
-    href: '/shelf',
-  },
+  // {
+  //   label: 'My Shelf',
+  //   href: '/shelf',
+  // },
   // {
   //   label: 'Favorites',
   //   href: '/favorites',
@@ -46,7 +46,7 @@ const Footer = () => {
 
             <nav
               aria-label="Footer navigation"
-              className="grid grid-cols-2 gap-x-10 gap-y-3 sm:grid-cols-3"
+              className="grid grid-cols-2 gap-x-10 gap-y-3"
             >
               {footerLinks.map((link) => (
                 <Link

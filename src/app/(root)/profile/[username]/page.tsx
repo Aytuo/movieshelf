@@ -1,7 +1,8 @@
-import TastePreview from '@/components/profile/taste-preview';
+import ProfileNavbar from '@/components/profile/profile-navbar';
 import { getPublicProfile } from '@/lib/services/profile-service';
 import { tmdbImage } from '@/lib/tmdb/images';
-import { Film, Star } from 'lucide-react';
+import { Film, Heart, Star } from 'lucide-react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 type ProfilePageProps = {
@@ -19,29 +20,12 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     notFound();
   }
 
-  const { profile, shelf, reviews, taste } = data;
-
-  const movieShelf = shelf.filter(({ media }) => media.type === 'movie');
-
-  const tvShelf = shelf.filter(({ media }) => media.type === 'tv');
-
-  const movieWatched = taste.movie.watched;
-
-  const tvWatched = taste.tv.watched;
-
-  const movieFavorites = movieShelf.filter(
-    ({ interaction }) => interaction.favorite
-  );
-
-  const tvFavorites = tvShelf.filter(({ interaction }) => interaction.favorite);
+  const { profile, stats, favorites } = data;
 
   return (
     <main className="container-content py-12 lg:py-16">
-      {/* ------------------------------------------------------------------ */}
-      {/* Profile header                                                     */}
-      {/* ------------------------------------------------------------------ */}
-
-      <header className="border-b border-border/60 pb-10">
+      {/* Profile header */}
+      <header>
         <div className="flex flex-col gap-7 sm:flex-row sm:items-end">
           <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-2xl font-bold">
             {profile.avatarUrl ? (
@@ -58,7 +42,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           <div>
             <p className="eyebrow">MovieShelf profile</p>
 
-            <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight">
+            <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
               {profile.displayName || `@${profile.username}`}
             </h1>
 
@@ -74,11 +58,15 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           </div>
         </div>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* Media statistics                                                 */}
-        {/* ---------------------------------------------------------------- */}
+        <div className="mt-8">
+          <ProfileNavbar username={profile.username} />
+        </div>
+      </header>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+      {/* Statistics */}
+      <section className="py-10 lg:py-14">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Movies */}
           <section className="rounded-2xl p-5 surface">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -88,35 +76,37 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
               </div>
 
               <span className="text-xs text-muted-foreground">
-                {taste.movie.total} total
+                {stats.movies.total} total
               </span>
             </div>
 
             <div className="mt-5 grid grid-cols-4 gap-3">
               <div>
-                <p className="text-2xl font-bold">{movieWatched}</p>
+                <p className="text-2xl font-bold">{stats.movies.watched}</p>
 
                 <p className="mt-1 text-xs text-muted-foreground">watched</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{taste.movie.rated}</p>
+                <p className="text-2xl font-bold">{stats.movies.rated}</p>
 
                 <p className="mt-1 text-xs text-muted-foreground">rated</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{movieFavorites.length}</p>
+                <p className="text-2xl font-bold">{stats.movies.favorites}</p>
 
                 <p className="mt-1 text-xs text-muted-foreground">favorites</p>
               </div>
 
               <div>
                 <div className="flex items-center gap-1">
-                  <Star className="size-3.5 fill-current text-rating" />
+                  {stats.movies.averageRating !== null && (
+                    <Star className="size-3.5 fill-current text-rating" />
+                  )}
 
                   <p className="text-2xl font-bold">
-                    {taste.movie.averageRating ?? '—'}
+                    {stats.movies.averageRating ?? '—'}
                   </p>
                 </div>
 
@@ -125,6 +115,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             </div>
           </section>
 
+          {/* TV Series */}
           <section className="rounded-2xl p-5 surface">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -134,35 +125,37 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
               </div>
 
               <span className="text-xs text-muted-foreground">
-                {taste.tv.total} total
+                {stats.tv.total} total
               </span>
             </div>
 
             <div className="mt-5 grid grid-cols-4 gap-3">
               <div>
-                <p className="text-2xl font-bold">{tvWatched}</p>
+                <p className="text-2xl font-bold">{stats.tv.watched}</p>
 
                 <p className="mt-1 text-xs text-muted-foreground">watched</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{taste.tv.rated}</p>
+                <p className="text-2xl font-bold">{stats.tv.rated}</p>
 
                 <p className="mt-1 text-xs text-muted-foreground">rated</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{tvFavorites.length}</p>
+                <p className="text-2xl font-bold">{stats.tv.favorites}</p>
 
                 <p className="mt-1 text-xs text-muted-foreground">favorites</p>
               </div>
 
               <div>
                 <div className="flex items-center gap-1">
-                  <Star className="size-3.5 fill-current text-rating" />
+                  {stats.tv.averageRating !== null && (
+                    <Star className="size-3.5 fill-current text-rating" />
+                  )}
 
                   <p className="text-2xl font-bold">
-                    {taste.tv.averageRating ?? '—'}
+                    {stats.tv.averageRating ?? '—'}
                   </p>
                 </div>
 
@@ -171,38 +164,49 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             </div>
           </section>
         </div>
-      </header>
+      </section>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Favorites                                                          */}
-      {/* ------------------------------------------------------------------ */}
-
-      <section className="py-12">
+      {/* Favorites */}
+      <section className="py-10 lg:py-14">
         <div className="mb-7">
           <p className="eyebrow">From the shelf</p>
 
           <h2 className="mt-2 font-heading text-2xl font-bold">Favorites</h2>
         </div>
 
-        {movieFavorites.length + tvFavorites.length > 0 ? (
+        {favorites.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-            {[...movieFavorites, ...tvFavorites]
-              .slice(0, 6)
-              .map(({ media }) => {
-                const poster = tmdbImage(media.posterPath, 'w500');
+            {favorites.map(({ media }) => {
+              const poster = tmdbImage(media.posterPath, 'w500');
 
-                return (
-                  <div key={`${media.type}:${media.tmdbId}`}>
-                    {poster && (
-                      <img
-                        src={poster}
-                        alt={media.title}
-                        className="aspect-[2/3] w-full rounded-xl object-cover"
-                      />
-                    )}
+              const href =
+                media.type === 'movie'
+                  ? `/movie/${media.tmdbId}`
+                  : `/tv/${media.tmdbId}`;
+
+              return (
+                <Link
+                  key={`${media.type}:${media.tmdbId}`}
+                  href={href}
+                  className="group"
+                >
+                  <article>
+                    <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
+                      {poster ? (
+                        <img
+                          src={poster}
+                          alt={`${media.title} poster`}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center px-2 text-center text-sm text-muted-foreground">
+                          No poster
+                        </div>
+                      )}
+                    </div>
 
                     <div className="mt-2">
-                      <p className="line-clamp-1 text-sm font-medium">
+                      <p className="line-clamp-1 text-sm font-medium transition-colors group-hover:text-primary">
                         {media.title}
                       </p>
 
@@ -210,73 +214,23 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
                         {media.type === 'movie' ? 'Movie' : 'TV Series'}
                       </p>
                     </div>
-                  </div>
-                );
-              })}
+                  </article>
+                </Link>
+              );
+            })}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">No favorites yet.</p>
-        )}
-      </section>
+          <div className="rounded-2xl p-12 text-center surface">
+            <Heart className="mx-auto size-6 text-muted-foreground" />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Taste                                                              */}
-      {/* ------------------------------------------------------------------ */}
+            <h3 className="mt-4 font-heading text-xl font-semibold">
+              No favorites yet
+            </h3>
 
-      <section className="border-t border-border/60 py-12">
-        <div className="mb-7">
-          <p className="eyebrow">Cinematic identity</p>
-
-          <h2 className="mt-2 font-heading text-2xl font-bold">Your Taste</h2>
-        </div>
-
-        <TastePreview taste={taste} username={profile.username} />
-      </section>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Reviews                                                            */}
-      {/* ------------------------------------------------------------------ */}
-
-      <section className="border-t border-border/60 py-12">
-        <div className="mb-7">
-          <p className="eyebrow">Words</p>
-
-          <h2 className="mt-2 font-heading text-2xl font-bold">Reviews</h2>
-        </div>
-
-        {reviews.length > 0 ? (
-          <div className="grid gap-4 lg:grid-cols-2">
-            {reviews.slice(0, 6).map(({ review, media }) => (
-              <article key={review.id} className="rounded-2xl p-5 surface">
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-muted-foreground">{media.title}</p>
-
-                  <span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-                    {media.type === 'movie' ? 'Movie' : 'TV Series'}
-                  </span>
-                </div>
-
-                {review.title && (
-                  <h3 className="mt-2 font-heading text-lg font-semibold">
-                    {review.title}
-                  </h3>
-                )}
-
-                <p className="mt-3 line-clamp-4 text-sm leading-6 text-muted-foreground">
-                  {review.content}
-                </p>
-
-                {review.rating !== null && (
-                  <p className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-rating">
-                    <Star className="size-3.5 fill-current" />
-                    {review.rating}/10
-                  </p>
-                )}
-              </article>
-            ))}
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+              Favorite movies and TV series will appear here.
+            </p>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">No reviews yet.</p>
         )}
       </section>
     </main>

@@ -7,6 +7,7 @@ import {
   usernameExists,
 } from '@/lib/repositories';
 import { getTasteProfile } from '@/lib/services/taste-service';
+import { getUserMediaActivity } from './media-activity-service';
 
 const USERNAME_MAX_LENGTH = 14;
 const RANDOM_SUFFIX_LENGTH = 4;
@@ -99,10 +100,82 @@ export async function getPublicProfile(username: string) {
     getTasteProfile(profile.userId),
   ]);
 
+  const favorites = shelf.filter(({ interaction }) => interaction.favorite);
+  const movieShelf = shelf.filter(({ media }) => media.type === 'movie');
+  const tvShelf = shelf.filter(({ media }) => media.type === 'tv');
+
   return {
     profile,
-    shelf,
+
+    stats: {
+      movies: {
+        total: taste.movie.total,
+        watched: taste.movie.watched,
+        rated: taste.movie.rated,
+        favorites: movieShelf.filter(({ interaction }) => interaction.favorite)
+          .length,
+        averageRating: taste.movie.averageRating,
+      },
+
+      tv: {
+        total: taste.tv.total,
+        watched: taste.tv.watched,
+        rated: taste.tv.rated,
+        favorites: tvShelf.filter(({ interaction }) => interaction.favorite)
+          .length,
+        averageRating: taste.tv.averageRating,
+      },
+    },
+
+    favorites: favorites.slice(0, 6),
+
     taste,
+
+    reviews: reviews.slice(0, 6),
+  };
+}
+
+export async function getPublicTaste(username: string) {
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return null;
+  }
+
+  const taste = await getTasteProfile(profile.userId);
+
+  return {
+    profile,
+    taste,
+  };
+}
+
+export async function getPublicReviews(username: string) {
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return null;
+  }
+
+  const reviews = await getUserReviews(profile.userId);
+
+  return {
+    profile,
     reviews,
+  };
+}
+
+export async function getPublicActivity(username: string) {
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return null;
+  }
+
+  const activities = await getUserMediaActivity(profile.userId);
+
+  return {
+    profile,
+    activities,
   };
 }

@@ -31,6 +31,17 @@ export const tmdbTvRepository: TvRepository = {
     return result.results.map(mapTmdbTv);
   },
 
+  async getTopPicks() {
+    const result = await discover({
+      page: 1,
+      sortBy: 'vote_average.desc',
+      voteAverageGte: 7.5,
+      voteCountGte: 500,
+    });
+
+    return result.results.map(mapTmdbTv).slice(0, 10);
+  },
+
   async getAiringToday() {
     const today = toDateString(new Date());
 
@@ -41,7 +52,7 @@ export const tmdbTvRepository: TvRepository = {
       airDateLte: today,
     });
 
-    return result.results.map(mapTmdbTv).slice(0, 20);
+    return result.results.map(mapTmdbTv);
   },
 
   async getOnTheAir() {
@@ -57,7 +68,7 @@ export const tmdbTvRepository: TvRepository = {
       airDateLte: toDateString(nextWeek),
     });
 
-    return result.results.map(mapTmdbTv).slice(0, 20);
+    return result.results.map(mapTmdbTv);
   },
 
   async getTopRated() {
@@ -70,8 +81,7 @@ export const tmdbTvRepository: TvRepository = {
 
     return result.results
       .map(mapTmdbTv)
-      .filter((show) => show.voteCount >= 1000)
-      .slice(0, 20);
+      .filter((show) => show.voteCount >= 1000);
   },
 
   async search(query, options) {

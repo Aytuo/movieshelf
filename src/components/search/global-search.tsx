@@ -6,8 +6,8 @@ import { ArrowRight, Command, Loader2, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import SearchEmptyState from './search-empty-state';
-import SearchResults from './search-result';
+import GlobalSearchEmptyState from './global-search-empty-state';
+import GlobalSearchResults from './global-search-result';
 
 const GlobalSearch = () => {
   const [open, setOpen] = useState(false);
@@ -232,13 +232,16 @@ const GlobalSearch = () => {
 
               <div className="max-h-[65vh] overflow-y-auto">
                 {query.trim().length < 2 ? (
-                  <SearchEmptyState />
+                  <GlobalSearchEmptyState />
                 ) : error ? (
                   <div className="px-6 py-12 text-center">
                     <p className="text-sm text-destructive">{error}</p>
                   </div>
                 ) : results.length > 0 ? (
-                  <SearchResults results={results} onResultClick={close} />
+                  <GlobalSearchResults
+                    results={results}
+                    onResultClick={close}
+                  />
                 ) : !isLoading ? (
                   <div className="px-6 py-12 text-center">
                     <p className="text-sm font-medium">No results found.</p>
@@ -255,9 +258,13 @@ const GlobalSearch = () => {
               </div>
 
               <div className="flex items-center justify-between gap-4 border-t border-border px-4 py-3">
-                <p className="text-[11px] text-muted-foreground">
-                  Find a movie or TV series
-                </p>
+                <Link
+                  href="/search"
+                  onClick={() => setOpen(false)}
+                  className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Advanced search
+                </Link>
 
                 {query.trim().length >= 2 && (
                   <Link

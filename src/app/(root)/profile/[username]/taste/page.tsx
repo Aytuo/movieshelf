@@ -1,51 +1,49 @@
-import Taste from '@/components/profile/taste';
-import { db } from '@/lib/db';
-import { profile } from '@/lib/db/schema';
-import { getTasteProfile } from '@/lib/services/taste-service';
-import { eq } from 'drizzle-orm';
+import ProfileNavbar from '@/components/profile/profile-navbar';
+import TasteOverview from '@/components/taste/taste-overview';
+import { getPublicTaste } from '@/lib/services/profile-service';
 import { notFound } from 'next/navigation';
 
-type TastePageProps = {
+type ProfileTastePageProps = {
   params: Promise<{
     username: string;
   }>;
 };
 
-const TastePage = async ({ params }: TastePageProps) => {
+const ProfileTastePage = async ({ params }: ProfileTastePageProps) => {
   const { username } = await params;
 
-  const result = await db
-    .select()
-    .from(profile)
-    .where(eq(profile.username, username))
-    .limit(1);
+  const data = await getPublicTaste(username);
 
-  const userProfile = result[0];
-
-  if (!userProfile) {
+  if (!data) {
     notFound();
   }
 
-  const taste = await getTasteProfile(userProfile.userId);
+  const { profile, taste } = data;
 
   return (
     <main className="container-content py-12 lg:py-16">
-      <div className="mb-10">
-        <p className="eyebrow">@{userProfile.username}</p>
+      <header>
+        <p className="eyebrow">@{profile.username}</p>
 
-        <h1 className="mt-2 font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-          Your Taste
+        <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+          Taste
         </h1>
 
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-          A visual snapshot of the movies, ratings and eras that shape your
-          cinematic identity.
+          A visual snapshot of the movies, ratings, and eras that define this
+          taste profile.
         </p>
-      </div>
 
-      <Taste taste={taste} />
+        <div className="mt-7">
+          <ProfileNavbar username={profile.username} />
+        </div>
+      </header>
+
+      <section className="py-10 lg:py-14">
+        <TasteOverview taste={taste} />
+      </section>
     </main>
   );
 };
 
-export default TastePage;
+export default ProfileTastePage;
