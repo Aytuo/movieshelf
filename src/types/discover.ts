@@ -2,6 +2,8 @@
 /*                                DISCOVER                                    */
 /* ========================================================================== */
 
+import { Media } from '@/lib/media';
+
 export type MovieDiscoverSort =
   | 'popularity.desc'
   | 'vote_average.desc'
@@ -40,6 +42,17 @@ export interface BaseDiscoverFilters {
 /* -------------------------------------------------------------------------- */
 /*                       MEDIA-SPECIFIC FILTERS                               */
 /* -------------------------------------------------------------------------- */
+
+export interface DiscoverResult {
+  media: Media[];
+  page: number;
+  totalPages: number;
+  totalResults: number;
+}
+
+export interface DiscoverOptions {
+  maxResults?: number;
+}
 
 export interface MovieDiscoverFilters extends BaseDiscoverFilters {
   type: 'movie';

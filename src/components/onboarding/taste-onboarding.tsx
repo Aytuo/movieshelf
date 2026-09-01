@@ -4,7 +4,7 @@ import {
   finishTasteOnboarding,
   saveTasteRatings,
   skipTasteOnboarding,
-} from '@/lib/actions/onboarding.action';
+} from '@/lib/actions/onboarding-action';
 import type { Media } from '@/lib/media';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';

@@ -7,7 +7,7 @@
  */
 
 import { MediaListItem, MovieDetails } from '@/lib/media';
-import { ActivityItem, NavLink, UserStats } from '@/types';
+import { UserStats } from '@/types';
 
 /* -------------------------------------------------------------------------- */
 /* Site                                                                       */
@@ -23,14 +23,14 @@ export const SITE_CONFIG = {
 /* Navigation                                                                 */
 /* -------------------------------------------------------------------------- */
 
-export const NAV_LINKS: NavLink[] = [
+export const NAV_LINKS = [
   { label: 'Home', href: '/', icon: 'house' },
   { label: 'Discover', href: '/discover', icon: 'compass' },
   { label: 'My Shelf', href: '/shelf', icon: 'library' },
   { label: 'Favorites', href: '/favorites', icon: 'heart' },
 ];
 
-export const ACCOUNT_NAV_LINKS: NavLink[] = [
+export const ACCOUNT_NAV_LINKS = [
   { label: 'Profile', href: '/profile', icon: 'user' },
   { label: 'Settings', href: '/settings', icon: 'settings' },
 ];
@@ -368,7 +368,7 @@ export const MOCK_FAVORITES: MediaListItem[] = [
 /* Mock activity                                                              */
 /* -------------------------------------------------------------------------- */
 
-export const MOCK_ACTIVITY: ActivityItem[] = [
+export const MOCK_ACTIVITY = [
   {
     id: 'activity-001',
     type: 'rating',

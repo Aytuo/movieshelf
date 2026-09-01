@@ -8,7 +8,7 @@ import {
   removeMediaFromShelf,
   startMediaWatching,
   toggleMediaFavorite,
-} from '@/lib/actions/media-interaction.action';
+} from '@/lib/actions/media-interaction-action';
 import type { MediaType } from '@/lib/media';
 import {
   Bookmark,

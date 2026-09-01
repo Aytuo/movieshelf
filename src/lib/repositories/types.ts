@@ -1,28 +1,11 @@
 import type { Media, MovieDetails, TvDetails } from '@/lib/media';
-import { MovieDiscoverFilters, TvDiscoverFilters } from '@/types';
-
-interface SearchOptions {
-  page?: number;
-  year?: number;
-}
-
-interface SearchResult {
-  media: Media[];
-  page: number;
-  totalPages: number;
-  totalResults: number;
-}
-
-export interface DiscoverResult {
-  media: Media[];
-  page: number;
-  totalPages: number;
-  totalResults: number;
-}
-
-export interface DiscoverOptions {
-  maxResults?: number;
-}
+import {
+  DiscoverOptions,
+  DiscoverResult,
+  MovieDiscoverFilters,
+  TvDiscoverFilters,
+} from '@/types';
+import { SearchOptions, SearchResult } from '@/types/search';
 
 export interface SearchRepository {
   search(query: string, options?: SearchOptions): Promise<SearchResult>;

@@ -1,6 +1,6 @@
 'use client';
 
-import { updateProfileSettings } from '@/lib/actions/profile.action';
+import { updateProfileSettings } from '@/lib/actions/profile-action';
 import Image from 'next/image';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 

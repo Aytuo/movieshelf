@@ -1,6 +1,6 @@
 'use client';
 
-import { saveMediaReview } from '@/lib/actions/review.action';
+import { saveMediaReview } from '@/lib/actions/review-action';
 import type { MediaType } from '@/lib/media';
 import { reviewSchema, type ReviewInput } from '@/lib/validations/review';
 import { zodResolver } from '@hookform/resolvers/zod';
