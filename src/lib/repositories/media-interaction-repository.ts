@@ -427,7 +427,7 @@ export async function removeMediaFromShelf({
   ]);
 }
 
-export async function getPublicMediaStats(userId: string) {
+export async function getUserMediaStats(userId: string) {
   const rows = await db
     .select({
       type: media.type,

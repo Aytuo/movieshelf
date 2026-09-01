@@ -2,7 +2,7 @@
 /*                                DISCOVER                                    */
 /* ========================================================================== */
 
-import { Media } from '@/lib/media';
+import type { Media } from '@/lib/media';
 
 export type MovieDiscoverSort =
   | 'popularity.desc'

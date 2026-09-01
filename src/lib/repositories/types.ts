@@ -3,9 +3,10 @@ import {
   DiscoverOptions,
   DiscoverResult,
   MovieDiscoverFilters,
+  SearchOptions,
+  SearchResult,
   TvDiscoverFilters,
 } from '@/types';
-import { SearchOptions, SearchResult } from '@/types/search';
 
 export interface SearchRepository {
   search(query: string, options?: SearchOptions): Promise<SearchResult>;

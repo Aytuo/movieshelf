@@ -2,8 +2,8 @@ import {
   createProfile,
   getProfileByUserId,
   getProfileByUsername,
-  getPublicMediaStats,
   getUserFavorites,
+  getUserMediaStats,
   getUserReviews,
   usernameExists,
 } from '@/lib/repositories';
@@ -44,7 +44,7 @@ function createEmptyMediaStats() {
 }
 
 function mapPublicMediaStats(
-  rows: Awaited<ReturnType<typeof getPublicMediaStats>>
+  rows: Awaited<ReturnType<typeof getUserMediaStats>>
 ) {
   const movie = rows.find((row) => row.type === 'movie') ?? {
     type: 'movie' as const,
@@ -139,7 +139,7 @@ export async function getPublicProfile(username: string) {
   }
 
   const [mediaStats, favorites] = await Promise.all([
-    getPublicMediaStats(profile.userId),
+    getUserMediaStats(profile.userId),
     getUserFavorites(profile.userId, 6),
   ]);
 

@@ -1,4 +1,4 @@
-import { Media } from '@/lib/media';
+import type { Media } from '@/lib/media';
 
 /* ========================================================================== */
 /*                                 SEARCH                                     */
