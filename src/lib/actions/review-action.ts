@@ -4,7 +4,8 @@ import { requireSession } from '@/lib/auth/require-session';
 import type { MediaType } from '@/lib/media';
 import { getOrCreateMediaRecord } from '@/lib/services/media-service';
 import { deleteReview, upsertReview } from '@/lib/services/review-service';
-import { reviewSchema, type ReviewInput } from '@/lib/validations/review';
+import { reviewSchema } from '@/lib/validations/review';
+import type { ReviewInput } from '@/types';
 import { revalidatePath } from 'next/cache';
 
 function getMediaPath(type: MediaType, tmdbId: number) {

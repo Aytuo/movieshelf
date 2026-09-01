@@ -4,6 +4,8 @@ import type { Media, MediaType } from '@/lib/media';
 import { and, eq } from 'drizzle-orm';
 
 type DbMedia = typeof media.$inferSelect;
+type DbMediaInsert = typeof media.$inferInsert;
+type DbMediaCreate = Omit<DbMediaInsert, 'id' | 'createdAt' | 'updatedAt'>;
 
 function mapDbMediaToMedia(row: DbMedia): Media {
   return {
@@ -48,17 +50,13 @@ export async function getMediaRecordByTmdbId(
   return result[0] ?? null;
 }
 
-export async function createMedia(
-  data: Omit<typeof media.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>
-) {
+export async function createMedia(data: DbMediaCreate) {
   const [created] = await db.insert(media).values(data).returning();
 
   return created;
 }
 
-export async function upsertMedia(
-  data: Omit<typeof media.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>
-) {
+export async function upsertMedia(data: DbMediaCreate) {
   const [result] = await db
     .insert(media)
     .values(data)

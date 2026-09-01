@@ -1,6 +1,6 @@
 'use client';
 
-import type { SearchMediaType } from '@/types/search';
+import type { SearchMediaType } from '@/types';
 import { Search, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useRef, useState } from 'react';

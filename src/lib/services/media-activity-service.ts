@@ -1,14 +1,15 @@
-import { media, review } from '@/lib/db/schema';
-import { getUserMediaActivity as getUserMediaActivityRepository } from '@/lib/repositories/media-activity-repository';
-import type { InferSelectModel } from 'drizzle-orm';
+import {
+  getUserMediaActivity as getUserMediaActivityRepository,
+  MediaActivityRow,
+} from '@/lib/repositories/media-activity-repository';
 
-type MediaRecord = InferSelectModel<typeof media>;
-type ReviewRecord = InferSelectModel<typeof review>;
+type ActivityMedia = MediaActivityRow['media'];
+type ActivityReview = NonNullable<MediaActivityRow['review']>;
 
 type BaseMediaActivityItem = {
   id: string;
   createdAt: Date;
-  media: MediaRecord;
+  media: ActivityMedia;
 };
 
 export type MediaActivityItem =
@@ -37,7 +38,7 @@ export type MediaActivityItem =
     })
   | (BaseMediaActivityItem & {
       type: 'reviewed';
-      review: ReviewRecord;
+      review: ActivityReview;
     })
   | (BaseMediaActivityItem & {
       type: 'shelf_removed';

@@ -2,7 +2,18 @@ import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { profile } from '../db/schema';
 
-export async function getProfileByUserId(userId: string) {
+type DbProfile = typeof profile.$inferSelect;
+type DbProfileInsert = typeof profile.$inferInsert;
+type DbProfileUpdate = {
+  username: string;
+  displayName: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+};
+
+export async function getProfileByUserId(
+  userId: string
+): Promise<DbProfile | null> {
   const result = await db
     .select()
     .from(profile)
@@ -12,7 +23,9 @@ export async function getProfileByUserId(userId: string) {
   return result[0] ?? null;
 }
 
-export async function getProfileByUsername(username: string) {
+export async function getProfileByUsername(
+  username: string
+): Promise<DbProfile | null> {
   const result = await db
     .select()
     .from(profile)
@@ -22,7 +35,7 @@ export async function getProfileByUsername(username: string) {
   return result[0] ?? null;
 }
 
-export async function usernameExists(username: string) {
+export async function usernameExists(username: string): Promise<boolean> {
   const result = await db
     .select({
       userId: profile.userId,
@@ -34,21 +47,13 @@ export async function usernameExists(username: string) {
   return result.length > 0;
 }
 
-export async function createProfile(data: typeof profile.$inferInsert) {
+export async function createProfile(data: DbProfileInsert) {
   const [created] = await db.insert(profile).values(data).returning();
 
   return created;
 }
 
-export async function updateProfile(
-  userId: string,
-  data: {
-    username: string;
-    displayName: string | null;
-    bio: string | null;
-    avatarUrl: string | null;
-  }
-) {
+export async function updateProfile(userId: string, data: DbProfileUpdate) {
   const [updated] = await db
     .update(profile)
     .set({

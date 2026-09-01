@@ -1,4 +1,7 @@
-import { getUserShelf } from '@/lib/repositories/media-interaction-repository';
+import {
+  getUserShelf,
+  UserShelfRow,
+} from '@/lib/repositories/media-interaction-repository';
 import type {
   RatingDistributionItem,
   TasteDecade,
@@ -8,7 +11,7 @@ import type {
   TasteStats,
 } from '@/types';
 
-type TasteItem = Awaited<ReturnType<typeof getUserShelf>>[number];
+type ShelfItem = UserShelfRow;
 
 function getDecade(releaseDate: string | null): string | null {
   if (!releaseDate) {
@@ -24,7 +27,7 @@ function getDecade(releaseDate: string | null): string | null {
   return `${Math.floor(year / 10) * 10}s`;
 }
 
-function buildTasteStats(items: TasteItem[]): TasteStats {
+function buildTasteStats(items: ShelfItem[]): TasteStats {
   const total = items.length;
 
   const watched = items.filter(
@@ -142,7 +145,7 @@ function buildTasteStats(items: TasteItem[]): TasteStats {
     .filter(({ interaction }) => interaction.rating !== null)
     .sort((a, b) => (b.interaction.rating ?? 0) - (a.interaction.rating ?? 0));
 
-  const toTasteMedia = ({ media, interaction }: TasteItem): TasteMedia => ({
+  const toTasteMedia = ({ media, interaction }: ShelfItem): TasteMedia => ({
     id: media.id,
     tmdbId: media.tmdbId,
     type: media.type,

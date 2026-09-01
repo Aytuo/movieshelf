@@ -5,6 +5,7 @@ import {
   getUserFavorites,
   getUserMediaStats,
   getUserReviews,
+  UserMediaStatsRow,
   usernameExists,
 } from '@/lib/repositories';
 import { getTasteProfile } from '@/lib/services/taste-service';
@@ -43,9 +44,7 @@ function createEmptyMediaStats() {
   };
 }
 
-function mapPublicMediaStats(
-  rows: Awaited<ReturnType<typeof getUserMediaStats>>
-) {
+function mapPublicMediaStats(rows: UserMediaStatsRow[]) {
   const movie = rows.find((row) => row.type === 'movie') ?? {
     type: 'movie' as const,
     ...createEmptyMediaStats(),

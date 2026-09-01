@@ -7,6 +7,24 @@ import {
 } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
+type DbMedia = typeof media.$inferSelect;
+type DbMediaActivity = typeof mediaActivity.$inferSelect;
+type DbReview = typeof review.$inferSelect;
+type CreateMediaActivityData = {
+  userId: string;
+  mediaId: string;
+  type: MediaActivityType;
+  rating?: number;
+  reviewId?: string;
+  createdAt?: Date;
+};
+
+export type MediaActivityRow = {
+  activity: DbMediaActivity;
+  media: DbMedia;
+  review: DbReview | null;
+};
+
 export async function createMediaActivity({
   userId,
   mediaId,
@@ -14,14 +32,7 @@ export async function createMediaActivity({
   rating,
   reviewId,
   createdAt = new Date(),
-}: {
-  userId: string;
-  mediaId: string;
-  type: MediaActivityType;
-  rating?: number;
-  reviewId?: string;
-  createdAt?: Date;
-}) {
+}: CreateMediaActivityData) {
   const [activity] = await db
     .insert(mediaActivity)
     .values({
@@ -37,7 +48,9 @@ export async function createMediaActivity({
   return activity;
 }
 
-export async function getUserMediaActivity(userId: string) {
+export async function getUserMediaActivity(
+  userId: string
+): Promise<MediaActivityRow[]> {
   return db
     .select({
       activity: mediaActivity,

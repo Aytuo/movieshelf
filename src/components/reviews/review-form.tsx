@@ -2,7 +2,8 @@
 
 import { saveMediaReview } from '@/lib/actions/review-action';
 import type { MediaType } from '@/lib/media';
-import { reviewSchema, type ReviewInput } from '@/lib/validations/review';
+import { reviewSchema } from '@/lib/validations/review';
+import type { ReviewInput } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';

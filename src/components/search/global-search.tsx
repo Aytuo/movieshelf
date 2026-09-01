@@ -1,7 +1,7 @@
 'use client';
 
 import { useDebounce } from '@/hooks/use-debounce';
-import { Media } from '@/lib/media';
+import type { Media } from '@/lib/media';
 import { ArrowRight, Command, Loader2, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';

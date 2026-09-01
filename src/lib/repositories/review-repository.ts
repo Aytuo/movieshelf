@@ -1,9 +1,32 @@
 import { db } from '@/lib/db';
 import { media, mediaActivity, profile, review } from '@/lib/db/schema';
-import type { ReviewInput } from '@/lib/validations/review';
+import type { ReviewInput } from '@/types';
 import { and, desc, eq } from 'drizzle-orm';
 
-export async function getMediaReviews(mediaId: string) {
+type DbReview = typeof review.$inferSelect;
+type DbMedia = typeof media.$inferSelect;
+type DbProfile = typeof profile.$inferSelect;
+
+type MediaReviewRow = {
+  review: DbReview;
+  profile: DbProfile;
+};
+
+type UserReviewRow = {
+  review: DbReview;
+  media: DbMedia;
+};
+
+type UpsertReviewData = {
+  userId: string;
+  mediaId: string;
+  input: ReviewInput;
+  now?: Date;
+};
+
+export async function getMediaReviews(
+  mediaId: string
+): Promise<MediaReviewRow[]> {
   return db
     .select({
       review,
@@ -15,7 +38,7 @@ export async function getMediaReviews(mediaId: string) {
     .orderBy(desc(review.createdAt));
 }
 
-export async function getUserReviews(userId: string) {
+export async function getUserReviews(userId: string): Promise<UserReviewRow[]> {
   return db
     .select({
       review,
@@ -27,7 +50,10 @@ export async function getUserReviews(userId: string) {
     .orderBy(desc(review.createdAt));
 }
 
-export async function getUserReviewForMedia(userId: string, mediaId: string) {
+export async function getUserReviewForMedia(
+  userId: string,
+  mediaId: string
+): Promise<DbReview | null> {
   const [result] = await db
     .select()
     .from(review)
@@ -42,12 +68,7 @@ export async function upsertReview({
   mediaId,
   input,
   now = new Date(),
-}: {
-  userId: string;
-  mediaId: string;
-  input: ReviewInput;
-  now?: Date;
-}) {
+}: UpsertReviewData): Promise<DbReview | null> {
   const [existing] = await db
     .select()
     .from(review)
@@ -110,7 +131,10 @@ export async function upsertReview({
   return created[0] ?? null;
 }
 
-export async function deleteReview(userId: string, reviewId: string) {
+export async function deleteReview(
+  userId: string,
+  reviewId: string
+): Promise<void> {
   await db
     .delete(review)
     .where(and(eq(review.id, reviewId), eq(review.userId, userId)));

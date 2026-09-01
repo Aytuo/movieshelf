@@ -1,4 +1,4 @@
-import type { SearchMediaType } from '@/types/search';
+import type { SearchMediaType } from '@/types';
 import Link from 'next/link';
 
 type SearchPaginationProps = {

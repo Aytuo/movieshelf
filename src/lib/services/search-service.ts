@@ -4,7 +4,7 @@ import {
   tmdbTvRepository,
 } from '@/lib/repositories';
 import { getSearchPagesNeeded, getSearchSlice } from '@/lib/search/pagination';
-import type { SearchFilters } from '@/types/search';
+import type { SearchFilters } from '@/types';
 
 export async function search({
   query,

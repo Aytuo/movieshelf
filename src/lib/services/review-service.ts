@@ -2,7 +2,7 @@ import {
   deleteReview as deleteReviewRepository,
   upsertReview as upsertReviewRepository,
 } from '@/lib/repositories/review-repository';
-import type { ReviewInput } from '@/lib/validations/review';
+import type { ReviewInput } from '@/types';
 
 export async function upsertReview(
   userId: string,

@@ -1,6 +1,7 @@
+import { ReviewInput } from '@/types';
 import { z } from 'zod';
 
-export const reviewSchema = z.object({
+export const reviewSchema: z.ZodType<ReviewInput, ReviewInput> = z.object({
   title: z
     .string()
     .trim()
@@ -15,5 +16,3 @@ export const reviewSchema = z.object({
   rating: z.number().min(1).max(10),
   containsSpoilers: z.boolean(),
 });
-
-export type ReviewInput = z.infer<typeof reviewSchema>;

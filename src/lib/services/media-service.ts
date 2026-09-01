@@ -1,4 +1,3 @@
-import type { media } from '@/lib/db/schema';
 import type { MediaDetails, MediaType } from '@/lib/media';
 import {
   getMediaReviews,
@@ -11,10 +10,8 @@ import {
   getMediaRecordByTmdbId,
   upsertMedia,
 } from '@/lib/repositories/media-repository';
-import type { InferSelectModel } from 'drizzle-orm';
+import type { MediaRecord } from '@/types';
 import { getMediaWatchCountForUser } from './watch-history-service';
-
-type MediaRecord = InferSelectModel<typeof media>;
 
 function getMediaRepository(type: MediaType) {
   return type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;

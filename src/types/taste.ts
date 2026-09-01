@@ -1,4 +1,4 @@
-import { MediaType } from '@/lib/media';
+import type { MediaType } from '@/lib/media';
 
 /* ========================================================================== */
 /*                                  TASTE                                     */

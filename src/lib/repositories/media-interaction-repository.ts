@@ -8,6 +8,23 @@ import {
 import type { MediaType } from '@/lib/media';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
 
+type DbMedia = typeof media.$inferSelect;
+type DbMediaInteraction = typeof mediaInteraction.$inferSelect;
+
+export type UserShelfRow = {
+  media: DbMedia;
+  interaction: DbMediaInteraction;
+};
+
+export type UserMediaStatsRow = {
+  type: MediaType;
+  total: number;
+  watched: number;
+  rated: number;
+  favorites: number;
+  averageRating: number | null;
+};
+
 export async function getUserMediaInteraction(userId: string, mediaId: string) {
   const result = await db
     .select()
@@ -34,7 +51,7 @@ export async function getUserMediaKeys(userId: string) {
     .where(eq(mediaInteraction.userId, userId));
 }
 
-export async function getUserShelf(userId: string) {
+export async function getUserShelf(userId: string): Promise<UserShelfRow[]> {
   return db
     .select({
       media,
@@ -427,7 +444,9 @@ export async function removeMediaFromShelf({
   ]);
 }
 
-export async function getUserMediaStats(userId: string) {
+export async function getUserMediaStats(
+  userId: string
+): Promise<UserMediaStatsRow[]> {
   const rows = await db
     .select({
       type: media.type,

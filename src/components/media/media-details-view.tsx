@@ -1,7 +1,6 @@
-import { mediaInteraction as mediaInteractionTable } from '@/lib/db/schema';
 import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
-import type { InferSelectModel } from 'drizzle-orm';
+import { MediaInteraction } from '@/types';
 import { Star } from 'lucide-react';
 import ReviewCard from '../reviews/review-card';
 import ReviewForm from '../reviews/review-form';
@@ -10,12 +9,10 @@ import MediaCast from './media-cast';
 import MediaRecommendations from './media-recommendations';
 import MediaVideo from './media-video';
 
-type DbMediaInteraction = InferSelectModel<typeof mediaInteractionTable>;
-
 type MediaDetailsViewProps = {
   media: MediaDetails;
 
-  mediaInteraction: DbMediaInteraction | null;
+  mediaInteraction: MediaInteraction | null;
 
   existingReview: {
     id: string;

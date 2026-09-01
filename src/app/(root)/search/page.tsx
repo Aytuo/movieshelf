@@ -2,7 +2,7 @@ import SearchControls from '@/components/search/search-controls';
 import SearchPagination from '@/components/search/search-pagination';
 import { search } from '@/lib/services/search-service';
 import { tmdbImage } from '@/lib/tmdb/images';
-import type { SearchMediaType } from '@/types/search';
+import type { SearchMediaType } from '@/types';
 import { ArrowRight, Search as SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 

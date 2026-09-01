@@ -2,15 +2,37 @@ import { db } from '@/lib/db';
 import { media, watchHistory } from '@/lib/db/schema';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
 
+type DbMedia = typeof media.$inferSelect;
+type DbWatchHistory = typeof watchHistory.$inferSelect;
+
+type CreateWatchHistoryEntryData = {
+  userId: string;
+  mediaId: string;
+  watchedAt?: Date;
+};
+
+type GetWatchHistoryPageData = {
+  userId: string;
+  limit: number;
+  offset: number;
+};
+
+type WatchHistoryRow = {
+  history: DbWatchHistory;
+  media: DbMedia;
+  watchNumber: number;
+};
+
+type GetMediaWatchCountData = {
+  userId: string;
+  mediaId: string;
+};
+
 export async function createWatchHistoryEntry({
   userId,
   mediaId,
   watchedAt = new Date(),
-}: {
-  userId: string;
-  mediaId: string;
-  watchedAt?: Date;
-}) {
+}: CreateWatchHistoryEntryData) {
   const [entry] = await db
     .insert(watchHistory)
     .values({
@@ -27,11 +49,7 @@ export async function getWatchHistoryPage({
   userId,
   limit,
   offset,
-}: {
-  userId: string;
-  limit: number;
-  offset: number;
-}) {
+}: GetWatchHistoryPageData): Promise<WatchHistoryRow[]> {
   return db
     .select({
       history: watchHistory,
@@ -59,7 +77,7 @@ export async function getWatchHistoryPage({
     .offset(offset);
 }
 
-export async function getWatchHistoryCount(userId: string) {
+export async function getWatchHistoryCount(userId: string): Promise<number> {
   const [result] = await db
     .select({
       count: count(),
@@ -73,10 +91,7 @@ export async function getWatchHistoryCount(userId: string) {
 export async function getMediaWatchCount({
   userId,
   mediaId,
-}: {
-  userId: string;
-  mediaId: string;
-}) {
+}: GetMediaWatchCountData): Promise<number> {
   const [result] = await db
     .select({
       count: count(),

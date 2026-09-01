@@ -1,4 +1,4 @@
-import { Media } from '@/lib/media/types';
+import type { Media } from '@/lib/media/types';
 
 /* ========================================================================== */
 /*                             RECOMMENDATIONS                                */
