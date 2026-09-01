@@ -1,4 +1,4 @@
-import { media } from '@/lib/db/schema';
+import type { media } from '@/lib/db/schema';
 import type { MediaDetails, MediaType } from '@/lib/media';
 import {
   getMediaReviews,

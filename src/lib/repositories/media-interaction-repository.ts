@@ -5,6 +5,7 @@ import {
   mediaInteraction,
   watchHistory,
 } from '@/lib/db/schema';
+import type { MediaType } from '@/lib/media';
 import { and, count, desc, eq } from 'drizzle-orm';
 
 export async function getUserMediaInteraction(userId: string, mediaId: string) {
@@ -43,6 +44,15 @@ export async function getUserShelf(userId: string) {
     .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
     .where(eq(mediaInteraction.userId, userId))
     .orderBy(desc(mediaInteraction.createdAt));
+}
+
+export async function getUserShelfForType(userId: string, type: MediaType) {
+  return db
+    .select({ media, interaction: mediaInteraction })
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(and(eq(mediaInteraction.userId, userId), eq(media.type, type)))
+    .orderBy(desc(mediaInteraction.updatedAt));
 }
 
 export async function getUserWatchedMedia(userId: string) {

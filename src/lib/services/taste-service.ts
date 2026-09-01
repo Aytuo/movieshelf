@@ -1,5 +1,4 @@
-import { db } from '@/lib/db';
-import { media, mediaInteraction } from '@/lib/db/schema';
+import { getUserShelf } from '@/lib/repositories/media-interaction-repository';
 import type {
   RatingDistributionItem,
   TasteDecade,
@@ -8,12 +7,8 @@ import type {
   TasteProfile,
   TasteStats,
 } from '@/types';
-import { desc, eq } from 'drizzle-orm';
 
-type TasteItem = {
-  media: typeof media.$inferSelect;
-  interaction: typeof mediaInteraction.$inferSelect;
-};
+type TasteItem = Awaited<ReturnType<typeof getUserShelf>>[number];
 
 function getDecade(releaseDate: string | null): string | null {
   if (!releaseDate) {
@@ -176,17 +171,10 @@ function buildTasteStats(items: TasteItem[]): TasteStats {
 }
 
 export async function getTasteProfile(userId: string): Promise<TasteProfile> {
-  const items = await db
-    .select({
-      media,
-      interaction: mediaInteraction,
-    })
-    .from(mediaInteraction)
-    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
-    .where(eq(mediaInteraction.userId, userId))
-    .orderBy(desc(mediaInteraction.createdAt));
+  const items = await getUserShelf(userId);
 
   const movieItems = items.filter(({ media }) => media.type === 'movie');
+
   const tvItems = items.filter(({ media }) => media.type === 'tv');
 
   return {

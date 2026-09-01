@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-import { media, mediaInteraction } from '@/lib/db/schema';
 import type { Media, MediaType } from '@/lib/media';
 import {
   generateCandidates,
@@ -14,31 +12,24 @@ import {
   buildTasteSignals,
   scoreCandidate,
 } from '@/lib/recommendations/scorer';
+import { getUserShelfForType } from '@/lib/repositories/media-interaction-repository';
 import type { MediaRecommendation } from '@/types';
-import type { InferSelectModel } from 'drizzle-orm';
-import { and, desc, eq } from 'drizzle-orm';
 
-type DbMedia = InferSelectModel<typeof media>;
+type RecommendationShelfItem = Awaited<
+  ReturnType<typeof getUserShelfForType>
+>[number];
 
 export async function getRecommendationsForUser(
   userId: string,
   type: MediaType
 ): Promise<MediaRecommendation[]> {
-  const shelf = await db
-    .select({
-      media,
-      interaction: mediaInteraction,
-    })
-    .from(mediaInteraction)
-    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
-    .where(and(eq(mediaInteraction.userId, userId), eq(media.type, type)))
-    .orderBy(desc(mediaInteraction.updatedAt));
+  const shelf = await getUserShelfForType(userId, type);
 
-  // Known media: Only media of the requested type are loaded above, so Movie recommendations never see TV entries and vice versa.
+  // Known media: Only media of the requested type are loaded by the repository.
 
   const knownMediaKeys = new Set(shelf.map(({ media }) => getMediaKey(media)));
 
-  // Rated media.
+  //  Rated media.
 
   const ratedMedia = shelf
     .filter(({ interaction }) => interaction.rating !== null)
@@ -54,7 +45,7 @@ export async function getRecommendationsForUser(
     return [];
   }
 
-  // Seeds: Only strongly-rated media are used recommendation sources.
+  // Seeds: Only strongly-rated media are used as recommendation sources.
 
   const seeds: RecommendationSeed[] = ratedMedia
     .filter(({ rating }) => rating >= 8)
@@ -104,6 +95,7 @@ export async function getRecommendationsForUser(
   );
 
   // Exclusions.
+
   const filtered = excludeKnownMedia(scored, knownMediaKeys);
 
   // Diversification.
@@ -111,7 +103,7 @@ export async function getRecommendationsForUser(
   return diversifyRecommendations(filtered, 12);
 }
 
-function toRecommendationMedia(media: DbMedia): Media {
+function toRecommendationMedia(media: RecommendationShelfItem['media']): Media {
   return {
     tmdbId: media.tmdbId,
     type: media.type,
