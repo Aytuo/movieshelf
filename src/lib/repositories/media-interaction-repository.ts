@@ -6,7 +6,7 @@ import {
   watchHistory,
 } from '@/lib/db/schema';
 import type { MediaType } from '@/lib/media';
-import { and, count, desc, eq } from 'drizzle-orm';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 export async function getUserMediaInteraction(userId: string, mediaId: string) {
   const result = await db
@@ -89,7 +89,7 @@ export async function getUserWatchlist(userId: string) {
     .orderBy(desc(mediaInteraction.createdAt));
 }
 
-export async function getUserFavorites(userId: string) {
+export async function getUserFavorites(userId: string, limit = 6) {
   return db
     .select({
       media,
@@ -103,7 +103,8 @@ export async function getUserFavorites(userId: string) {
         eq(mediaInteraction.favorite, true)
       )
     )
-    .orderBy(desc(mediaInteraction.updatedAt));
+    .orderBy(desc(mediaInteraction.updatedAt))
+    .limit(limit);
 }
 
 export async function addMediaToWatchlist({
@@ -424,4 +425,36 @@ export async function removeMediaFromShelf({
       createdAt: now,
     }),
   ]);
+}
+
+export async function getPublicMediaStats(userId: string) {
+  const rows = await db
+    .select({
+      type: media.type,
+      total: count(mediaInteraction.id),
+      watched: sql<number>`
+        count(*) filter (
+          where ${mediaInteraction.status} = 'watched'
+        )
+      `,
+      rated: sql<number>`
+        count(*) filter (
+          where ${mediaInteraction.rating} is not null
+        )
+      `,
+      favorites: sql<number>`
+        count(*) filter (
+          where ${mediaInteraction.favorite} = true
+        )
+      `,
+      averageRating: sql<number | null>`
+        avg(${mediaInteraction.rating})
+      `,
+    })
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(eq(mediaInteraction.userId, userId))
+    .groupBy(media.type);
+
+  return rows;
 }

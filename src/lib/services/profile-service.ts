@@ -2,8 +2,9 @@ import {
   createProfile,
   getProfileByUserId,
   getProfileByUsername,
+  getPublicMediaStats,
+  getUserFavorites,
   getUserReviews,
-  getUserShelf,
   usernameExists,
 } from '@/lib/repositories';
 import { getTasteProfile } from '@/lib/services/taste-service';
@@ -30,6 +31,49 @@ function createBaseUsername(name: string | null | undefined, email: string) {
     .slice(0, 14);
 
   return fromEmail || 'moviefan';
+}
+
+function createEmptyMediaStats() {
+  return {
+    total: 0,
+    watched: 0,
+    rated: 0,
+    favorites: 0,
+    averageRating: null,
+  };
+}
+
+function mapPublicMediaStats(
+  rows: Awaited<ReturnType<typeof getPublicMediaStats>>
+) {
+  const movie = rows.find((row) => row.type === 'movie') ?? {
+    type: 'movie' as const,
+    ...createEmptyMediaStats(),
+  };
+
+  const tv = rows.find((row) => row.type === 'tv') ?? {
+    type: 'tv' as const,
+    ...createEmptyMediaStats(),
+  };
+
+  return {
+    movies: {
+      total: Number(movie.total),
+      watched: Number(movie.watched),
+      rated: Number(movie.rated),
+      favorites: Number(movie.favorites),
+      averageRating:
+        movie.averageRating === null ? null : Number(movie.averageRating),
+    },
+    tv: {
+      total: Number(tv.total),
+      watched: Number(tv.watched),
+      rated: Number(tv.rated),
+      favorites: Number(tv.favorites),
+      averageRating:
+        tv.averageRating === null ? null : Number(tv.averageRating),
+    },
+  };
 }
 
 async function generateUniqueUsername(base: string) {
@@ -94,44 +138,15 @@ export async function getPublicProfile(username: string) {
     return null;
   }
 
-  const [shelf, reviews, taste] = await Promise.all([
-    getUserShelf(profile.userId),
-    getUserReviews(profile.userId),
-    getTasteProfile(profile.userId),
+  const [mediaStats, favorites] = await Promise.all([
+    getPublicMediaStats(profile.userId),
+    getUserFavorites(profile.userId, 6),
   ]);
-
-  const favorites = shelf.filter(({ interaction }) => interaction.favorite);
-  const movieShelf = shelf.filter(({ media }) => media.type === 'movie');
-  const tvShelf = shelf.filter(({ media }) => media.type === 'tv');
 
   return {
     profile,
-
-    stats: {
-      movies: {
-        total: taste.movie.total,
-        watched: taste.movie.watched,
-        rated: taste.movie.rated,
-        favorites: movieShelf.filter(({ interaction }) => interaction.favorite)
-          .length,
-        averageRating: taste.movie.averageRating,
-      },
-
-      tv: {
-        total: taste.tv.total,
-        watched: taste.tv.watched,
-        rated: taste.tv.rated,
-        favorites: tvShelf.filter(({ interaction }) => interaction.favorite)
-          .length,
-        averageRating: taste.tv.averageRating,
-      },
-    },
-
-    favorites: favorites.slice(0, 6),
-
-    taste,
-
-    reviews: reviews.slice(0, 6),
+    stats: mapPublicMediaStats(mediaStats),
+    favorites,
   };
 }
 
