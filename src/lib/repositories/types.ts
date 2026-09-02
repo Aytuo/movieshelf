@@ -1,15 +1,16 @@
 import type { Media, MovieDetails, TvDetails } from '@/lib/media';
-import {
+import type {
   DiscoverOptions,
   DiscoverResult,
+  MediaSearchResult,
   MovieDiscoverFilters,
+  SearchAllResult,
   SearchOptions,
-  SearchResult,
   TvDiscoverFilters,
 } from '@/types';
 
 export interface SearchRepository {
-  search(query: string, options?: SearchOptions): Promise<SearchResult>;
+  search(query: string, options?: SearchOptions): Promise<SearchAllResult>;
 }
 
 export interface MovieRepository {
@@ -22,7 +23,7 @@ export interface MovieRepository {
   getUpcoming(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
 
-  search(query: string, options?: SearchOptions): Promise<SearchResult>;
+  search(query: string, options?: SearchOptions): Promise<MediaSearchResult>;
 
   discover(
     filters: MovieDiscoverFilters,
@@ -40,7 +41,7 @@ export interface TvRepository {
   getOnTheAir(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
 
-  search(query: string, options?: SearchOptions): Promise<SearchResult>;
+  search(query: string, options?: SearchOptions): Promise<MediaSearchResult>;
 
   discover(
     filters: TvDiscoverFilters,

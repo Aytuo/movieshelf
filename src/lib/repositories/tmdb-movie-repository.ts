@@ -1,6 +1,5 @@
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
 import type { Movie } from '@/lib/media';
-import { mapTmdbMovie, mapTmdbMovieDetails } from '@/lib/tmdb/mapper';
 import {
   discover,
   getMovie,
@@ -10,6 +9,7 @@ import {
 } from '@/lib/tmdb/movie-api';
 import { MovieDiscoverFilters } from '@/types';
 import { paginateSearchResults } from '../search/pagination';
+import { mapTmdbMovie, mapTmdbMovieDetails } from '../tmdb/media-mapper';
 import { MovieRepository } from './types';
 
 export const tmdbMovieRepository: MovieRepository = {

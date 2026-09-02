@@ -1,14 +1,14 @@
-import { getUserShelf as getUserShelfRepository } from '@/lib/repositories';
 import {
   addMediaToWatchlist,
   getUserMediaInteraction,
+  getUserShelf as getUserShelfRepository,
   markMediaAsDropped,
   markMediaAsWatched,
   removeMediaFromShelf,
   setMediaRating,
   startMediaWatching,
   toggleMediaFavorite,
-} from '@/lib/repositories/media-interaction-repository';
+} from '@/lib/repositories';
 
 /* ========================================================================== */
 /*                                GET USER SHELF                              */

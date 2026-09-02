@@ -1,10 +1,11 @@
 import type { Media } from '@/lib/media';
+import type { PersonSearchItem, PersonSearchResult } from './people';
 
 /* ========================================================================== */
 /*                                 SEARCH                                     */
 /* ========================================================================== */
 
-export type SearchMediaType = 'all' | 'movie' | 'tv';
+export type SearchMediaType = 'all' | 'movie' | 'tv' | 'person';
 
 export interface SearchFilters {
   type: SearchMediaType;
@@ -17,9 +18,29 @@ export interface SearchOptions {
   year?: number;
 }
 
-export interface SearchResult {
+export interface MediaSearchResult {
   media: Media[];
   page: number;
   totalPages: number;
   totalResults: number;
 }
+
+export type SearchAllItem =
+  | {
+      type: 'media';
+      media: Media;
+    }
+  | {
+      type: 'person';
+      person: PersonSearchItem;
+    };
+
+export interface SearchAllResult {
+  results: SearchAllItem[];
+  page: number;
+  totalPages: number;
+  totalResults: number;
+}
+
+export type SearchResult =
+  SearchAllResult | MediaSearchResult | PersonSearchResult;

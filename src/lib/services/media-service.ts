@@ -1,15 +1,13 @@
 import type { MediaDetails, MediaType } from '@/lib/media';
 import {
+  getMediaRecordByTmdbId,
   getMediaReviews,
   getUserMediaInteraction,
   getUserReviewForMedia,
   tmdbMovieRepository,
   tmdbTvRepository,
-} from '@/lib/repositories';
-import {
-  getMediaRecordByTmdbId,
   upsertMedia,
-} from '@/lib/repositories/media-repository';
+} from '@/lib/repositories';
 import type { MediaRecord } from '@/types';
 import { getMediaWatchCountForUser } from './watch-history-service';
 

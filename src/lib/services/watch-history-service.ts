@@ -3,7 +3,7 @@ import {
   getMediaWatchCount,
   getWatchHistoryCount,
   getWatchHistoryPage,
-} from '@/lib/repositories/watch-history-repository';
+} from '@/lib/repositories';
 
 export const HISTORY_PAGE_SIZE = 20;
 

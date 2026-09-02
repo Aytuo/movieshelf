@@ -1,6 +1,5 @@
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
 import type { TvShow } from '@/lib/media';
-import { mapTmdbTv, mapTmdbTvDetails } from '@/lib/tmdb/mapper';
 import {
   discover,
   getPopular,
@@ -10,6 +9,7 @@ import {
 } from '@/lib/tmdb/tv-api';
 import { TvDiscoverFilters } from '@/types';
 import { paginateSearchResults } from '../search/pagination';
+import { mapTmdbTv, mapTmdbTvDetails } from '../tmdb/media-mapper';
 import { TvRepository } from './types';
 
 export const tmdbTvRepository: TvRepository = {

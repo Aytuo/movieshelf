@@ -26,12 +26,10 @@ const SearchPagination = ({
     params.set('q', query);
     params.set('page', String(nextPage));
 
-    if (type !== 'all') {
-      params.set('type', type);
-    }
-
-    if (year !== undefined) {
-      params.set('year', String(year));
+    if (type === 'movie' || type === 'tv') {
+      if (year !== undefined) {
+        params.set('year', String(year));
+      }
     }
 
     return `/search?${params.toString()}`;

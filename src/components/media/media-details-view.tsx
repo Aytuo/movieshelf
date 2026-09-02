@@ -1,6 +1,6 @@
 import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
-import { MediaInteraction } from '@/types';
+import type { MediaInteraction } from '@/types';
 import { Star } from 'lucide-react';
 import ReviewCard from '../reviews/review-card';
 import ReviewForm from '../reviews/review-form';

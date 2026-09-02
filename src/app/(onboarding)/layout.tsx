@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { getProfileByUserId } from '@/lib/repositories/profile-repository';
+import { getProfileByUserId } from '@/lib/repositories';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 

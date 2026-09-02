@@ -12,6 +12,10 @@ type SearchControlsProps = {
   currentYear: number;
 };
 
+function supportsYear(type: SearchMediaType) {
+  return type === 'movie' || type === 'tv';
+}
+
 const SearchControls = ({
   initialQuery,
   initialType,
@@ -48,7 +52,7 @@ const SearchControls = ({
     if (nextType !== 'all') {
       params.set('type', nextType);
 
-      if (nextYear) {
+      if (supportsYear(nextType) && nextYear) {
         params.set('year', nextYear);
       }
     }
@@ -74,7 +78,7 @@ const SearchControls = ({
 
     const nextUrl = buildUrl({
       nextType,
-      nextYear: nextType === 'all' ? '' : year,
+      nextYear: supportsYear(nextType) ? year : '',
     });
 
     router.push(nextUrl, {
@@ -118,9 +122,9 @@ const SearchControls = ({
       onSubmit={handleSubmit}
       className={[
         'grid gap-3',
-        type === 'all'
-          ? 'sm:grid-cols-[1fr_160px_auto]'
-          : 'sm:grid-cols-[1fr_160px_140px_auto]',
+        supportsYear(type)
+          ? 'sm:grid-cols-[1fr_160px_140px_auto]'
+          : 'sm:grid-cols-[1fr_160px_auto]',
       ].join(' ')}
     >
       <div className="relative">
@@ -159,9 +163,11 @@ const SearchControls = ({
         <option value="movie">Movies</option>
 
         <option value="tv">TV Series</option>
+
+        <option value="person">People</option>
       </select>
 
-      {type !== 'all' && (
+      {supportsYear(type) && (
         <input
           name="year"
           type="number"

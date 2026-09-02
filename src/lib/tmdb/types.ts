@@ -181,6 +181,117 @@ export type TmdbTvBundle = TmdbTvDetails & {
 };
 
 /* ========================================================================== */
+/*                                 PEOPLE                                     */
+/* ========================================================================== */
+
+export type TmdbPersonDetails = {
+  id: number;
+  name: string;
+  also_known_as: string[];
+  biography: string | null;
+  birthday: string | null;
+  deathday: string | null;
+  gender: number;
+  homepage: string | null;
+  imdb_id: string | null;
+  known_for_department: string | null;
+  place_of_birth: string | null;
+  popularity: number;
+  profile_path: string | null;
+};
+
+export type TmdbPersonMovieCastCredit = {
+  id: number;
+  title: string;
+  original_title: string;
+  overview: string | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  adult: boolean;
+  genre_ids?: number[];
+  vote_average: number;
+  vote_count: number;
+  popularity: number;
+  original_language: string;
+  character: string;
+  credit_id: string;
+  order: number;
+  media_type: 'movie';
+};
+
+export type TmdbPersonMovieCrewCredit = {
+  id: number;
+  title: string;
+  original_title: string;
+  overview: string | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  adult: boolean;
+  genre_ids?: number[];
+  vote_average: number;
+  vote_count: number;
+  popularity: number;
+  original_language: string;
+  department: string;
+  job: string;
+  credit_id: string;
+  media_type: 'movie';
+};
+
+export type TmdbPersonTvCastCredit = {
+  id: number;
+  name: string;
+  original_name: string;
+  overview: string | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  first_air_date: string;
+  adult: boolean;
+  genre_ids?: number[];
+  vote_average: number;
+  vote_count: number;
+  popularity: number;
+  original_language: string;
+  character: string;
+  credit_id: string;
+  episode_count: number;
+  media_type: 'tv';
+};
+
+export type TmdbPersonTvCrewCredit = {
+  id: number;
+  name: string;
+  original_name: string;
+  overview: string | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  first_air_date: string;
+  adult: boolean;
+  genre_ids?: number[];
+  vote_average: number;
+  vote_count: number;
+  popularity: number;
+  original_language: string;
+  department: string;
+  job: string;
+  credit_id: string;
+  episode_count: number;
+  media_type: 'tv';
+};
+
+export type TmdbPersonCombinedCredits = {
+  id: number;
+  cast: (TmdbPersonMovieCastCredit | TmdbPersonTvCastCredit)[];
+  crew: (TmdbPersonMovieCrewCredit | TmdbPersonTvCrewCredit)[];
+};
+
+export type TmdbPersonBundle = TmdbPersonDetails & {
+  combined_credits?: TmdbPersonCombinedCredits;
+};
+
+/* ========================================================================== */
 /*                             MULTI SEARCH                                   */
 /* ========================================================================== */
 

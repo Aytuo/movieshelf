@@ -12,7 +12,7 @@ import {
   buildTasteSignals,
   scoreCandidate,
 } from '@/lib/recommendations/scorer';
-import { getUserShelfForType } from '@/lib/repositories/media-interaction-repository';
+import { getUserShelfForType } from '@/lib/repositories';
 import type { MediaRecommendation } from '@/types';
 
 type RecommendationShelfItem = Awaited<

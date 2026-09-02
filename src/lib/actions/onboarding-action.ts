@@ -1,7 +1,7 @@
 'use server';
 
 import { requireSession } from '@/lib/auth/require-session';
-import { completeOnboarding } from '@/lib/repositories/profile-repository';
+import { completeOnboarding } from '@/lib/repositories';
 import { setRating } from '@/lib/services/media-interaction-service';
 import { getOrCreateMediaRecord } from '@/lib/services/media-service';
 import {

@@ -1,5 +1,6 @@
 export * from './discover';
 export * from './media';
+export * from './people';
 export * from './profile';
 export * from './recommendations';
 export * from './reviews';
