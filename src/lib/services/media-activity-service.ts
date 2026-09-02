@@ -1,7 +1,7 @@
 import {
   getUserMediaActivity as getUserMediaActivityRepository,
   MediaActivityRow,
-} from '@/lib/repositories/media-activity-repository';
+} from '@/lib/repositories';
 
 type ActivityMedia = MediaActivityRow['media'];
 type ActivityReview = NonNullable<MediaActivityRow['review']>;

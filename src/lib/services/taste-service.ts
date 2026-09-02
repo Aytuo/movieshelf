@@ -1,7 +1,4 @@
-import {
-  getUserShelf,
-  UserShelfRow,
-} from '@/lib/repositories/media-interaction-repository';
+import { getUserShelf, type UserShelfRow } from '@/lib/repositories';
 import type {
   RatingDistributionItem,
   TasteDecade,

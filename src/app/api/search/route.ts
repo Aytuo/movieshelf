@@ -38,8 +38,15 @@ export async function GET(request: Request) {
       },
     });
 
-    return NextResponse.json({
-      media: result.media.slice(0, 6),
+    if (!('results' in result)) {
+      return Response.json({
+        results: [],
+        totalResults: 0,
+      });
+    }
+
+    return Response.json({
+      results: result.results.slice(0, 6),
       totalResults: result.totalResults,
     });
   } catch {

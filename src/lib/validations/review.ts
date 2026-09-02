@@ -1,4 +1,4 @@
-import { ReviewInput } from '@/types';
+import type { ReviewInput } from '@/types';
 import { z } from 'zod';
 
 export const reviewSchema: z.ZodType<ReviewInput, ReviewInput> = z.object({

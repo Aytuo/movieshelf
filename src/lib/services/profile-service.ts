@@ -5,7 +5,7 @@ import {
   getUserFavorites,
   getUserMediaStats,
   getUserReviews,
-  UserMediaStatsRow,
+  type UserMediaStatsRow,
   usernameExists,
 } from '@/lib/repositories';
 import { getTasteProfile } from '@/lib/services/taste-service';

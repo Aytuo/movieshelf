@@ -10,7 +10,7 @@ const GlobalSearchEmptyState = () => {
       <p className="mt-4 text-sm font-medium">Find something to watch</p>
 
       <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
-        Start typing a movie or TV series title and MovieShelf will show
+        Start typing a movie, TV series or person name and MovieShelf will show
         matching results instantly.
       </p>
     </div>

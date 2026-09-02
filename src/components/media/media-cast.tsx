@@ -1,5 +1,6 @@
 import type { MediaCastMember } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
+import Link from 'next/link';
 
 type MediaCastProps = {
   cast: MediaCastMember[];
@@ -25,29 +26,35 @@ const MediaCast = ({ cast }: MediaCastProps) => {
           const image = tmdbImage(person.profilePath, 'w342');
 
           return (
-            <article key={person.id}>
-              <div className="aspect-[2/3] overflow-hidden rounded-xl bg-surface">
-                {image ? (
-                  <img
-                    src={image}
-                    alt={person.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
-                    {person.name}
-                  </div>
-                )}
-              </div>
+            <Link
+              key={person.id}
+              href={`/person/${person.id}`}
+              className="group"
+            >
+              <article>
+                <div className="aspect-[2/3] overflow-hidden rounded-xl bg-surface">
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={person.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
+                      {person.name}
+                    </div>
+                  )}
+                </div>
 
-              <h3 className="mt-3 line-clamp-1 text-sm font-semibold">
-                {person.name}
-              </h3>
+                <h3 className="mt-3 line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">
+                  {person.name}
+                </h3>
 
-              <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
-                {person.character || 'Actor'}
-              </p>
-            </article>
+                <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                  {person.character || 'Actor'}
+                </p>
+              </article>
+            </Link>
           );
         })}
       </div>

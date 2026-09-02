@@ -1,5 +1,4 @@
 import type {
-  Media,
   MediaCastMember,
   MediaCrewMember,
   MediaGenre,
@@ -17,7 +16,6 @@ import type {
   TmdbCreditCrew,
   TmdbMovieBundle,
   TmdbMovieResult,
-  TmdbMultiSearchResult,
   TmdbTvAggregateCast,
   TmdbTvBundle,
   TmdbTvResult,
@@ -28,7 +26,7 @@ import type {
 /*                              BASIC MEDIA                                   */
 /* ========================================================================== */
 
-function mapMovieResult(movie: TmdbMovieResult): Movie {
+export function mapMovieResult(movie: TmdbMovieResult): Movie {
   return {
     tmdbId: movie.id,
     type: 'movie',
@@ -47,7 +45,7 @@ function mapMovieResult(movie: TmdbMovieResult): Movie {
   };
 }
 
-function mapTvResult(tv: TmdbTvResult): TvShow {
+export function mapTvResult(tv: TmdbTvResult): TvShow {
   return {
     tmdbId: tv.id,
     type: 'tv',
@@ -203,19 +201,4 @@ export function mapTmdbTvDetails(tv: TmdbTvBundle): TvDetails {
       .slice(0, 6)
       .map(mapTvResult),
   };
-}
-
-export function mapTmdbMultiSearchResult(
-  result: TmdbMultiSearchResult
-): Media | null {
-  switch (result.media_type) {
-    case 'movie':
-      return mapMovieResult(result);
-
-    case 'tv':
-      return mapTvResult(result);
-
-    case 'person':
-      return null;
-  }
 }

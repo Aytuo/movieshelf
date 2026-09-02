@@ -5,6 +5,7 @@ import {
 } from '@/lib/repositories';
 import { getSearchPagesNeeded, getSearchSlice } from '@/lib/search/pagination';
 import type { SearchFilters } from '@/types';
+import { searchPeople } from './people-service';
 
 export async function search({
   query,
@@ -64,16 +65,20 @@ export async function search({
         : []),
     ];
 
-    const candidates = responses.flatMap((response) => response.media);
+    const candidates = responses.flatMap((response) => response.results);
 
     const { start, end } = getSearchSlice(page);
 
     return {
-      media: candidates.slice(start, end),
+      results: candidates.slice(start, end),
       page,
       totalResults,
       totalPages,
     };
+  }
+
+  if (filters.type === 'person') {
+    return searchPeople(normalized, page);
   }
 
   // Type-specific search: /search?type=movie AND /search?type=tv; the selected repository is responsible for translating the application-level year filter to the correct TMDB parameter.

@@ -1,7 +1,10 @@
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
 import type { Media } from '@/lib/media';
-import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
-import { getUserMediaKeys } from '@/lib/repositories/media-interaction-repository';
+import {
+  getUserMediaKeys,
+  tmdbMovieRepository,
+  tmdbTvRepository,
+} from '@/lib/repositories';
 import type { DiscoverFilters } from '@/types';
 
 function getMediaKey(media: Pick<Media, 'tmdbId' | 'type'>) {

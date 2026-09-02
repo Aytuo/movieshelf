@@ -1,18 +1,18 @@
 'use client';
 
 import { useDebounce } from '@/hooks/use-debounce';
-import type { Media } from '@/lib/media';
+import type { SearchAllItem } from '@/types';
 import { ArrowRight, Command, Loader2, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import GlobalSearchEmptyState from './global-search-empty-state';
-import GlobalSearchResults from './global-search-result';
+import GlobalSearchResults from './global-search-results';
 
 const GlobalSearch = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Media[]>([]);
+  const [results, setResults] = useState<SearchAllItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,10 +91,11 @@ const GlobalSearch = () => {
         }
 
         const data = (await response.json()) as {
-          media: Media[];
+          results: SearchAllItem[];
           totalResults: number;
         };
-        setResults(data.media);
+
+        setResults(data.results);
         setTotalResults(data.totalResults);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
@@ -147,7 +148,6 @@ const GlobalSearch = () => {
     setResults([]);
     setTotalResults(0);
     setError(null);
-
     inputRef.current?.focus();
   }
 
@@ -197,7 +197,7 @@ const GlobalSearch = () => {
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
-              aria-label="Search movies"
+              aria-label="Search movies, TV series and people"
               onPointerDown={(event) => event.stopPropagation()}
               className="mx-auto mt-[8vh] w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-background/95 shadow-[0_30px_120px_rgb(0_0_0_/_60%)]"
             >
@@ -208,7 +208,7 @@ const GlobalSearch = () => {
                   ref={inputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search movies & TV series..."
+                  placeholder="Search movies, TV series & people..."
                   className="h-16 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/60 sm:text-lg"
                   autoComplete="off"
                   spellCheck={false}
@@ -247,7 +247,7 @@ const GlobalSearch = () => {
                     <p className="text-sm font-medium">No results found.</p>
 
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Try a different movie or TV series title.
+                      Try a different movie, TV series or person.
                     </p>
                   </div>
                 ) : (
@@ -282,7 +282,6 @@ const GlobalSearch = () => {
               </div>
             </div>
           </div>,
-
           document.body
         )}
     </>
