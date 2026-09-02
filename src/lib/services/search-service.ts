@@ -8,7 +8,7 @@ import {
   getSearchSlice,
   getSearchTotalPages,
 } from '@/lib/search/pagination';
-import type { SearchFilters } from '@/types';
+import type { SearchFilters, SearchResult } from '@/types';
 import { searchPeople } from './people-service';
 
 export async function search({
@@ -17,11 +17,29 @@ export async function search({
 }: {
   query: string;
   filters: SearchFilters;
-}) {
+}): Promise<SearchResult> {
   const normalized = query.trim();
   const page = filters.page ?? 1;
 
   if (!normalized) {
+    if (filters.type === 'all') {
+      return {
+        results: [],
+        page: 1,
+        totalResults: 0,
+        totalPages: 0,
+      };
+    }
+
+    if (filters.type === 'person') {
+      return {
+        people: [],
+        page: 1,
+        totalResults: 0,
+        totalPages: 0,
+      };
+    }
+
     return {
       media: [],
       page: 1,

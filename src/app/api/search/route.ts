@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
   if (query.length < 2) {
     return NextResponse.json({
-      media: [],
+      results: [],
       totalResults: 0,
     });
   }
