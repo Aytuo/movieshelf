@@ -2,17 +2,12 @@ import {
   getPersonDetails,
   searchPeople as searchPeopleApi,
 } from '@/lib/tmdb/people-api';
-import type { TmdbPersonResult } from '@/lib/tmdb/types';
-import type {
-  PersonCredit,
-  PersonProfile,
-  PersonSearchItem,
-  PersonSearchResult,
-} from '@/types';
+import type { PersonCredit, PersonProfile, PersonSearchResult } from '@/types';
 import {
   mapTmdbPerson,
   mapTmdbPersonCastCredit,
   mapTmdbPersonCrewCredit,
+  mapTmdbPersonSearchItem,
 } from '../tmdb/people-mapper';
 
 function isNonRoleAppearance(credit: PersonCredit) {
@@ -74,16 +69,6 @@ function splitActingCredits(credits: PersonCredit[]) {
       credits.filter((credit) => credit.type === 'movie')
     ),
     tv: sortCreditsByDate(credits.filter((credit) => credit.type === 'tv')),
-  };
-}
-
-function mapPersonSearchItem(person: TmdbPersonResult): PersonSearchItem {
-  return {
-    id: person.id,
-    name: person.name,
-    profilePath: person.profile_path,
-    knownForDepartment: person.known_for_department,
-    popularity: person.popularity,
   };
 }
 
@@ -204,7 +189,7 @@ export async function searchPeople(
   const response = await searchPeopleApi(query, page);
 
   return {
-    people: response.results.map(mapPersonSearchItem),
+    people: response.results.map(mapTmdbPersonSearchItem),
     page: response.page,
     totalPages: response.total_pages,
     totalResults: response.total_results,

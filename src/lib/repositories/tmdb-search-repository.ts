@@ -28,7 +28,6 @@ export const tmdbSearchRepository: SearchRepository = {
 
     const results = response.results
       .map(mapTmdbMultiSearchResult)
-      .filter((item): item is MappedMultiSearchResult => item !== null)
       .map(mapSearchResult);
 
     return {

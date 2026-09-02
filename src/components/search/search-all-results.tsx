@@ -8,11 +8,17 @@ type SearchAllResultsProps = {
 
 const SearchAllResults = ({ results }: SearchAllResultsProps) => {
   const media = results
-    .filter((item) => item.type === 'media')
+    .filter(
+      (item): item is Extract<SearchAllItem, { type: 'media' }> =>
+        item.type === 'media'
+    )
     .map((item) => item.media);
 
   const people = results
-    .filter((item) => item.type === 'person')
+    .filter(
+      (item): item is Extract<SearchAllItem, { type: 'person' }> =>
+        item.type === 'person'
+    )
     .map((item) => item.person);
 
   return (

@@ -38,7 +38,7 @@ export default async function PersonPage({ params }: PersonPageProps) {
   const { id } = await params;
   const personId = Number(id);
 
-  if (!Number.isInteger(personId)) {
+  if (!Number.isInteger(personId) || personId <= 0) {
     notFound();
   }
 

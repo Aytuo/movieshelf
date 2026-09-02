@@ -24,12 +24,15 @@ const SearchPagination = ({
     const params = new URLSearchParams();
 
     params.set('q', query);
+
+    if (type !== 'all') {
+      params.set('type', type);
+    }
+
     params.set('page', String(nextPage));
 
-    if (type === 'movie' || type === 'tv') {
-      if (year !== undefined) {
-        params.set('year', String(year));
-      }
+    if ((type === 'movie' || type === 'tv') && year !== undefined) {
+      params.set('year', String(year));
     }
 
     return `/search?${params.toString()}`;

@@ -1,9 +1,16 @@
 'use client';
 
+import { useDebounce } from '@/hooks/use-debounce';
 import type { SearchMediaType } from '@/types';
 import { Search, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useRef, useState } from 'react';
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 type SearchControlsProps = {
   initialQuery: string;
@@ -32,14 +39,42 @@ const SearchControls = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const debouncedYear = useDebounce(year, 300);
+  const previousDebouncedYear = useRef(debouncedYear);
+
+  useEffect(() => {
+    if (!supportsYear(type)) {
+      previousDebouncedYear.current = debouncedYear;
+      return;
+    }
+
+    if (previousDebouncedYear.current === debouncedYear) {
+      return;
+    }
+
+    previousDebouncedYear.current = debouncedYear;
+
+    const nextUrl = buildUrl({
+      nextType: type,
+      nextYear: debouncedYear,
+      preservePage: false,
+    });
+
+    router.push(nextUrl, {
+      scroll: false,
+    });
+  }, [debouncedYear, type]);
+
   function buildUrl({
     nextQuery = query,
     nextType = type,
     nextYear = year,
+    preservePage = true,
   }: {
     nextQuery?: string;
     nextType?: SearchMediaType;
     nextYear?: string;
+    preservePage?: boolean;
   } = {}) {
     const params = new URLSearchParams();
 
@@ -57,33 +92,52 @@ const SearchControls = ({
       }
     }
 
-    const existingPage = searchParams.get('page');
+    if (preservePage) {
+      const existingPage = searchParams.get('page');
 
-    if (existingPage) {
-      params.set('page', existingPage);
+      if (existingPage) {
+        params.set('page', existingPage);
+      }
     }
 
     return params.toString() ? `${pathname}?${params.toString()}` : pathname;
   }
 
-  function handleTypeChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const nextType = event.target.value as SearchMediaType;
-
-    setType(nextType);
-
-    // "All" does not support year, so remove it immediately.
-    if (nextType === 'all') {
-      setYear('');
-    }
-
+  function navigateWithFilters({
+    nextType = type,
+    nextYear = year,
+  }: {
+    nextType?: SearchMediaType;
+    nextYear?: string;
+  } = {}) {
     const nextUrl = buildUrl({
       nextType,
-      nextYear: supportsYear(nextType) ? year : '',
+      nextYear: supportsYear(nextType) ? nextYear : '',
+      preservePage: false,
     });
 
     router.push(nextUrl, {
       scroll: false,
     });
+  }
+
+  function handleTypeChange(event: ChangeEvent<HTMLSelectElement>) {
+    const nextType = event.target.value as SearchMediaType;
+
+    setType(nextType);
+
+    if (!supportsYear(nextType)) {
+      setYear('');
+    }
+
+    navigateWithFilters({
+      nextType,
+      nextYear: supportsYear(nextType) ? year : '',
+    });
+  }
+
+  function handleYearChange(event: ChangeEvent<HTMLInputElement>) {
+    setYear(event.target.value);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -93,27 +147,16 @@ const SearchControls = ({
       nextQuery: query,
       nextType: type,
       nextYear: year,
+      preservePage: false,
     });
 
-    const params = new URLSearchParams(
-      nextUrl.includes('?') ? nextUrl.split('?')[1] : ''
-    );
-
-    // A new search always starts from the first page.
-    params.delete('page');
-
-    const finalUrl = params.toString()
-      ? `${pathname}?${params.toString()}`
-      : pathname;
-
-    router.push(finalUrl, {
+    router.push(nextUrl, {
       scroll: false,
     });
   }
 
   function clearQuery() {
     setQuery('');
-
     inputRef.current?.focus();
   }
 
@@ -159,11 +202,8 @@ const SearchControls = ({
         aria-label="Search media type"
       >
         <option value="all">All</option>
-
         <option value="movie">Movies</option>
-
         <option value="tv">TV Series</option>
-
         <option value="person">People</option>
       </select>
 
@@ -174,7 +214,7 @@ const SearchControls = ({
           min="1888"
           max={currentYear}
           value={year}
-          onChange={(event) => setYear(event.target.value)}
+          onChange={handleYearChange}
           placeholder="Year"
           className="input h-12"
         />

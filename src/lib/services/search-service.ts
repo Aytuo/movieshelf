@@ -3,7 +3,11 @@ import {
   tmdbSearchRepository,
   tmdbTvRepository,
 } from '@/lib/repositories';
-import { getSearchPagesNeeded, getSearchSlice } from '@/lib/search/pagination';
+import {
+  getSearchPagesNeeded,
+  getSearchSlice,
+  getSearchTotalPages,
+} from '@/lib/search/pagination';
 import type { SearchFilters } from '@/types';
 import { searchPeople } from './people-service';
 
@@ -34,19 +38,21 @@ export async function search({
     });
 
     const totalResults = firstResponse.totalResults;
-
-    const totalPages = firstResponse.totalPages;
+    const totalPages = getSearchTotalPages(totalResults);
 
     if (totalResults === 0 || page > totalPages) {
       return {
-        media: [],
+        results: [],
         page,
         totalResults,
         totalPages,
       };
     }
 
-    const pagesNeeded = Math.min(getSearchPagesNeeded(page), totalPages);
+    const pagesNeeded = Math.min(
+      getSearchPagesNeeded(page),
+      firstResponse.totalPages
+    );
 
     const responses = [
       firstResponse,

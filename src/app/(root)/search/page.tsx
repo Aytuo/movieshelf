@@ -65,7 +65,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
         query,
         filters: {
           type,
-          year: type === 'all' ? undefined : year,
+          year: type === 'movie' || type === 'tv' ? year : undefined,
           page,
         },
       })
@@ -82,8 +82,6 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
 
   const currentYear = new Date().getFullYear();
 
-  const totalResults = results?.totalResults ?? 0;
-
   return (
     <main className="container-content py-12 lg:py-16">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -95,8 +93,8 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Search movies, TV series and people by name and, when needed, narrow
-            the results by year.
+            Search movies, TV series or people by name and, when needed, narrow
+            movie and TV results by year.
           </p>
         </div>
 
@@ -135,8 +133,8 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">
-                  {totalResults.toLocaleString()}{' '}
-                  {totalResults === 1 ? 'result' : 'results'}
+                  {results?.totalResults.toLocaleString() ?? 0}{' '}
+                  {(results?.totalResults ?? 0) === 1 ? 'result' : 'results'}
                 </p>
 
                 <h2 className="mt-1 font-heading text-2xl font-bold tracking-tight">
@@ -169,7 +167,9 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                     <PeopleSearchResults people={results.people} />
                   </div>
                 ) : (
-                  <MediaSearchResults media={results.media} />
+                  <div className="mt-10">
+                    <MediaSearchResults media={results.media} />
+                  </div>
                 )}
 
                 <SearchPagination
@@ -177,7 +177,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                   totalPages={results.totalPages}
                   query={query}
                   type={type}
-                  year={type === 'all' || type === 'person' ? undefined : year}
+                  year={type === 'movie' || type === 'tv' ? year : undefined}
                 />
               </>
             ) : (
