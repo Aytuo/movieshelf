@@ -108,7 +108,7 @@ export const tmdbMovieRepository: MovieRepository = {
           voteCountGte: 10_000,
           primaryReleaseDateLte: today,
         }),
-      200
+      500
     );
 
     return candidates.map(mapTmdbMovie);

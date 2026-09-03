@@ -93,7 +93,7 @@ export const tmdbTvRepository: TvRepository = {
           sortBy: 'vote_average.desc',
           voteCountGte: 10_000,
         }),
-      200
+      500
     );
 
     return candidates.map(mapTmdbTv);

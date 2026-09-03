@@ -1,4 +1,4 @@
-import { TmdbPagedResponse } from '../tmdb/types';
+import type { TmdbPagedResponse } from '../tmdb/types';
 
 const TMDB_PAGE_SIZE = 20;
 
@@ -8,11 +8,21 @@ export async function collectPagedResults<TResult>(
 ): Promise<TResult[]> {
   const pagesNeeded = Math.ceil(targetCount / TMDB_PAGE_SIZE);
 
-  const responses = await Promise.all(
-    Array.from({ length: pagesNeeded }, (_, index) => fetchPage(index + 1))
-  );
+  const results: TResult[] = [];
 
-  return responses
-    .flatMap((response) => response.results)
-    .slice(0, targetCount);
+  for (let page = 1; page <= pagesNeeded; page += 1) {
+    const response = await fetchPage(page);
+
+    results.push(...response.results);
+
+    if (results.length >= targetCount) {
+      break;
+    }
+
+    if (page >= response.total_pages) {
+      break;
+    }
+  }
+
+  return results.slice(0, targetCount);
 }
