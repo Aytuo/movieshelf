@@ -41,7 +41,7 @@ export async function getMovieCatalogSections(): Promise<MovieCatalogSections> {
 }
 
 export async function getTvCatalogSections(): Promise<TvCatalogSections> {
-  const [trending, popular, topPicks, topRated, airingToday, onTheAir] =
+  const [popular, trending, topPicks, airingToday, onTheAir, topRated] =
     await Promise.all([
       tmdbTvRepository.getPopular(),
       tmdbTvRepository.getTrending(),

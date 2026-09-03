@@ -20,7 +20,7 @@ export default async function TvSeriesPage() {
         {
           type: 'carousel',
           eyebrow: 'Trending now',
-          title: "What's hot this week",
+          title: "What's hot today",
           description:
             'The series everyone seems to be talking about right now.',
           media: sections.trending,
@@ -28,7 +28,7 @@ export default async function TvSeriesPage() {
         {
           type: 'ranking',
           eyebrow: 'Weekly top 10',
-          title: 'Top 10 TV series this week',
+          title: 'Top picks this week',
           description: 'The biggest shows of the week, ranked.',
           media: sections.topPicks,
         },

@@ -27,18 +27,13 @@ export const tmdbTvRepository: TvRepository = {
   },
 
   async getTrending() {
-    const result = await getTrending('week');
+    const result = await getTrending('day');
 
     return result.results.map(mapTmdbTv);
   },
 
   async getTopPicks() {
-    const result = await discover({
-      page: 1,
-      sortBy: 'vote_average.desc',
-      voteAverageGte: 7.5,
-      voteCountGte: 500,
-    });
+    const result = await getTrending('week');
 
     return result.results.map(mapTmdbTv).slice(0, 10);
   },
@@ -76,8 +71,7 @@ export const tmdbTvRepository: TvRepository = {
     const result = await discover({
       page: 1,
       sortBy: 'vote_average.desc',
-      voteAverageGte: 8,
-      voteCountGte: 1000,
+      voteCountGte: 10_000,
     });
 
     return result.results

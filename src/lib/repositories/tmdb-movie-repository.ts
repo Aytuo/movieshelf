@@ -27,18 +27,13 @@ export const tmdbMovieRepository: MovieRepository = {
   },
 
   async getTrending() {
-    const result = await getTrending('week');
+    const result = await getTrending('day');
 
     return result.results.map(mapTmdbMovie);
   },
 
   async getTopPicks() {
-    const result = await discover({
-      page: 1,
-      sortBy: 'vote_average.desc',
-      voteAverageGte: 7.5,
-      voteCountGte: 500,
-    });
+    const result = await getTrending('week');
 
     return result.results.map(mapTmdbMovie).slice(0, 10);
   },
