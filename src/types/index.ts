@@ -2,6 +2,7 @@ export * from './discover';
 export * from './media';
 export * from './people';
 export * from './profile';
+export * from './rankings';
 export * from './recommendations';
 export * from './reviews';
 export * from './search';

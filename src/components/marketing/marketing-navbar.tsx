@@ -1,4 +1,4 @@
-import { ArrowRight, Film } from 'lucide-react';
+import { ArrowRight, Clapperboard } from 'lucide-react';
 import Link from 'next/link';
 
 type MarketingNavbarProps = {
@@ -15,7 +15,7 @@ const MarketingNavbar = ({ authenticated = false }: MarketingNavbarProps) => {
             className="group flex items-center gap-2.5"
           >
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-[0_0_24px_var(--primary-glow)] transition-transform duration-200 group-hover:scale-105">
-              <Film className="size-4" />
+              <Clapperboard className="size-4" />
             </span>
 
             <span className="text-lg font-bold tracking-tight">

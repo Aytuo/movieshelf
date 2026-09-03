@@ -8,6 +8,7 @@ import {
   search as searchMovies,
 } from '@/lib/tmdb/movie-api';
 import { MovieDiscoverFilters } from '@/types';
+import { collectPagedResults } from '../rankings/pagination';
 import { paginateSearchItems } from '../search/pagination';
 import { mapTmdbMovie, mapTmdbMovieDetails } from '../tmdb/media-mapper';
 import { MovieRepository } from './types';
@@ -94,6 +95,23 @@ export const tmdbMovieRepository: MovieRepository = {
     });
 
     return result.results.map(mapTmdbMovie);
+  },
+
+  async getRankingCandidates() {
+    const today = toDateString(new Date());
+
+    const candidates = await collectPagedResults(
+      (page) =>
+        discover({
+          page,
+          sortBy: 'vote_average.desc',
+          voteCountGte: 10_000,
+          primaryReleaseDateLte: today,
+        }),
+      200
+    );
+
+    return candidates.map(mapTmdbMovie);
   },
 
   async search(query, options) {

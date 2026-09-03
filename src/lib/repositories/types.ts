@@ -22,6 +22,7 @@ export interface MovieRepository {
   getNowPlaying(): Promise<Media[]>;
   getUpcoming(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
+  getRankingCandidates(): Promise<Media[]>;
 
   search(query: string, options?: SearchOptions): Promise<MediaSearchResult>;
 
@@ -40,6 +41,7 @@ export interface TvRepository {
   getAiringToday(): Promise<Media[]>;
   getOnTheAir(): Promise<Media[]>;
   getTopRated(): Promise<Media[]>;
+  getRankingCandidates(): Promise<Media[]>;
 
   search(query: string, options?: SearchOptions): Promise<MediaSearchResult>;
 

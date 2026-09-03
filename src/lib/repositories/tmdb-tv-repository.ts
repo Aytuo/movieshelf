@@ -8,6 +8,7 @@ import {
   search as searchTv,
 } from '@/lib/tmdb/tv-api';
 import { TvDiscoverFilters } from '@/types';
+import { collectPagedResults } from '../rankings/pagination';
 import { paginateSearchItems } from '../search/pagination';
 import { mapTmdbTv, mapTmdbTvDetails } from '../tmdb/media-mapper';
 import { TvRepository } from './types';
@@ -82,6 +83,20 @@ export const tmdbTvRepository: TvRepository = {
     return result.results
       .map(mapTmdbTv)
       .filter((show) => show.voteCount >= 1000);
+  },
+
+  async getRankingCandidates() {
+    const candidates = await collectPagedResults(
+      (page) =>
+        discover({
+          page,
+          sortBy: 'vote_average.desc',
+          voteCountGte: 10_000,
+        }),
+      200
+    );
+
+    return candidates.map(mapTmdbTv);
   },
 
   async search(query, options) {

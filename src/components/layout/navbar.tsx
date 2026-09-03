@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Profile, User } from '@/types';
-import { Compass, Film, Menu, Tv, X } from 'lucide-react';
+import { Clapperboard, Compass, Film, Menu, Trophy, Tv, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -24,6 +24,11 @@ const navLinks = [
     label: 'Discover',
     href: '/discover',
     icon: Compass,
+  },
+  {
+    label: 'Rankings',
+    href: '/rankings',
+    icon: Trophy,
   },
 ];
 
@@ -62,7 +67,7 @@ const Navbar = ({ user, profile }: NavbarProps) => {
             onClick={() => setMobileOpen(false)}
           >
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-[0_0_24px_var(--primary-glow)] transition-transform duration-200 group-hover:scale-105">
-              <Film className="size-4" strokeWidth={2.2} />
+              <Clapperboard className="size-4" strokeWidth={2.2} />
             </span>
 
             <span className="text-lg font-bold tracking-tight">
