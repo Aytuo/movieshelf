@@ -8,7 +8,7 @@ import {
   search as searchMovies,
 } from '@/lib/tmdb/movie-api';
 import { MovieDiscoverFilters } from '@/types';
-import { paginateSearchResults } from '../search/pagination';
+import { paginateSearchItems } from '../search/pagination';
 import { mapTmdbMovie, mapTmdbMovieDetails } from '../tmdb/media-mapper';
 import { MovieRepository } from './types';
 
@@ -97,12 +97,15 @@ export const tmdbMovieRepository: MovieRepository = {
   },
 
   async search(query, options) {
-    const result = await paginateSearchResults(options?.page ?? 1, (page) =>
-      searchMovies(query, page, options?.year)
+    const page = options?.page ?? 1;
+    const year = options?.year;
+
+    const result = await paginateSearchItems(page, (tmdbPage) =>
+      searchMovies(query, tmdbPage, year)
     );
 
     return {
-      media: result.media.map(mapTmdbMovie),
+      media: result.items.map(mapTmdbMovie),
       page: result.page,
       totalResults: result.totalResults,
       totalPages: result.totalPages,

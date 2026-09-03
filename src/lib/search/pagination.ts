@@ -20,19 +20,18 @@ export function getSearchSlice(appPage: number) {
   };
 }
 
-export async function paginateSearchResults<TResult>(
+export async function paginateSearchItems<TResult>(
   appPage: number,
   fetchPage: (tmdbPage: number) => Promise<TmdbPagedResponse<TResult>>
 ) {
   const firstResponse = await fetchPage(1);
 
   const totalResults = firstResponse.total_results;
-
   const totalPages = getSearchTotalPages(totalResults);
 
   if (totalResults === 0 || appPage > totalPages) {
     return {
-      media: [],
+      items: [],
       page: appPage,
       totalResults,
       totalPages,
@@ -60,7 +59,7 @@ export async function paginateSearchResults<TResult>(
   const { start, end } = getSearchSlice(appPage);
 
   return {
-    media: candidates.slice(start, end),
+    items: candidates.slice(start, end),
     page: appPage,
     totalResults,
     totalPages,

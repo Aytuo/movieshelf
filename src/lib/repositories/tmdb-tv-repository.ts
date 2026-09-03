@@ -8,7 +8,7 @@ import {
   search as searchTv,
 } from '@/lib/tmdb/tv-api';
 import { TvDiscoverFilters } from '@/types';
-import { paginateSearchResults } from '../search/pagination';
+import { paginateSearchItems } from '../search/pagination';
 import { mapTmdbTv, mapTmdbTvDetails } from '../tmdb/media-mapper';
 import { TvRepository } from './types';
 
@@ -85,12 +85,15 @@ export const tmdbTvRepository: TvRepository = {
   },
 
   async search(query, options) {
-    const result = await paginateSearchResults(options?.page ?? 1, (page) =>
-      searchTv(query, page, options?.year)
+    const page = options?.page ?? 1;
+    const year = options?.year;
+
+    const result = await paginateSearchItems(page, (tmdbPage) =>
+      searchTv(query, tmdbPage, year)
     );
 
     return {
-      media: result.media.map(mapTmdbTv),
+      media: result.items.map(mapTmdbTv),
       page: result.page,
       totalResults: result.totalResults,
       totalPages: result.totalPages,

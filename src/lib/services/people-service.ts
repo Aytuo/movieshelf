@@ -3,6 +3,7 @@ import {
   searchPeople as searchPeopleApi,
 } from '@/lib/tmdb/people-api';
 import type { PersonCredit, PersonProfile, PersonSearchResult } from '@/types';
+import { paginateSearchItems } from '../search/pagination';
 import {
   mapTmdbPerson,
   mapTmdbPersonCastCredit,
@@ -186,12 +187,14 @@ export async function searchPeople(
   query: string,
   page = 1
 ): Promise<PersonSearchResult> {
-  const response = await searchPeopleApi(query, page);
+  const response = await paginateSearchItems(page, (tmdbPage) =>
+    searchPeopleApi(query, tmdbPage)
+  );
 
   return {
-    people: response.results.map(mapTmdbPersonSearchItem),
+    people: response.items.map(mapTmdbPersonSearchItem),
     page: response.page,
-    totalPages: response.total_pages,
-    totalResults: response.total_results,
+    totalPages: response.totalPages,
+    totalResults: response.totalResults,
   };
 }
