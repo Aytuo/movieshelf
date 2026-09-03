@@ -1,4 +1,5 @@
-import { Film } from 'lucide-react';
+import { Clapperboard } from 'lucide-react';
+
 import Link from 'next/link';
 
 const footerLinks = [
@@ -6,14 +7,10 @@ const footerLinks = [
     label: 'Discover',
     href: '/discover',
   },
-  // {
-  //   label: 'My Shelf',
-  //   href: '/shelf',
-  // },
-  // {
-  //   label: 'Favorites',
-  //   href: '/favorites',
-  // },
+  {
+    label: 'Rankings',
+    href: '/rankings',
+  },
   {
     label: 'About',
     href: '/about',
@@ -30,23 +27,24 @@ const Footer = () => {
             <div className="max-w-sm">
               <Link href="/" className="inline-flex items-center gap-2.5">
                 <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Film className="size-4" />
+                  <Clapperboard className="size-4" />
                 </span>
 
                 <span className="text-lg font-bold tracking-tight">
-                  Movie<span className="text-primary">Shelf</span>
+                  Movie
+                  <span className="text-primary">Shelf</span>
                 </span>
               </Link>
 
               <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                Your personal movie shelf. Discover films, build your
+                Your personal movie and TV shelf. Discover films, build your
                 collection, rate what you watch and develop your own taste.
               </p>
             </div>
 
             <nav
               aria-label="Footer navigation"
-              className="grid grid-cols-2 gap-x-10 gap-y-3"
+              className="grid grid-cols-3 gap-x-10 gap-y-3"
             >
               {footerLinks.map((link) => (
                 <Link

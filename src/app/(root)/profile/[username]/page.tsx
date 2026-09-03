@@ -1,7 +1,7 @@
 import ProfileNavbar from '@/components/profile/profile-navbar';
 import { getPublicProfile } from '@/lib/services/profile-service';
 import { tmdbImage } from '@/lib/tmdb/images';
-import { Film, Heart, Star } from 'lucide-react';
+import { Film, Heart, Star, Tv } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -119,7 +119,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           <section className="rounded-2xl p-5 surface">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Film className="size-4 text-primary" />
+                <Tv className="size-4 text-primary" />
 
                 <p className="text-sm font-semibold">TV Series</p>
               </div>
