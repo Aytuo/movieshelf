@@ -2,7 +2,12 @@ import {
   getPersonDetails,
   searchPeople as searchPeopleApi,
 } from '@/lib/tmdb/people-api';
-import type { PersonCredit, PersonProfile, PersonSearchResult } from '@/types';
+import type {
+  Person,
+  PersonCredit,
+  PersonProfile,
+  PersonSearchResult,
+} from '@/types';
 import { paginateSearchItems } from '../search/pagination';
 import {
   mapTmdbPerson,
@@ -28,39 +33,118 @@ function isNonRoleAppearance(credit: PersonCredit) {
   ].some((value) => character.includes(value));
 }
 
-function getKnownForScore(credit: PersonCredit) {
+function isKnownForCrewRole(
+  credit: PersonCredit,
+  department: string | null
+): boolean {
+  switch (department) {
+    case 'Directing':
+      return credit.job === 'Director';
+
+    case 'Writing':
+      return (
+        credit.job === 'Writer' ||
+        credit.job === 'Screenplay' ||
+        credit.job === 'Story'
+      );
+
+    case 'Production':
+      return (
+        credit.job === 'Producer' ||
+        credit.job === 'Executive Producer' ||
+        credit.job === 'Co-Producer' ||
+        credit.job === 'Associate Producer'
+      );
+
+    default:
+      return false;
+  }
+}
+
+function getKnownForScore(
+  credit: PersonCredit,
+  department: string | null
+): number {
   const voteScore = Math.log10(credit.voteCount + 1);
   const popularityScore = Math.log10(credit.popularity + 1);
   const ratingScore = credit.rating / 10;
 
-  const billingBonus =
-    credit.castOrder !== null ? Math.max(0, 1 - credit.castOrder / 20) : 0;
+  if (department === 'Acting') {
+    const billingBonus =
+      credit.castOrder !== null ? Math.max(0, 1 - credit.castOrder / 20) : 0;
 
-  const mediaBonus = credit.type === 'movie' ? 0.2 : 0;
+    const mediaBonus = credit.type === 'movie' ? 0.2 : 0;
 
-  const tvAppearancePenalty =
-    credit.type === 'tv' && (credit.episodeCount ?? 0) <= 1 ? 0.35 : 1;
+    const tvAppearancePenalty =
+      credit.type === 'tv' && (credit.episodeCount ?? 0) <= 1 ? 0.35 : 1;
 
-  return (
-    (voteScore * 0.45 +
-      popularityScore * 0.25 +
-      ratingScore * 0.2 +
-      billingBonus * 0.1 +
-      mediaBonus) *
-    tvAppearancePenalty
-  );
+    return (
+      (voteScore * 0.45 +
+        popularityScore * 0.25 +
+        ratingScore * 0.2 +
+        billingBonus * 0.1 +
+        mediaBonus) *
+      tvAppearancePenalty
+    );
+  }
+
+  let score = voteScore * 0.45 + popularityScore * 0.35 + ratingScore * 0.2;
+
+  if (department === 'Directing') {
+    if (credit.type === 'movie') {
+      score *= 1.25;
+    } else {
+      score *= 0.3;
+    }
+  }
+
+  if (department === 'Writing') {
+    if (credit.type === 'movie') {
+      score *= 1.15;
+    } else {
+      score *= 0.8;
+    }
+  }
+
+  if (department === 'Production') {
+    if (credit.type === 'movie') {
+      score *= 1.1;
+    } else {
+      score *= 0.75;
+    }
+  }
+
+  return score;
 }
 
-function getKnownFor(credits: PersonCredit[]) {
-  return credits
+function getKnownFor(
+  person: Person,
+  castCredits: PersonCredit[],
+  crewCredits: PersonCredit[]
+): PersonCredit[] {
+  if (person.knownForDepartment === 'Acting') {
+    return castCredits
+      .filter((credit) => !isNonRoleAppearance(credit))
+      .filter(
+        (credit) =>
+          credit.type === 'tv' ||
+          credit.castOrder === null ||
+          credit.castOrder <= 20
+      )
+      .sort(
+        (a, b) => getKnownForScore(b, 'Acting') - getKnownForScore(a, 'Acting')
+      )
+      .slice(0, 10);
+  }
+
+  return crewCredits
     .filter((credit) => !isNonRoleAppearance(credit))
-    .filter(
-      (credit) =>
-        credit.type === 'tv' ||
-        credit.castOrder === null ||
-        credit.castOrder <= 20
+    .filter((credit) => isKnownForCrewRole(credit, person.knownForDepartment))
+    .sort(
+      (a, b) =>
+        getKnownForScore(b, person.knownForDepartment) -
+        getKnownForScore(a, person.knownForDepartment)
     )
-    .sort((a, b) => getKnownForScore(b) - getKnownForScore(a))
     .slice(0, 10);
 }
 
@@ -113,22 +197,58 @@ function dedupeCredits(credits: PersonCredit[]): PersonCredit[] {
   });
 }
 
-function getCrewSections(credits: PersonCredit[]) {
-  const directing = credits.filter((credit) => credit.job === 'Director');
+function dedupeCrewCredits(credits: PersonCredit[]): PersonCredit[] {
+  const seen = new Set<string>();
 
-  const writing = credits.filter(
-    (credit) =>
-      credit.job === 'Writer' ||
-      credit.job === 'Screenplay' ||
-      credit.job === 'Story'
+  return credits.filter((credit) => {
+    const key = `${credit.type}:${credit.tmdbId}:${credit.job}:${credit.creditId}`;
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
+function dedupeCreditsByMedia(credits: PersonCredit[]): PersonCredit[] {
+  const seen = new Set<string>();
+
+  return credits.filter((credit) => {
+    const key = `${credit.type}:${credit.tmdbId}`;
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
+function getCrewSections(credits: PersonCredit[]) {
+  const directing = dedupeCreditsByMedia(
+    credits.filter((credit) => credit.job === 'Director')
   );
 
-  const production = credits.filter(
-    (credit) =>
-      credit.job === 'Producer' ||
-      credit.job === 'Executive Producer' ||
-      credit.job === 'Co-Producer' ||
-      credit.job === 'Associate Producer'
+  const writing = dedupeCreditsByMedia(
+    credits.filter(
+      (credit) =>
+        credit.job === 'Writer' ||
+        credit.job === 'Screenplay' ||
+        credit.job === 'Story'
+    )
+  );
+
+  const production = dedupeCreditsByMedia(
+    credits.filter(
+      (credit) =>
+        credit.job === 'Producer' ||
+        credit.job === 'Executive Producer' ||
+        credit.job === 'Co-Producer' ||
+        credit.job === 'Associate Producer'
+    )
   );
 
   const categorized = new Set(
@@ -137,9 +257,11 @@ function getCrewSections(credits: PersonCredit[]) {
     )
   );
 
-  const otherCrew = credits.filter(
-    (credit) =>
-      !categorized.has(`${credit.type}:${credit.tmdbId}:${credit.creditId}`)
+  const otherCrew = dedupeCreditsByMedia(
+    credits.filter(
+      (credit) =>
+        !categorized.has(`${credit.type}:${credit.tmdbId}:${credit.creditId}`)
+    )
   );
 
   return {
@@ -163,17 +285,19 @@ export async function getPersonProfile(
   const crew = (data.combined_credits?.crew ?? []).map(mapTmdbPersonCrewCredit);
 
   const dedupedCast = dedupeCredits(cast);
-  const dedupedCrew = dedupeCredits(crew);
+  const dedupedCrew = dedupeCrewCredits(crew);
 
   const acting = splitActingCredits(dedupedCast);
 
   const { directing, writing, production, otherCrew } =
     getCrewSections(dedupedCrew);
 
-  const knownFor = getKnownFor(dedupedCast);
+  const person = mapTmdbPerson(data);
+
+  const knownFor = getKnownFor(person, dedupedCast, dedupedCrew);
 
   return {
-    person: mapTmdbPerson(data),
+    person,
     knownFor,
     acting,
     directing: sortCreditsByDate(directing),
