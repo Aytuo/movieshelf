@@ -1,5 +1,11 @@
 import { tmdbFetch } from './client';
-import type { TmdbPagedResponse, TmdbTvBundle, TmdbTvResult } from './types';
+import type {
+  TmdbPagedResponse,
+  TmdbTvBundle,
+  TmdbTvEpisode,
+  TmdbTvResult,
+  TmdbTvSeasonDetails,
+} from './types';
 
 export type TmdbTvDiscoverParams = {
   page?: number;
@@ -143,6 +149,25 @@ export async function getPopular(page = 1) {
 export async function getTrending(timeWindow: 'day' | 'week' = 'week') {
   return tmdbFetch<TmdbPagedResponse<TmdbTvResult>>(
     `/trending/tv/${timeWindow}`,
+    {
+      language: 'en-US',
+    }
+  );
+}
+
+export async function getSeason(tvId: number, seasonNumber: number) {
+  return tmdbFetch<TmdbTvSeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`, {
+    language: 'en-US',
+  });
+}
+
+export async function getEpisode(
+  tvId: number,
+  seasonNumber: number,
+  episodeNumber: number
+) {
+  return tmdbFetch<TmdbTvEpisode>(
+    `/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`,
     {
       language: 'en-US',
     }

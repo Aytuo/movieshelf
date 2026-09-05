@@ -125,6 +125,8 @@ export type TmdbTvDetails = {
   backdrop_path: string | null;
   first_air_date: string;
   last_air_date: string | null;
+  last_episode_to_air: TmdbTvEpisode | null;
+  next_episode_to_air: TmdbTvEpisode | null;
   genres: {
     id: number;
     name: string;
@@ -178,6 +180,27 @@ export type TmdbTvBundle = TmdbTvDetails & {
   videos?: TmdbVideosResponse;
   similar?: TmdbPagedResponse<TmdbTvResult>;
   recommendations?: TmdbPagedResponse<TmdbTvResult>;
+};
+
+/* ========================================================================== */
+/*                         TV SEASONS & EPISODES                              */
+/* ========================================================================== */
+
+export type TmdbTvEpisode = {
+  id: number;
+  name: string;
+  overview: string | null;
+  air_date: string | null;
+  episode_number: number;
+  season_number: number;
+  runtime: number | null;
+  still_path: string | null;
+  vote_average: number;
+  vote_count: number;
+};
+
+export type TmdbTvSeasonDetails = TmdbTvSeason & {
+  episodes: TmdbTvEpisode[];
 };
 
 /* ========================================================================== */

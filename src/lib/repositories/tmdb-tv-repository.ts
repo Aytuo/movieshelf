@@ -1,8 +1,14 @@
 import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
-import type { TvShow } from '@/lib/media';
+import type {
+  TvEpisode,
+  TvScheduleItem,
+  TvSeasonDetails,
+  TvShow,
+} from '@/lib/media';
 import {
   discover,
   getPopular,
+  getSeason,
   getTrending,
   getTv,
   search as searchTv,
@@ -10,7 +16,12 @@ import {
 import { TvDiscoverFilters } from '@/types';
 import { collectPagedResults } from '../rankings/pagination';
 import { paginateSearchItems } from '../search/pagination';
-import { mapTmdbTv, mapTmdbTvDetails } from '../tmdb/media-mapper';
+import {
+  mapTmdbTv,
+  mapTmdbTvDetails,
+  mapTmdbTvSeasonDetails,
+  mapTvEpisode,
+} from '../tmdb/media-mapper';
 import { TvRepository } from './types';
 
 export const tmdbTvRepository: TvRepository = {
@@ -35,7 +46,7 @@ export const tmdbTvRepository: TvRepository = {
   async getTopPicks() {
     const result = await getTrending('week');
 
-    return result.results.map(mapTmdbTv).slice(0, 10);
+    return result.results.map(mapTmdbTv);
   },
 
   async getAiringToday() {
@@ -48,23 +59,55 @@ export const tmdbTvRepository: TvRepository = {
       airDateLte: today,
     });
 
-    return result.results.map(mapTmdbTv);
+    const shows = result.results.map(mapTmdbTv);
+
+    return toScheduleItems(shows, async (showId) => {
+      const details = await getTv(showId);
+
+      if (details.last_episode_to_air?.air_date === today) {
+        return mapTvEpisode(details.last_episode_to_air);
+      }
+
+      if (details.next_episode_to_air?.air_date === today) {
+        return mapTvEpisode(details.next_episode_to_air);
+      }
+
+      return null;
+    });
   },
 
   async getOnTheAir() {
     const today = new Date();
-
     const nextWeek = new Date(today);
+
     nextWeek.setDate(nextWeek.getDate() + 7);
+
+    const todayString = toDateString(today);
+    const nextWeekString = toDateString(nextWeek);
 
     const result = await discover({
       page: 1,
       sortBy: 'popularity.desc',
-      airDateGte: toDateString(today),
-      airDateLte: toDateString(nextWeek),
+      airDateGte: todayString,
+      airDateLte: nextWeekString,
     });
 
-    return result.results.map(mapTmdbTv);
+    const shows = result.results.map(mapTmdbTv);
+
+    return toScheduleItems(shows, async (showId) => {
+      const details = await getTv(showId);
+      const episode = details.next_episode_to_air;
+
+      if (!episode?.air_date) {
+        return null;
+      }
+
+      if (episode.air_date < todayString || episode.air_date > nextWeekString) {
+        return null;
+      }
+
+      return mapTvEpisode(episode);
+    });
   },
 
   async getTopRated() {
@@ -74,9 +117,7 @@ export const tmdbTvRepository: TvRepository = {
       voteCountGte: 10_000,
     });
 
-    return result.results
-      .map(mapTmdbTv)
-      .filter((show) => show.voteCount >= 1000);
+    return result.results.map(mapTmdbTv);
   },
 
   async getRankingCandidates() {
@@ -91,6 +132,15 @@ export const tmdbTvRepository: TvRepository = {
     );
 
     return candidates.map(mapTmdbTv);
+  },
+
+  async getSeason(
+    tvId: number,
+    seasonNumber: number
+  ): Promise<TvSeasonDetails> {
+    const response = await getSeason(tvId, seasonNumber);
+
+    return mapTmdbTvSeasonDetails(response);
   },
 
   async search(query, options) {
@@ -216,4 +266,26 @@ function toTmdbDiscoverParams(filters: TvDiscoverFilters, page: number) {
 
 function toDateString(date: Date) {
   return date.toISOString().split('T')[0];
+}
+
+async function toScheduleItems(
+  shows: TvShow[],
+  getEpisode: (showId: number) => Promise<TvEpisode | null>
+): Promise<TvScheduleItem[]> {
+  const results = await Promise.all(
+    shows.map(async (show) => {
+      const episode = await getEpisode(show.tmdbId);
+
+      if (!episode) {
+        return null;
+      }
+
+      return {
+        media: show,
+        episode,
+      };
+    })
+  );
+
+  return results.filter((item): item is TvScheduleItem => item !== null);
 }

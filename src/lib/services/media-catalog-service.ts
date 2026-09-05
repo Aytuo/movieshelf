@@ -1,9 +1,9 @@
-import type { Media } from '@/lib/media';
+import type { Media, TvScheduleItem } from '@/lib/media';
 import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
 
 export type MovieCatalogSections = {
-  trending: Media[];
   popular: Media[];
+  trending: Media[];
   topPicks: Media[];
   nowPlaying: Media[];
   upcoming: Media[];
@@ -11,11 +11,11 @@ export type MovieCatalogSections = {
 };
 
 export type TvCatalogSections = {
-  trending: Media[];
   popular: Media[];
+  trending: Media[];
   topPicks: Media[];
-  airingToday: Media[];
-  onTheAir: Media[];
+  airingToday: TvScheduleItem[];
+  onTheAir: TvScheduleItem[];
   topRated: Media[];
 };
 

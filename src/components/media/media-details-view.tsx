@@ -2,8 +2,10 @@ import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { MediaInteraction } from '@/types';
 import { Star } from 'lucide-react';
+import Link from 'next/link';
 import ReviewCard from '../reviews/review-card';
 import ReviewForm from '../reviews/review-form';
+import TvSeasons from '../tv/tv-seasons';
 import MediaActions from './media-actions';
 import MediaCast from './media-cast';
 import MediaRecommendations from './media-recommendations';
@@ -203,12 +205,13 @@ const MediaDetailsView = ({
 
                         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
                           {directors.map((person) => (
-                            <span
+                            <Link
                               key={`${person.id}-${person.job}`}
-                              className="text-sm font-medium text-foreground"
+                              href={`/person/${person.id}`}
+                              className="text-sm font-medium text-foreground transition-colors hover:text-primary"
                             >
                               {person.name}
-                            </span>
+                            </Link>
                           ))}
                         </div>
                       </div>
@@ -222,12 +225,13 @@ const MediaDetailsView = ({
 
                         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
                           {writers.map((person) => (
-                            <span
+                            <Link
                               key={`${person.id}-${person.job}`}
-                              className="text-sm font-medium text-foreground"
+                              href={`/person/${person.id}`}
+                              className="text-sm font-medium text-foreground transition-colors hover:text-primary"
                             >
                               {person.name}
-                            </span>
+                            </Link>
                           ))}
                         </div>
                       </div>
@@ -237,36 +241,55 @@ const MediaDetailsView = ({
 
               {/* TV-specific metadata */}
               {media.type === 'tv' && (
-                <div className="mt-7 grid gap-4 sm:grid-cols-3">
-                  <div>
-                    <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Seasons
-                    </p>
+                <div className="mt-7">
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                        Seasons
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {media.numberOfSeasons}
+                      </p>
+                    </div>
 
-                    <p className="mt-2 text-sm font-medium">
-                      {media.numberOfSeasons}
-                    </p>
+                    <div>
+                      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                        Episodes
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {media.numberOfEpisodes}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                        Status
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {media.status ?? '—'}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Episodes
-                    </p>
+                  {media.creators.length > 0 && (
+                    <div className="mt-6">
+                      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                        Created by
+                      </p>
 
-                    <p className="mt-2 text-sm font-medium">
-                      {media.numberOfEpisodes}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Status
-                    </p>
-
-                    <p className="mt-2 text-sm font-medium">
-                      {media.status ?? '—'}
-                    </p>
-                  </div>
+                      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                        {media.creators.map((creator) => (
+                          <Link
+                            key={creator.id}
+                            href={`/person/${creator.id}`}
+                            className="text-sm font-medium text-foreground transition-colors hover:text-primary"
+                          >
+                            {creator.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -301,67 +324,7 @@ const MediaDetailsView = ({
       {/* ---------------------------------------------------------------- */}
 
       {media.type === 'tv' && media.seasons.length > 0 && (
-        <section className="border-t border-border/60">
-          <div className="container-content py-14 lg:py-20">
-            <div className="mb-8">
-              <p className="eyebrow">Series information</p>
-
-              <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-                Seasons
-              </h2>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {media.seasons
-                .filter((season) => season.seasonNumber >= 0)
-                .map((season) => {
-                  const seasonPoster = tmdbImage(season.posterPath, 'w342');
-
-                  return (
-                    <article
-                      key={season.id}
-                      className="overflow-hidden rounded-2xl surface"
-                    >
-                      <div className="grid grid-cols-[96px_1fr] gap-4">
-                        <div className="aspect-[2/3] bg-surface-hover">
-                          {seasonPoster && (
-                            <img
-                              src={seasonPoster}
-                              alt={`${season.name} poster`}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </div>
-
-                        <div className="py-4 pr-4">
-                          <h3 className="font-heading text-base font-semibold">
-                            {season.name}
-                          </h3>
-
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {season.episodeCount}{' '}
-                            {season.episodeCount === 1 ? 'episode' : 'episodes'}
-                          </p>
-
-                          {season.airDate && (
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              {getYear(season.airDate) ?? '—'}
-                            </p>
-                          )}
-
-                          {season.overview && (
-                            <p className="mt-3 line-clamp-4 text-xs leading-5 text-muted-foreground">
-                              {season.overview}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
-            </div>
-          </div>
-        </section>
+        <TvSeasons tvId={media.tmdbId} seasons={media.seasons} />
       )}
 
       {/* ---------------------------------------------------------------- */}
