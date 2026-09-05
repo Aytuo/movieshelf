@@ -1,4 +1,10 @@
-import type { Media, MovieDetails, TvDetails } from '@/lib/media';
+import type {
+  Media,
+  MovieDetails,
+  TvDetails,
+  TvScheduleItem,
+  TvSeasonDetails,
+} from '@/lib/media';
 import type {
   DiscoverOptions,
   DiscoverResult,
@@ -38,10 +44,12 @@ export interface TvRepository {
   getPopular(): Promise<Media[]>;
   getTrending(): Promise<Media[]>;
   getTopPicks(): Promise<Media[]>;
-  getAiringToday(): Promise<Media[]>;
-  getOnTheAir(): Promise<Media[]>;
+  getAiringToday(): Promise<TvScheduleItem[]>;
+  getOnTheAir(): Promise<TvScheduleItem[]>;
   getTopRated(): Promise<Media[]>;
   getRankingCandidates(): Promise<Media[]>;
+
+  getSeason(tvId: number, seasonNumber: number): Promise<TvSeasonDetails>;
 
   search(query: string, options?: SearchOptions): Promise<MediaSearchResult>;
 

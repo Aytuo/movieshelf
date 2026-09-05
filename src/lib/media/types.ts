@@ -92,15 +92,37 @@ export interface MovieDetails extends BaseMediaDetails {
   runtime: number | null;
 }
 
-export interface TvSeason {
+export type TvSeason = {
   id: number;
-  name: string;
-  overview: string;
   seasonNumber: number;
-  episodeCount: number;
+  name: string;
+  overview: string | null;
   airDate: string | null;
+  episodeCount: number;
   posterPath: string | null;
-}
+};
+
+export type TvEpisode = {
+  id: number;
+  seasonNumber: number;
+  episodeNumber: number;
+  name: string;
+  overview: string | null;
+  airDate: string | null;
+  runtime: number | null;
+  stillPath: string | null;
+  rating: number;
+  voteCount: number;
+};
+
+export type TvScheduleItem = {
+  media: TvShow;
+  episode: TvEpisode;
+};
+
+export type TvSeasonDetails = TvSeason & {
+  episodes: TvEpisode[];
+};
 
 export interface TvCreator {
   id: number;
@@ -113,6 +135,8 @@ export interface TvDetails extends BaseMediaDetails {
   lastAirDate: string | null;
   numberOfSeasons: number;
   numberOfEpisodes: number;
+  lastEpisodeToAir: TvEpisode | null;
+  nextEpisodeToAir: TvEpisode | null;
   status: string | null;
   creators: TvCreator[];
   seasons: TvSeason[];

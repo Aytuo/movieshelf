@@ -7,7 +7,9 @@ import type {
   MovieDetails,
   TvCreator,
   TvDetails,
+  TvEpisode,
   TvSeason,
+  TvSeasonDetails,
   TvShow,
 } from '@/lib/media';
 import { TMDB_MOVIES_GENRES, TMDB_TV_GENRES } from './genres';
@@ -18,7 +20,9 @@ import type {
   TmdbMovieResult,
   TmdbTvAggregateCast,
   TmdbTvBundle,
+  TmdbTvEpisode,
   TmdbTvResult,
+  TmdbTvSeasonDetails,
   TmdbVideo,
 } from './types';
 
@@ -154,6 +158,21 @@ function mapTvSeason(season: {
   };
 }
 
+export function mapTvEpisode(episode: TmdbTvEpisode): TvEpisode {
+  return {
+    id: episode.id,
+    seasonNumber: episode.season_number,
+    episodeNumber: episode.episode_number,
+    name: episode.name,
+    overview: episode.overview,
+    airDate: episode.air_date,
+    runtime: episode.runtime,
+    stillPath: episode.still_path,
+    rating: episode.vote_average,
+    voteCount: episode.vote_count,
+  };
+}
+
 /* ========================================================================== */
 /*                              PUBLIC MAPPERS                                 */
 /* ========================================================================== */
@@ -200,5 +219,21 @@ export function mapTmdbTvDetails(tv: TmdbTvBundle): TvDetails {
     recommendations: (tv.recommendations?.results ?? [])
       .slice(0, 6)
       .map(mapTvResult),
+    lastEpisodeToAir: tv.last_episode_to_air
+      ? mapTvEpisode(tv.last_episode_to_air)
+      : null,
+
+    nextEpisodeToAir: tv.next_episode_to_air
+      ? mapTvEpisode(tv.next_episode_to_air)
+      : null,
+  };
+}
+
+export function mapTmdbTvSeasonDetails(
+  season: TmdbTvSeasonDetails
+): TvSeasonDetails {
+  return {
+    ...mapTvSeason(season),
+    episodes: season.episodes.map(mapTvEpisode),
   };
 }

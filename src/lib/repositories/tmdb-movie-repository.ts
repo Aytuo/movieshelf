@@ -35,7 +35,7 @@ export const tmdbMovieRepository: MovieRepository = {
   async getTopPicks() {
     const result = await getTrending('week');
 
-    return result.results.map(mapTmdbMovie).slice(0, 10);
+    return result.results.map(mapTmdbMovie);
   },
 
   async getNowPlaying() {

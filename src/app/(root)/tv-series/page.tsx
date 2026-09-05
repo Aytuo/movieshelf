@@ -33,18 +33,18 @@ export default async function TvSeriesPage() {
           media: sections.topPicks,
         },
         {
-          type: 'carousel',
+          type: 'schedule',
           eyebrow: 'Airing today',
           title: 'On today',
           description: 'Series with new episodes airing today.',
-          media: sections.airingToday,
+          items: sections.airingToday,
         },
         {
-          type: 'carousel',
+          type: 'schedule',
           eyebrow: 'Currently airing',
           title: 'On the air',
           description: 'Series currently in active release.',
-          media: sections.onTheAir,
+          items: sections.onTheAir,
         },
         {
           type: 'carousel',

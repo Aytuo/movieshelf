@@ -1,4 +1,4 @@
-import type { MediaDetails, MediaType } from '@/lib/media';
+import type { MediaDetails, MediaType, TvSeasonDetails } from '@/lib/media';
 import {
   getMediaRecordByTmdbId,
   getMediaReviews,
@@ -92,4 +92,15 @@ export async function getOrCreateMediaRecord(
     tmdbVoteCount: source.voteCount,
     tagline: source.tagline,
   });
+}
+
+/* ========================================================================== */
+/*                             GET TV SEASON DETAILS                          */
+/* ========================================================================== */
+
+export async function getTvSeason(
+  tvId: number,
+  seasonNumber: number
+): Promise<TvSeasonDetails> {
+  return tmdbTvRepository.getSeason(tvId, seasonNumber);
 }

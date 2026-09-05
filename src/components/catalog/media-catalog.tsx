@@ -1,6 +1,7 @@
 import RankedMediaList from '@/components/catalog/ranked-media-list';
 import MediaCarousel from '@/components/media/media-carousel';
-import type { Media } from '@/lib/media';
+import type { Media, TvScheduleItem } from '@/lib/media';
+import TvScheduleCarousel from '../tv/tv-schedule-carousel';
 
 type MediaCatalogCarouselBlock = {
   type: 'carousel';
@@ -18,8 +19,18 @@ type MediaCatalogRankingBlock = {
   media: Media[];
 };
 
+type MediaCatalogScheduleBlock = {
+  type: 'schedule';
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  items: TvScheduleItem[];
+};
+
 export type MediaCatalogBlock =
-  MediaCatalogCarouselBlock | MediaCatalogRankingBlock;
+  | MediaCatalogCarouselBlock
+  | MediaCatalogRankingBlock
+  | MediaCatalogScheduleBlock;
 
 type MediaCatalogProps = {
   eyebrow: string;
@@ -50,10 +61,12 @@ const MediaCatalog = ({
 
       <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
         {blocks.map((block, index) => {
+          const key = `${block.type}-${block.title}-${index}`;
+
           if (block.type === 'carousel') {
             return (
               <MediaCarousel
-                key={`${block.type}-${block.title}-${index}`}
+                key={key}
                 eyebrow={block.eyebrow}
                 title={block.title}
                 description={block.description}
@@ -62,9 +75,21 @@ const MediaCatalog = ({
             );
           }
 
+          if (block.type === 'schedule') {
+            return (
+              <TvScheduleCarousel
+                key={key}
+                eyebrow={block.eyebrow}
+                title={block.title}
+                description={block.description}
+                items={block.items}
+              />
+            );
+          }
+
           return (
             <RankedMediaList
-              key={`${block.type}-${block.title}-${index}`}
+              key={key}
               eyebrow={block.eyebrow}
               title={block.title}
               description={block.description}
