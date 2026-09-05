@@ -9,7 +9,11 @@ import {
   startMediaWatching,
   toggleMediaFavorite,
 } from '@/lib/actions/media-interaction-action';
-import type { MediaType } from '@/lib/media';
+import type { MediaDetails } from '@/lib/media';
+import {
+  canMarkAsWatched,
+  canStartWatching,
+} from '@/lib/media/media-status-policy';
 import {
   Bookmark,
   Check,
@@ -33,15 +37,19 @@ type MediaActionsState = {
 };
 
 type MediaActionsProps = {
-  type: MediaType;
-  tmdbId: number;
+  media: MediaDetails;
   initialState: MediaActionsState;
 };
 
-const MediaActions = ({ type, tmdbId, initialState }: MediaActionsProps) => {
+const MediaActions = ({ media, initialState }: MediaActionsProps) => {
   const [state, setState] = useState<MediaActionsState>(initialState);
 
   const [isPending, startTransition] = useTransition();
+
+  const { type, tmdbId } = media;
+
+  const canWatch = canStartWatching(media);
+  const canMarkWatched = canMarkAsWatched(media);
 
   const mediaLabel = type === 'movie' ? 'movie' : 'TV series';
 
@@ -211,53 +219,61 @@ const MediaActions = ({ type, tmdbId, initialState }: MediaActionsProps) => {
               Add to watchlist
             </button>
 
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={handleMarkAsWatched}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Check className="size-4" />
-              Mark as watched
-            </button>
+            {canMarkWatched && (
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={handleMarkAsWatched}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Check className="size-4" />
+                Mark as watched
+              </button>
+            )}
           </>
         )}
 
         {state.status === 'watchlist' && (
           <>
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={handleStartWatching}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Play className="size-4" />
-              Start watching
-            </button>
+            {canWatch && (
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={handleStartWatching}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Play className="size-4" />
+                Start watching
+              </button>
+            )}
 
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={handleMarkAsWatched}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Check className="size-4" />
-              Mark as watched
-            </button>
+            {canMarkWatched && (
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={handleMarkAsWatched}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Check className="size-4" />
+                Mark as watched
+              </button>
+            )}
           </>
         )}
 
         {state.status === 'watching' && (
           <>
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={handleMarkAsWatched}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Check className="size-4" />
-              Mark as watched
-            </button>
+            {canMarkWatched && (
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={handleMarkAsWatched}
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Check className="size-4" />
+                Mark as watched
+              </button>
+            )}
 
             <button
               type="button"
@@ -283,7 +299,7 @@ const MediaActions = ({ type, tmdbId, initialState }: MediaActionsProps) => {
           </button>
         )}
 
-        {state.status === 'dropped' && (
+        {state.status === 'dropped' && canWatch && (
           <button
             type="button"
             disabled={isPending}

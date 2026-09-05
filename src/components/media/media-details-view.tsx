@@ -308,11 +308,7 @@ const MediaDetailsView = ({
 
               {/* User actions */}
               <div className="mt-7">
-                <MediaActions
-                  type={media.type}
-                  tmdbId={media.tmdbId}
-                  initialState={initialState}
-                />
+                <MediaActions media={media} initialState={initialState} />
               </div>
             </div>
           </div>
