@@ -14,7 +14,7 @@ const TvSeasons = ({ tvId, seasons }: TvSeasonsProps) => {
   }
 
   return (
-    <section className="border-t border-border/60">
+    <section className="border-t border-border/60 bg-surface/20">
       <div className="container-content py-14 lg:py-20">
         <div className="mb-8">
           <p className="eyebrow">Series information</p>

@@ -10,7 +10,7 @@ const MediaVideo = ({ video }: MediaVideoProps) => {
   }
 
   return (
-    <section className="border-y border-border/60 bg-surface/20">
+    <section className="border-t border-border/60 bg-surface/20">
       <div className="container-content py-14 lg:py-20">
         <div className="mb-7">
           <p className="eyebrow">Watch the trailer</p>

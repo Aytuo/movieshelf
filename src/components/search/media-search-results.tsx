@@ -1,7 +1,6 @@
-import Link from 'next/link';
-
 import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
+import Link from 'next/link';
 
 type MediaSearchResultsProps = {
   media: Media[];

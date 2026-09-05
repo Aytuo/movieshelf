@@ -12,6 +12,7 @@ type MediaCarouselProps = {
   eyebrow?: string;
   description?: string;
   href?: string;
+  showType?: boolean;
 };
 
 const MediaCarousel = ({
@@ -20,6 +21,7 @@ const MediaCarousel = ({
   eyebrow,
   description,
   href,
+  showType = false,
 }: MediaCarouselProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -163,9 +165,11 @@ const MediaCarousel = ({
                     {item.title}
                   </h3>
 
-                  <span className="shrink-0 text-[9px] font-semibold tracking-wide text-muted-foreground uppercase">
-                    {item.type === 'movie' ? 'Movie' : 'TV'}
-                  </span>
+                  {showType && (
+                    <span className="shrink-0 text-[9px] font-semibold tracking-wide text-muted-foreground uppercase">
+                      {item.type === 'movie' ? 'Movie' : 'TV'}
+                    </span>
+                  )}
                 </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">

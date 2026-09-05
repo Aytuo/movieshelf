@@ -8,6 +8,7 @@ type RankedMediaListProps = {
   eyebrow?: string;
   title?: string;
   description?: string;
+  showType?: boolean;
 };
 
 const RankedMediaList = ({
@@ -15,6 +16,7 @@ const RankedMediaList = ({
   eyebrow,
   title,
   description,
+  showType = false,
 }: RankedMediaListProps) => {
   const rankedMedia = media.slice(0, 10);
 
@@ -94,9 +96,11 @@ const RankedMediaList = ({
                           #{rank}
                         </span>
 
-                        <span className="text-[9px] font-semibold tracking-wide text-muted-foreground uppercase">
-                          {item.type === 'movie' ? 'Movie' : 'TV'}
-                        </span>
+                        {showType && (
+                          <span className="text-[9px] font-semibold tracking-wide text-muted-foreground uppercase">
+                            {item.type === 'movie' ? 'Movie' : 'TV'}
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="mt-3 line-clamp-3 font-heading text-xl font-bold tracking-tight transition-colors group-hover:text-primary sm:text-2xl">

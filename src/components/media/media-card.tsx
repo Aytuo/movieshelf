@@ -5,9 +5,10 @@ import Link from 'next/link';
 
 type MediaCardProps = {
   media: Media;
+  showType?: boolean;
 };
 
-const MediaCard = ({ media }: MediaCardProps) => {
+const MediaCard = ({ media, showType = false }: MediaCardProps) => {
   const poster = tmdbImage(media.posterPath, 'w500');
 
   const href =
@@ -48,9 +49,11 @@ const MediaCard = ({ media }: MediaCardProps) => {
               {media.title}
             </h3>
 
-            <span className="shrink-0 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
-              {media.type === 'movie' ? 'Movie' : 'TV'}
-            </span>
+            {showType && (
+              <span className="shrink-0 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                {media.type === 'movie' ? 'Movie' : 'TV'}
+              </span>
+            )}
           </div>
 
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">

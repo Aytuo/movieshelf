@@ -5,9 +5,10 @@ import Link from 'next/link';
 
 type RankingListProps = {
   items: RankingItem[];
+  showType?: boolean;
 };
 
-const RankingList = ({ items }: RankingListProps) => {
+const RankingList = ({ items, showType = false }: RankingListProps) => {
   return (
     <div className="divide-y divide-border/60 border-y border-border/60">
       {items.map((item) => {
@@ -55,13 +56,17 @@ const RankingList = ({ items }: RankingListProps) => {
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                   {year !== null && <span>{year}</span>}
 
-                  {year !== null && (
-                    <span className="size-1 rounded-full bg-muted-foreground/40" />
-                  )}
+                  {showType && (
+                    <>
+                      {year !== null && (
+                        <span className="size-1 rounded-full bg-muted-foreground/40" />
+                      )}
 
-                  <span className="font-semibold tracking-wide uppercase">
-                    {media.type === 'movie' ? 'Movie' : 'TV Series'}
-                  </span>
+                      <span className="font-semibold tracking-wide uppercase">
+                        {media.type === 'movie' ? 'Movie' : 'TV Series'}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <h2 className="mt-2 line-clamp-2 font-heading text-lg font-bold tracking-tight transition-colors group-hover:text-primary sm:text-xl">

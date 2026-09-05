@@ -1,7 +1,7 @@
 import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { MediaInteraction } from '@/types';
-import { Star } from 'lucide-react';
+import { Eye, Search, Star } from 'lucide-react';
 import Link from 'next/link';
 import ReviewCard from '../reviews/review-card';
 import ReviewForm from '../reviews/review-form';
@@ -45,6 +45,8 @@ type MediaDetailsViewProps = {
   }[];
 
   watchNumber: number | null;
+
+  showType?: boolean;
 };
 
 function getYear(releaseDate: string | null): number | null {
@@ -63,6 +65,7 @@ const MediaDetailsView = ({
   existingReview,
   reviews,
   watchNumber,
+  showType = false,
 }: MediaDetailsViewProps) => {
   const poster = tmdbImage(media.posterPath, 'w500');
 
@@ -155,9 +158,11 @@ const MediaDetailsView = ({
               <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 {year !== null && <span>{year}</span>}
 
-                <span className="rounded-md bg-surface px-2 py-1 text-[10px] font-semibold tracking-wide uppercase">
-                  {isMovie ? 'Movie' : 'TV Series'}
-                </span>
+                {showType && (
+                  <span className="rounded-md bg-surface px-2 py-1 text-[10px] font-semibold tracking-wide uppercase">
+                    {isMovie ? 'Movie' : 'TV Series'}
+                  </span>
+                )}
 
                 {media.type === 'movie' && media.runtime !== null && (
                   <>
@@ -375,10 +380,14 @@ const MediaDetailsView = ({
                   }
                 />
               ) : (
-                <div className="rounded-2xl p-6 surface">
-                  <p className="text-sm font-medium">Watch it first.</p>
+                <div className="rounded-2xl p-12 text-center surface">
+                  <Eye className="mx-auto size-6 text-muted-foreground" />
 
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  <h3 className="mt-4 font-heading text-xl font-semibold">
+                    Watch it first
+                  </h3>
+
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
                     Once you&apos;ve marked this{' '}
                     {media.type === 'movie' ? 'movie' : 'TV series'} as watched,
                     you&apos;ll be able to rate it and write your review.
@@ -416,14 +425,16 @@ const MediaDetailsView = ({
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-border px-6 py-16 text-center">
-              <p className="text-sm text-muted-foreground">
-                Nobody has reviewed this{' '}
-                {media.type === 'movie' ? 'movie' : 'TV series'} yet.
-              </p>
+            <div className="rounded-2xl p-12 text-center surface">
+              <Search className="mx-auto size-6 text-muted-foreground" />
 
-              <p className="mt-1 text-xs text-muted-foreground/70">
-                Be the first to share your thoughts.
+              <h3 className="mt-4 font-heading text-xl font-semibold">
+                No reviews yet
+              </h3>
+
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                Be the first to share your thoughts about this{' '}
+                {media.type === 'movie' ? 'movie' : 'TV series'}.
               </p>
             </div>
           )}
@@ -434,19 +445,23 @@ const MediaDetailsView = ({
       {/* Similar / recommendations                                        */}
       {/* ---------------------------------------------------------------- */}
 
-      <MediaRecommendations
-        media={media.similar}
-        title={`Similar ${media.type === 'movie' ? 'movies' : 'TV series'}`}
-        eyebrow="If you liked this"
-      />
+      <section className="border-t border-border/60">
+        <MediaRecommendations
+          media={media.similar}
+          title={`Similar ${media.type === 'movie' ? 'movies' : 'TV series'}`}
+          eyebrow="If you liked this"
+        />
 
-      <MediaRecommendations
-        media={media.recommendations}
-        title={
-          media.type === 'movie' ? 'More like these' : 'More like these series'
-        }
-        eyebrow="From TMDB"
-      />
+        <MediaRecommendations
+          media={media.recommendations}
+          title={
+            media.type === 'movie'
+              ? 'More like these'
+              : 'More like these series'
+          }
+          eyebrow="From TMDB"
+        />
+      </section>
     </main>
   );
 };

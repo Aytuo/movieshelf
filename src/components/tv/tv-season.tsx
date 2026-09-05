@@ -84,16 +84,11 @@ const TvSeason = ({ tvId, season }: TvSeasonProps) => {
         </div>
 
         <div className="min-w-0 flex-1 self-center">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-            <span>Season {season.seasonNumber}</span>
-
-            {year !== null && (
-              <>
-                <span>•</span>
-                <span>{year}</span>
-              </>
-            )}
-          </div>
+          {year !== null && (
+            <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+              {year}
+            </p>
+          )}
 
           <h3 className="mt-2 font-heading text-xl font-semibold tracking-tight transition-colors group-hover:text-primary sm:text-2xl">
             {season.name}
@@ -170,9 +165,13 @@ const TvSeason = ({ tvId, season }: TvSeasonProps) => {
                             )}
                           </span>
 
+                          <span className="text-xs text-muted-foreground">
+                            ·
+                          </span>
+
                           {episode.airDate && (
                             <span className="text-xs text-muted-foreground">
-                              · {episode.airDate}
+                              {episode.airDate}
                             </span>
                           )}
                         </div>
