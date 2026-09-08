@@ -368,16 +368,13 @@ const MediaDetailsView = ({
                 <ReviewForm
                   type={media.type}
                   tmdbId={media.tmdbId}
-                  initialValues={
-                    existingReview
-                      ? {
-                          title: existingReview.title ?? '',
-                          content: existingReview.content,
-                          rating: existingReview.rating ?? 8,
-                          containsSpoilers: existingReview.containsSpoilers,
-                        }
-                      : undefined
-                  }
+                  initialValues={{
+                    title: existingReview?.title ?? '',
+                    content: existingReview?.content ?? '',
+                    rating:
+                      existingReview?.rating ?? mediaInteraction?.rating ?? 8,
+                    containsSpoilers: existingReview?.containsSpoilers ?? false,
+                  }}
                 />
               ) : (
                 <div className="rounded-2xl p-12 text-center surface">

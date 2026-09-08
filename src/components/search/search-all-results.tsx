@@ -29,7 +29,7 @@ const SearchAllResults = ({ results }: SearchAllResultsProps) => {
             Movies & TV
           </h3>
 
-          <MediaSearchResults media={media} />
+          <MediaSearchResults media={media} type="all" />
         </section>
       )}
 

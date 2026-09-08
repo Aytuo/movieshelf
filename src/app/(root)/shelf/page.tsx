@@ -10,6 +10,7 @@ import {
   Star,
   X,
 } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 
 type ShelfFilter =
@@ -19,6 +20,12 @@ type ShelfPageProps = {
   searchParams: Promise<{
     filter?: ShelfFilter;
   }>;
+};
+
+export const metadata: Metadata = {
+  title: 'Your Shelf',
+  description:
+    'Manage your movie and TV collection, watchlist and watched titles.',
 };
 
 const ShelfPage = async ({ searchParams }: ShelfPageProps) => {

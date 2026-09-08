@@ -1,12 +1,14 @@
 import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
+import type { SearchMediaType } from '@/types';
 import Link from 'next/link';
 
 type MediaSearchResultsProps = {
   media: Media[];
+  type: SearchMediaType;
 };
 
-const MediaSearchResults = ({ media }: MediaSearchResultsProps) => {
+const MediaSearchResults = ({ media, type }: MediaSearchResultsProps) => {
   return (
     <>
       <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
@@ -44,9 +46,11 @@ const MediaSearchResults = ({ media }: MediaSearchResultsProps) => {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
 
-                  <span className="absolute top-3 left-3 rounded-md bg-black/70 px-2 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur-sm">
-                    {item.type === 'movie' ? 'Movie' : 'TV'}
-                  </span>
+                  {type === 'all' && (
+                    <span className="absolute top-3 left-3 rounded-md bg-black/70 px-2 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur-sm">
+                      {item.type === 'movie' ? 'Movie' : 'TV'}
+                    </span>
+                  )}
                 </div>
 
                 <div className="mt-3">

@@ -30,7 +30,7 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
 
   const poster = tmdbImage(media.posterPath, 'w500');
 
-  const mediaLabel = media.type === 'movie' ? 'Movie' : 'TV Series';
+  // const mediaLabel = media.type === 'movie' ? 'Movie' : 'TV Series';
 
   const MediaIcon = media.type === 'movie' ? Film : Tv;
 
@@ -54,7 +54,7 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
 
         <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
           <MediaIcon className="size-3" />
-          {mediaLabel}
+          {/* {mediaLabel} */}
         </span>
       </div>
 

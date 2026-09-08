@@ -1,8 +1,14 @@
 import ProfileSettingsForm from '@/components/profile/profile-settings-form';
 import { auth } from '@/lib/auth';
 import { getProfileByUserId } from '@/lib/repositories';
+import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Settings',
+  description: 'Manage your MovieShelf account and preferences.',
+};
 
 const ProfileSettingsPage = async () => {
   const session = await auth.api.getSession({

@@ -11,6 +11,7 @@ import type {
   SearchResult,
 } from '@/types';
 import { ArrowRight, Search as SearchIcon } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 
 type SearchPageProps = {
@@ -21,6 +22,35 @@ type SearchPageProps = {
     page?: string;
   }>;
 };
+
+export async function generateMetadata({
+  searchParams,
+}: SearchPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const query = params.q?.trim() ?? '';
+  const type = parseSearchType(params.type);
+
+  if (!query) {
+    return {
+      title: 'Search',
+      description: 'Search movies, TV series and people on MovieShelf.',
+    };
+  }
+
+  const label =
+    type === 'movie'
+      ? 'Movie'
+      : type === 'tv'
+        ? 'TV Series'
+        : type === 'person'
+          ? 'People'
+          : 'Movies, TV Series and People';
+
+  return {
+    title: `Search: ${query}`,
+    description: `Search ${label.toLowerCase()} for "${query}" on MovieShelf.`,
+  };
+}
 
 function parseSearchType(value: string | undefined): SearchMediaType {
   if (value === 'movie' || value === 'tv' || value === 'person') {
@@ -168,7 +198,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                   </div>
                 ) : (
                   <div className="mt-10">
-                    <MediaSearchResults media={results.media} />
+                    <MediaSearchResults media={results.media} type={type} />
                   </div>
                 )}
 

@@ -24,6 +24,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 type MediaStatus = 'watchlist' | 'watching' | 'watched' | 'dropped' | null;
@@ -42,6 +43,8 @@ type MediaActionsProps = {
 };
 
 const MediaActions = ({ media, initialState }: MediaActionsProps) => {
+  const router = useRouter();
+
   const [state, setState] = useState<MediaActionsState>(initialState);
 
   const [isPending, startTransition] = useTransition();
@@ -149,6 +152,8 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         status: 'watched',
         rating,
       });
+
+      router.refresh();
     });
   }
 

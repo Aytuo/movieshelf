@@ -3,12 +3,18 @@ import HistoryPagination from '@/components/history/history-pagination';
 import { requireSession } from '@/lib/auth/require-session';
 import { getUserWatchHistory } from '@/lib/services/watch-history-service';
 import { ArrowRight, Clock3 } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 
 type HistoryPageProps = {
   searchParams: Promise<{
     page?: string;
   }>;
+};
+
+export const metadata: Metadata = {
+  title: 'Watch History',
+  description: 'Review everything you have marked as watched on MovieShelf.',
 };
 
 const HistoryPage = async ({ searchParams }: HistoryPageProps) => {

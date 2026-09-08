@@ -5,7 +5,7 @@ import type { MediaType } from '@/lib/media';
 import { reviewSchema } from '@/lib/validations/review';
 import type { ReviewInput } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 type ReviewFormProps = {
@@ -28,6 +28,19 @@ const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
       containsSpoilers: initialValues?.containsSpoilers ?? false,
     },
   });
+
+  useEffect(() => {
+    if (!initialValues) {
+      return;
+    }
+
+    form.reset({
+      title: initialValues.title ?? '',
+      content: initialValues.content ?? '',
+      rating: initialValues.rating ?? 8,
+      containsSpoilers: initialValues.containsSpoilers ?? false,
+    });
+  }, [initialValues, form]);
 
   function onSubmit(values: ReviewInput) {
     setError(null);

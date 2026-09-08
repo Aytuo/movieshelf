@@ -2,6 +2,7 @@ import ProfileNavbar from '@/components/profile/profile-navbar';
 import { getPublicProfile } from '@/lib/services/profile-service';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Film, Heart, Star, Tv } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -9,6 +10,11 @@ type ProfilePageProps = {
   params: Promise<{
     username: string;
   }>;
+};
+
+export const metadata: Metadata = {
+  title: 'Profile',
+  description: 'View and manage your MovieShelf profile.',
 };
 
 const ProfilePage = async ({ params }: ProfilePageProps) => {

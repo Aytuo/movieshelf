@@ -2,7 +2,13 @@ import ActivityTimeline from '@/components/activity/activity-timeline';
 import { requireSession } from '@/lib/auth/require-session';
 import { getUserMediaActivity } from '@/lib/services/media-activity-service';
 import { Activity, ArrowRight } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Activity',
+  description: 'See your latest activity across MovieShelf.',
+};
 
 const ActivityPage = async () => {
   const session = await requireSession();

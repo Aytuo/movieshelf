@@ -5,6 +5,7 @@ import { requireSession } from '@/lib/auth/require-session';
 import { parseDiscoverFilters } from '@/lib/discover/parse-filters';
 import { discoverForUser } from '@/lib/services/discover-service';
 import type { DiscoverFilters as DiscoverFiltersType } from '@/types';
+import { Metadata } from 'next';
 import Link from 'next/link';
 
 function FilterChip({ label }: { label: string }) {
@@ -52,6 +53,18 @@ function hasActiveDiscoverFilters(filters: DiscoverFiltersType) {
   );
 }
 
+function toURLSearchParams(params: Awaited<DiscoverPageProps['searchParams']>) {
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) {
+      searchParams.set(key, value);
+    }
+  }
+
+  return searchParams;
+}
+
 type DiscoverPageProps = {
   searchParams: Promise<{
     type?: string;
@@ -67,17 +80,11 @@ type DiscoverPageProps = {
   }>;
 };
 
-function toURLSearchParams(params: Awaited<DiscoverPageProps['searchParams']>) {
-  const searchParams = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined) {
-      searchParams.set(key, value);
-    }
-  }
-
-  return searchParams;
-}
+export const metadata: Metadata = {
+  title: 'Discover',
+  description:
+    'Explore movies and TV series with filters for genre, rating, year, runtime and more.',
+};
 
 const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
   const session = await requireSession();

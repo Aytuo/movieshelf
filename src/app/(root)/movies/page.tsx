@@ -1,5 +1,12 @@
 import MediaCatalog from '@/components/catalog/media-catalog';
 import { getMovieCatalogSections } from '@/lib/services/media-catalog-service';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Movies',
+  description:
+    'Discover movies worth watching, from what is trending now to timeless favorites.',
+};
 
 export default async function MoviesPage() {
   const sections = await getMovieCatalogSections();

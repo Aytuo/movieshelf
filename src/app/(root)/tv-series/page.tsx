@@ -1,5 +1,12 @@
 import MediaCatalog from '@/components/catalog/media-catalog';
 import { getTvCatalogSections } from '@/lib/services/media-catalog-service';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'TV Series',
+  description:
+    'Discover TV series worth watching, from what is trending now to all-time favorites.',
+};
 
 export default async function TvSeriesPage() {
   const sections = await getTvCatalogSections();

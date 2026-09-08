@@ -1,6 +1,7 @@
 import RankingList from '@/components/rankings/ranking-list';
 import { getMovieRanking, getTvRanking } from '@/lib/services/ranking-service';
 import type { RankingType } from '@/types';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 type RankingsPageProps = {
@@ -8,6 +9,25 @@ type RankingsPageProps = {
     type?: string;
   }>;
 };
+
+export async function generateMetadata({
+  searchParams,
+}: RankingsPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const type = parseRankingType(params.type);
+
+  if (type === 'tv') {
+    return {
+      title: 'Top 100 TV Series',
+      description: 'The 100 highest-ranked TV series on MovieShelf.',
+    };
+  }
+
+  return {
+    title: 'Top 100 Movies',
+    description: 'The 100 highest-ranked movies on MovieShelf.',
+  };
+}
 
 function parseRankingType(value: string | undefined): RankingType {
   return value === 'tv' ? 'tv' : 'movie';
