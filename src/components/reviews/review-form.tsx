@@ -12,11 +12,18 @@ type ReviewFormProps = {
   type: MediaType;
   tmdbId: number;
   initialValues?: Partial<ReviewInput>;
+  onSuccess?: (values: ReviewInput) => void;
+  onCancel?: () => void;
 };
 
-const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
+const ReviewForm = ({
+  type,
+  tmdbId,
+  initialValues,
+  onSuccess,
+  onCancel,
+}: ReviewFormProps) => {
   const [isPending, startTransition] = useTransition();
-
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<ReviewInput>({
@@ -48,8 +55,7 @@ const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
     startTransition(async () => {
       try {
         await saveMediaReview(type, tmdbId, values);
-
-        form.reset(values);
+        onSuccess?.(values);
       } catch {
         setError("We couldn't save your review. Please try again.");
       }
@@ -67,7 +73,6 @@ const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
         >
           Title
         </label>
-
         <input
           id="review-title"
           {...form.register('title')}
@@ -89,7 +94,6 @@ const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
         >
           Your review
         </label>
-
         <textarea
           id="review-content"
           {...form.register('content')}
@@ -152,13 +156,26 @@ const ReviewForm = ({ type, tmdbId, initialValues }: ReviewFormProps) => {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isPending ? 'Saving...' : 'Publish review'}
-      </button>
+      <div className="flex items-center justify-end gap-3">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPending}
+            className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Cancel
+          </button>
+        )}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isPending ? 'Saving...' : 'Publish review'}
+        </button>
+      </div>
     </form>
   );
 };

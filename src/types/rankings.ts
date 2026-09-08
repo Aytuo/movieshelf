@@ -1,5 +1,9 @@
 import type { Media } from '@/lib/media';
 
+/* ========================================================================== */
+/*                                RANKINGS                                    */
+/* ========================================================================== */
+
 export type RankingType = 'movie' | 'tv';
 
 export type RankingItem = {

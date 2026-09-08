@@ -65,6 +65,7 @@ const TvDetailsPage = async ({ params }: TvDetailsPageProps) => {
       existingReview={data.existingReview}
       reviews={data.reviews}
       watchNumber={data.watchNumber}
+      posts={data.posts}
     />
   );
 };

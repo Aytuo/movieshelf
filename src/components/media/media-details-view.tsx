@@ -1,10 +1,11 @@
 import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
-import type { MediaInteraction } from '@/types';
-import { Eye, Search, Star } from 'lucide-react';
+import type { MediaInteraction, Post } from '@/types';
+import { Search, Star } from 'lucide-react';
 import Link from 'next/link';
+import PostList from '../posts/post-list';
 import ReviewCard from '../reviews/review-card';
-import ReviewForm from '../reviews/review-form';
+import YourReviewSection from '../reviews/your-review-section';
 import TvSeasons from '../tv/tv-seasons';
 import MediaActions from './media-actions';
 import MediaCast from './media-cast';
@@ -47,6 +48,8 @@ type MediaDetailsViewProps = {
   watchNumber: number | null;
 
   showType?: boolean;
+
+  posts: Post[];
 };
 
 function getYear(releaseDate: string | null): number | null {
@@ -66,6 +69,7 @@ const MediaDetailsView = ({
   reviews,
   watchNumber,
   showType = false,
+  posts,
 }: MediaDetailsViewProps) => {
   const poster = tmdbImage(media.posterPath, 'w500');
 
@@ -364,33 +368,13 @@ const MediaDetailsView = ({
             </div>
 
             <div className="rounded-2xl p-5 surface sm:p-7">
-              {isWatched ? (
-                <ReviewForm
-                  type={media.type}
-                  tmdbId={media.tmdbId}
-                  initialValues={{
-                    title: existingReview?.title ?? '',
-                    content: existingReview?.content ?? '',
-                    rating:
-                      existingReview?.rating ?? mediaInteraction?.rating ?? 8,
-                    containsSpoilers: existingReview?.containsSpoilers ?? false,
-                  }}
-                />
-              ) : (
-                <div className="rounded-2xl p-12 text-center surface">
-                  <Eye className="mx-auto size-6 text-muted-foreground" />
-
-                  <h3 className="mt-4 font-heading text-xl font-semibold">
-                    Watch it first
-                  </h3>
-
-                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                    Once you&apos;ve marked this{' '}
-                    {media.type === 'movie' ? 'movie' : 'TV series'} as watched,
-                    you&apos;ll be able to rate it and write your review.
-                  </p>
-                </div>
-              )}
+              <YourReviewSection
+                type={media.type}
+                tmdbId={media.tmdbId}
+                isWatched={isWatched}
+                existingReview={existingReview}
+                interactionRating={mediaInteraction?.rating ?? null}
+              />
             </div>
           </div>
         </div>
@@ -439,10 +423,16 @@ const MediaDetailsView = ({
       </section>
 
       {/* ---------------------------------------------------------------- */}
+      {/* Community reviews                                                */}
+      {/* ---------------------------------------------------------------- */}
+
+      <PostList posts={posts} type={media.type} tmdbId={media.tmdbId} />
+
+      {/* ---------------------------------------------------------------- */}
       {/* Similar / recommendations                                        */}
       {/* ---------------------------------------------------------------- */}
 
-      <section className="border-t border-border/60">
+      <section className="border-t border-border/60 bg-surface/20">
         <MediaRecommendations
           media={media.similar}
           title={`Similar ${media.type === 'movie' ? 'movies' : 'TV series'}`}
