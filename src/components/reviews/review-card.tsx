@@ -1,4 +1,4 @@
-import { EyeOff, Star } from 'lucide-react';
+import { ChevronDown, EyeOff, Star } from 'lucide-react';
 
 type ReviewCardProps = {
   review: {
@@ -58,14 +58,16 @@ const ReviewCard = ({ review, profile }: ReviewCardProps) => {
 
       {review.containsSpoilers ? (
         <details className="mt-4">
-          <summary className="cursor-pointer text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-2">
-              <EyeOff className="size-3.5" />
-              Contains spoilers — reveal review
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm text-muted-foreground [&::-webkit-details-marker]:hidden">
+            <span className="inline-flex min-w-0 items-center gap-2">
+              <EyeOff className="size-3.5 shrink-0" />
+              <span>Contains spoilers — click to reveal</span>
             </span>
+
+            <ChevronDown className="size-4 shrink-0 transition-transform duration-200 [[open]_&]:rotate-180" />
           </summary>
 
-          <p className="mt-4 text-sm leading-7 whitespace-pre-line text-muted-foreground">
+          <p className="mt-4 border-t border-border/60 pt-4 text-sm leading-7 whitespace-pre-line text-muted-foreground">
             {review.content}
           </p>
         </details>

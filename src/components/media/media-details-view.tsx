@@ -367,15 +367,13 @@ const MediaDetailsView = ({
               </p>
             </div>
 
-            <div className="rounded-2xl p-5 surface sm:p-7">
-              <YourReviewSection
-                type={media.type}
-                tmdbId={media.tmdbId}
-                isWatched={isWatched}
-                existingReview={existingReview}
-                interactionRating={mediaInteraction?.rating ?? null}
-              />
-            </div>
+            <YourReviewSection
+              type={media.type}
+              tmdbId={media.tmdbId}
+              isWatched={isWatched}
+              existingReview={existingReview}
+              interactionRating={mediaInteraction?.rating ?? null}
+            />
           </div>
         </div>
       </section>

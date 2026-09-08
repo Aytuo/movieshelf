@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { Inter, Manrope } from 'next/font/google';
 import './globals.css';
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${manrope.variable} `}>
       <body className="min-h-screen bg-background font-sans antialiased">
         {children}
+        <Toaster />
       </body>
     </html>
   );

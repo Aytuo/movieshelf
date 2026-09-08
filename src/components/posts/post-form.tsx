@@ -2,14 +2,19 @@
 
 import { savePost } from '@/lib/actions/post-action';
 import type { MediaType } from '@/lib/media';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 type PostFormProps = {
   type: MediaType;
   tmdbId: number;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 };
 
-const PostForm = ({ type, tmdbId }: PostFormProps) => {
+const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
+  const router = useRouter();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +34,8 @@ const PostForm = ({ type, tmdbId }: PostFormProps) => {
           content,
         });
 
-        setTitle('');
-        setContent('');
+        router.refresh();
+        onSuccess?.();
       } catch {
         setError("We couldn't publish your post. Please try again.");
       }
@@ -83,13 +88,26 @@ const PostForm = ({ type, tmdbId }: PostFormProps) => {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isPending ? 'Publishing...' : 'Publish post'}
-      </button>
+      <div className="flex items-center justify-end gap-3">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPending}
+            className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Cancel
+          </button>
+        )}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isPending ? 'Publishing...' : 'Publish post'}
+        </button>
+      </div>
     </form>
   );
 };

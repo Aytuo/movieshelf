@@ -2,9 +2,17 @@
 
 import type { MediaType } from '@/lib/media';
 import type { ReviewInput } from '@/types';
-import { CheckCircle2, Edit3, EyeOff, Star } from 'lucide-react';
+import {
+  CheckCircle2,
+  ChevronDown,
+  Edit3,
+  Eye,
+  EyeOff,
+  Star,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import ReviewForm from './review-form';
 
 type ReviewData = {
@@ -35,8 +43,7 @@ const YourReviewSection = ({
   const router = useRouter();
 
   const [review, setReview] = useState<ReviewData | null>(existingReview);
-  const [isEditing, setIsEditing] = useState(existingReview === null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const initialValues: Partial<ReviewInput> = {
     title: review?.title ?? '',
@@ -47,6 +54,7 @@ const YourReviewSection = ({
 
   function handleSuccess(values: ReviewInput) {
     const now = new Date();
+    const isUpdate = review !== null;
 
     setReview((current) => ({
       id: current?.id ?? crypto.randomUUID(),
@@ -58,9 +66,10 @@ const YourReviewSection = ({
       updatedAt: now,
     }));
 
-    setIsEditing(false);
-    setSuccessMessage(
-      review
+    setIsFormOpen(false);
+
+    toast.success(
+      isUpdate
         ? 'Your review has been updated.'
         : 'Your review has been published.'
     );
@@ -71,7 +80,11 @@ const YourReviewSection = ({
   if (!isWatched) {
     return (
       <div className="rounded-2xl p-12 text-center surface">
-        <p className="mx-auto max-w-md text-sm leading-6 text-muted-foreground">
+        <div className="flex justify-center">
+          <Eye className="size-6 text-muted-foreground" />
+        </div>
+
+        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-muted-foreground">
           Once you&apos;ve marked this{' '}
           {type === 'movie' ? 'movie' : 'TV series'} as watched, you&apos;ll be
           able to rate it and write your review.
@@ -80,93 +93,116 @@ const YourReviewSection = ({
     );
   }
 
-  if (isEditing) {
+  if (isFormOpen) {
     return (
-      <ReviewForm
-        type={type}
-        tmdbId={tmdbId}
-        initialValues={initialValues}
-        onSuccess={handleSuccess}
-        onCancel={() => {
-          setSuccessMessage(null);
-          setIsEditing(false);
-        }}
-      />
+      <div className="rounded-2xl p-5 surface sm:p-7">
+        <ReviewForm
+          type={type}
+          tmdbId={tmdbId}
+          initialValues={initialValues}
+          onSuccess={handleSuccess}
+          onCancel={() => {
+            setIsFormOpen(false);
+          }}
+        />
+      </div>
     );
   }
 
   if (!review) {
-    return null;
+    return (
+      <div className="flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary-muted p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold">Share your take</p>
+
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Put your thoughts into words and share them with the community.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsFormOpen(true)}
+          className="inline-flex w-fit shrink-0 items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+        >
+          Write a review
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
-      {successMessage && (
-        <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
-          <CheckCircle2 className="size-4 text-primary" />
-          <span>{successMessage}</span>
-        </div>
-      )}
+      <article className="overflow-hidden rounded-2xl border border-primary/15 bg-primary-muted">
+        <div className="relative p-6 sm:p-8">
+          <div className="pointer-events-none absolute top-[-25%] right-[-5%] size-72 rounded-full bg-primary/10 blur-[100px]" />
 
-      <article className="rounded-2xl p-5 surface">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-              Your review
-            </p>
+          <div className="relative">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="size-4 text-primary" />
 
-            {review.title && (
-              <h3 className="mt-3 font-heading text-xl font-semibold">
-                {review.title}
-              </h3>
-            )}
-          </div>
+                  <p className="eyebrow">Your review</p>
+                </div>
 
-          {review.rating !== null && (
-            <div className="inline-flex items-center gap-1 text-sm font-semibold text-rating">
-              <Star className="size-3.5 fill-current" />
-              {review.rating}/10
+                {review.title && (
+                  <h3 className="mt-3 font-heading text-xl font-semibold tracking-tight">
+                    {review.title}
+                  </h3>
+                )}
+              </div>
+
+              {review.rating !== null && (
+                <div className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-rating">
+                  <Star className="size-3.5 fill-current" />
+                  {review.rating}/10
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {review.containsSpoilers ? (
-          <details className="mt-5">
-            <summary className="cursor-pointer text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-2">
-                <EyeOff className="size-3.5" />
-                Contains spoilers — reveal review
-              </span>
-            </summary>
+            {review.containsSpoilers ? (
+              <details className="mt-6 rounded-xl border border-border/60 bg-background/40 p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm text-muted-foreground [&::-webkit-details-marker]:hidden">
+                  <span className="inline-flex min-w-0 items-center gap-2">
+                    <EyeOff className="size-3.5 shrink-0" />
+                    <span>Contains spoilers — click to reveal</span>
+                  </span>
 
-            <p className="mt-4 text-sm leading-7 whitespace-pre-line text-muted-foreground">
-              {review.content}
-            </p>
-          </details>
-        ) : (
-          <p className="mt-5 text-sm leading-7 whitespace-pre-line text-muted-foreground">
-            {review.content}
-          </p>
-        )}
+                  <ChevronDown className="size-4 shrink-0 transition-transform duration-200 [[open]_&]:rotate-180" />
+                </summary>
 
-        <div className="mt-5 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">
-            {review.updatedAt.getTime() !== review.createdAt.getTime()
-              ? `Updated ${review.updatedAt.toLocaleDateString()}`
-              : review.createdAt.toLocaleDateString()}
-          </p>
+                <p className="mt-4 border-t border-border/60 pt-4 text-sm leading-7 whitespace-pre-line text-muted-foreground">
+                  {review.content}
+                </p>
+              </details>
+            ) : (
+              <div className="mt-6 rounded-xl border border-border/60 bg-background/40 p-5">
+                <p className="text-sm leading-7 whitespace-pre-line text-muted-foreground">
+                  {review.content}
+                </p>
+              </div>
+            )}
 
-          <button
-            type="button"
-            onClick={() => {
-              setSuccessMessage(null);
-              setIsEditing(true);
-            }}
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-semibold transition-colors hover:bg-surface-hover"
-          >
-            <Edit3 className="size-3.5" />
-            Edit
-          </button>
+            <div className="mt-5 flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                {review.updatedAt.getTime() !== review.createdAt.getTime()
+                  ? `Updated ${review.updatedAt.toLocaleDateString()}`
+                  : review.createdAt.toLocaleDateString()}
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsFormOpen(true);
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background/40 px-3 py-2 text-xs font-semibold transition-colors hover:bg-background/60"
+              >
+                <Edit3 className="size-3.5" />
+                Edit
+              </button>
+            </div>
+          </div>
         </div>
       </article>
     </div>
