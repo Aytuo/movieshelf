@@ -387,7 +387,7 @@ const MediaDetailsView = ({
           <div className="mb-8">
             <p className="eyebrow">From the community</p>
 
-            <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight sm:text-3xl">
+            <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
               Reviews
             </h2>
 
