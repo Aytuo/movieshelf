@@ -1,5 +1,4 @@
 import type { Post } from '@/types';
-
 import Link from 'next/link';
 
 type PostCardProps = {

@@ -3,7 +3,7 @@ import {
   getMediaPosts as getMediaPostsRepository,
   getPostById as getPostByIdRepository,
 } from '@/lib/repositories';
-import type { PostInput } from '@/types';
+import type { PostInput, PostPaginationOptions } from '@/types';
 import { getOrCreateMediaRecord } from './media-service';
 
 export async function createPost(userId: string, input: PostInput) {
@@ -17,10 +17,14 @@ export async function createPost(userId: string, input: PostInput) {
   });
 }
 
-export async function getMediaPosts(type: PostInput['type'], tmdbId: number) {
+export async function getMediaPosts(
+  type: PostInput['type'],
+  tmdbId: number,
+  options?: PostPaginationOptions
+) {
   const media = await getOrCreateMediaRecord(type, tmdbId);
 
-  return getMediaPostsRepository(media.id);
+  return getMediaPostsRepository(media.id, options);
 }
 
 export async function getPostById(postId: string) {

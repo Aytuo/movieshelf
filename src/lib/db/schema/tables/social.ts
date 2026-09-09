@@ -77,7 +77,11 @@ export const post = pgTable(
   (table) => [
     index('post_media_idx').on(table.mediaId),
     index('post_author_idx').on(table.authorId),
-    index('post_created_at_idx').on(table.createdAt),
+    index('post_media_created_at_id_idx').on(
+      table.mediaId,
+      table.createdAt,
+      table.id
+    ),
   ]
 );
 

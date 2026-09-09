@@ -66,6 +66,7 @@ const MovieDetailsPage = async ({ params }: MovieDetailsPageProps) => {
       reviews={data.reviews}
       watchNumber={data.watchNumber}
       posts={data.posts}
+      postCursor={data.postCursor}
     />
   );
 };

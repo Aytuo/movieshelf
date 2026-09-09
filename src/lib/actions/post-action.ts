@@ -1,7 +1,7 @@
 'use server';
 
 import { requireSession } from '@/lib/auth/require-session';
-import { createPost } from '@/lib/services/post-service';
+import { createPost, getMediaPosts } from '@/lib/services/post-service';
 import { postSchema } from '@/lib/validations/post';
 import type { PostInput } from '@/types';
 import { revalidatePath } from 'next/cache';
@@ -30,4 +30,25 @@ export async function savePost(input: PostInput) {
   revalidatePath('/profile');
 
   return post;
+}
+
+export async function loadMoreMediaPosts(
+  type: PostInput['type'],
+  tmdbId: number,
+  cursor: string
+) {
+  const session = await requireSession();
+
+  if (!session.user.id) {
+    throw new Error('Unauthorized.');
+  }
+
+  if (!cursor) {
+    throw new Error('Invalid cursor.');
+  }
+
+  return getMediaPosts(type, tmdbId, {
+    limit: 5,
+    cursor,
+  });
 }

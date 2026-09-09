@@ -2,13 +2,15 @@
 
 import { savePost } from '@/lib/actions/post-action';
 import type { MediaType } from '@/lib/media';
+import type { Post } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 type PostFormProps = {
   type: MediaType;
   tmdbId: number;
-  onSuccess?: () => void;
+  onSuccess?: (post: Post) => void;
   onCancel?: () => void;
 };
 
@@ -17,27 +19,25 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError(null);
-
     startTransition(async () => {
       try {
-        await savePost({
+        const post = await savePost({
           type,
           tmdbId,
           title,
           content,
         });
 
+        toast.success('Your post has been published.');
         router.refresh();
-        onSuccess?.();
+        onSuccess?.(post);
       } catch {
-        setError("We couldn't publish your post. Please try again.");
+        toast.error("We couldn't publish your post. Please try again.");
       }
     });
   }
@@ -81,12 +81,6 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
           placeholder="What do you think?"
         />
       </div>
-
-      {error && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
 
       <div className="flex items-center justify-end gap-3">
         {onCancel && (

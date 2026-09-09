@@ -27,3 +27,13 @@ export type Post = {
   author: PostAuthor;
   media: Media;
 };
+
+export type PostPage = {
+  posts: Post[];
+  nextCursor: string | null;
+};
+
+export type PostPaginationOptions = {
+  limit?: number;
+  cursor?: string | null;
+};

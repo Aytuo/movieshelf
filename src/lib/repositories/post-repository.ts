@@ -1,7 +1,10 @@
 import { db } from '@/lib/db';
 import { media, post, profile } from '@/lib/db/schema';
-import type { Post } from '@/types';
-import { desc, eq } from 'drizzle-orm';
+import type { Post, PostPage, PostPaginationOptions } from '@/types';
+import { and, desc, eq, lt, or } from 'drizzle-orm';
+
+const DEFAULT_POST_PAGE_SIZE = 5;
+const MAX_POST_PAGE_SIZE = 20;
 
 type DbPost = typeof post.$inferSelect;
 type DbMedia = typeof media.$inferSelect;
@@ -11,6 +14,11 @@ type PostRow = {
   post: DbPost;
   media: DbMedia;
   profile: DbProfile;
+};
+
+type PostCursor = {
+  createdAt: string;
+  id: string;
 };
 
 function mapPost(row: PostRow): Post {
@@ -42,6 +50,34 @@ function mapPost(row: PostRow): Post {
       genres: row.media.genres,
     },
   };
+}
+
+function encodePostCursor(cursor: PostCursor) {
+  return Buffer.from(JSON.stringify(cursor)).toString('base64url');
+}
+
+function decodePostCursor(cursor: string): PostCursor | null {
+  try {
+    const decoded = Buffer.from(cursor, 'base64url').toString('utf8');
+    const parsed = JSON.parse(decoded) as Partial<PostCursor>;
+
+    if (typeof parsed.createdAt !== 'string' || typeof parsed.id !== 'string') {
+      return null;
+    }
+
+    const date = new Date(parsed.createdAt);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return {
+      createdAt: date.toISOString(),
+      id: parsed.id,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function createPost(data: {
@@ -87,8 +123,15 @@ export async function createPost(data: {
 
 export async function getMediaPosts(
   mediaId: string,
-  limit = 20
-): Promise<Post[]> {
+  options: PostPaginationOptions = {}
+): Promise<PostPage> {
+  const limit = Math.min(
+    Math.max(options.limit ?? DEFAULT_POST_PAGE_SIZE, 1),
+    MAX_POST_PAGE_SIZE
+  );
+
+  const cursor = options.cursor ? decodePostCursor(options.cursor) : null;
+
   const rows = await db
     .select({
       post,
@@ -98,11 +141,38 @@ export async function getMediaPosts(
     .from(post)
     .innerJoin(media, eq(media.id, post.mediaId))
     .innerJoin(profile, eq(profile.userId, post.authorId))
-    .where(eq(post.mediaId, mediaId))
-    .orderBy(desc(post.createdAt))
-    .limit(limit);
+    .where(
+      cursor
+        ? and(
+            eq(post.mediaId, mediaId),
+            or(
+              lt(post.createdAt, new Date(cursor.createdAt)),
+              and(
+                eq(post.createdAt, new Date(cursor.createdAt)),
+                lt(post.id, cursor.id)
+              )
+            )
+          )
+        : eq(post.mediaId, mediaId)
+    )
+    .orderBy(desc(post.createdAt), desc(post.id))
+    .limit(limit + 1);
 
-  return rows.map(mapPost);
+  const hasMore = rows.length > limit;
+  const visibleRows = hasMore ? rows.slice(0, limit) : rows;
+
+  const lastRow = visibleRows.at(-1);
+
+  return {
+    posts: visibleRows.map(mapPost),
+    nextCursor:
+      hasMore && lastRow
+        ? encodePostCursor({
+            createdAt: lastRow.post.createdAt.toISOString(),
+            id: lastRow.post.id,
+          })
+        : null,
+  };
 }
 
 export async function getPostById(postId: string): Promise<Post | null> {

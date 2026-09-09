@@ -1,17 +1,15 @@
 import type { Post } from '@/types';
 import { MessageSquare } from 'lucide-react';
-import PostCard from './post-card';
-import PostComposer from './post-composer';
+import PostFeed from './post-feed';
 
 type PostListProps = {
   posts: Post[];
+  postCursor: string | null;
   type: Post['media']['type'];
   tmdbId: number;
 };
 
-const PostList = ({ posts, type, tmdbId }: PostListProps) => {
-  const visiblePosts = posts.slice(0, 5);
-
+const PostList = ({ posts, postCursor, type, tmdbId }: PostListProps) => {
   return (
     <section className="border-t border-border/60">
       <div className="container-content py-14 lg:py-20">
@@ -28,14 +26,13 @@ const PostList = ({ posts, type, tmdbId }: PostListProps) => {
         </div>
 
         <div>
-          <PostComposer type={type} tmdbId={tmdbId} />
-
           {posts.length > 0 ? (
-            <div className="space-y-4">
-              {visiblePosts.map((post) => (
-                <PostCard key={post.id} post={post} variant="preview" />
-              ))}
-            </div>
+            <PostFeed
+              initialPosts={posts}
+              initialCursor={postCursor}
+              type={type}
+              tmdbId={tmdbId}
+            />
           ) : (
             <div className="rounded-2xl p-12 text-center surface">
               <MessageSquare className="mx-auto size-6 text-muted-foreground" />

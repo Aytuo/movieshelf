@@ -1,6 +1,7 @@
 'use client';
 
 import type { MediaType } from '@/lib/media';
+import type { Post } from '@/types';
 import { MessageSquarePlus, X } from 'lucide-react';
 import { useState } from 'react';
 import PostForm from './post-form';
@@ -8,13 +9,15 @@ import PostForm from './post-form';
 type PostComposerProps = {
   type: MediaType;
   tmdbId: number;
+  onSuccess?: (post: Post) => void;
 };
 
-const PostComposer = ({ type, tmdbId }: PostComposerProps) => {
+const PostComposer = ({ type, tmdbId, onSuccess }: PostComposerProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  function handleSuccess() {
+  function handleSuccess(post: Post) {
     setIsOpen(false);
+    onSuccess?.(post);
   }
 
   function handleCancel() {

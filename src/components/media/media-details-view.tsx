@@ -50,6 +50,7 @@ type MediaDetailsViewProps = {
   showType?: boolean;
 
   posts: Post[];
+  postCursor: string | null;
 };
 
 function getYear(releaseDate: string | null): number | null {
@@ -70,6 +71,7 @@ const MediaDetailsView = ({
   watchNumber,
   showType = false,
   posts,
+  postCursor,
 }: MediaDetailsViewProps) => {
   const poster = tmdbImage(media.posterPath, 'w500');
 
@@ -355,15 +357,13 @@ const MediaDetailsView = ({
               <p className="eyebrow">Your thoughts</p>
 
               <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-                {existingReview ? 'Your review' : 'Write a review'}
+                Review
               </h2>
 
               <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
-                {existingReview
-                  ? 'Update your thoughts whenever your opinion changes.'
-                  : media.type === 'movie'
-                    ? 'What stayed with you after watching this film?'
-                    : 'What did you think about this TV series?'}
+                {media.type === 'movie'
+                  ? 'What stayed with you after watching this film?'
+                  : 'What did you think about this TV series?'}
               </p>
             </div>
 
@@ -424,7 +424,12 @@ const MediaDetailsView = ({
       {/* Community reviews                                                */}
       {/* ---------------------------------------------------------------- */}
 
-      <PostList posts={posts} type={media.type} tmdbId={media.tmdbId} />
+      <PostList
+        posts={posts}
+        postCursor={postCursor}
+        type={media.type}
+        tmdbId={media.tmdbId}
+      />
 
       {/* ---------------------------------------------------------------- */}
       {/* Similar / recommendations                                        */}

@@ -1,6 +1,6 @@
 import type { MediaDetails, MediaType, TvSeasonDetails } from '@/lib/media';
 import {
-  getMediaPosts,
+  getMediaPosts as getMediaPostsRepository,
   getMediaRecordByTmdbId,
   getMediaReviews,
   getUserMediaInteraction,
@@ -40,12 +40,17 @@ export async function getMediaDetailsPageData(
 
   const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, mediaDetails);
 
-  const [mediaInteraction, existingReview, reviews, posts] = await Promise.all([
-    getUserMediaInteraction(userId, mediaRecord.id),
-    getUserReviewForMedia(userId, mediaRecord.id),
-    getMediaReviews(mediaRecord.id),
-    getMediaPosts(mediaRecord.id),
-  ]);
+  const postsPagePromise = getMediaPostsRepository(mediaRecord.id, {
+    limit: 5,
+  });
+
+  const [mediaInteraction, existingReview, reviews, postsPage] =
+    await Promise.all([
+      getUserMediaInteraction(userId, mediaRecord.id),
+      getUserReviewForMedia(userId, mediaRecord.id),
+      getMediaReviews(mediaRecord.id),
+      postsPagePromise,
+    ]);
 
   const watchNumber =
     mediaInteraction?.status === 'watched'
@@ -58,7 +63,8 @@ export async function getMediaDetailsPageData(
     watchNumber,
     existingReview,
     reviews,
-    posts,
+    posts: postsPage.posts,
+    postCursor: postsPage.nextCursor,
   };
 }
 

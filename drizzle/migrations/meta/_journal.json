@@ -29,6 +29,13 @@
       "when": 1788200888987,
       "tag": "0003_wonderful_katie_power",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788959170851,
+      "tag": "0004_remarkable_shinobi_shaw",
+      "breakpoints": true
     }
   ]
 }
