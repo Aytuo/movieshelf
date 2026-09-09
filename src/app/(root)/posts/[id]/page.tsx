@@ -1,4 +1,6 @@
+import CommentList from '@/components/comments/comment-list';
 import PostCard from '@/components/posts/post-card';
+import { getPostComments } from '@/lib/services/comment-service';
 import { getPostById } from '@/lib/services/post-service';
 import { ArrowLeft } from 'lucide-react';
 import { Metadata } from 'next';
@@ -31,7 +33,11 @@ export async function generateMetadata({
 
 const PostPage = async ({ params }: PostPageProps) => {
   const { id } = await params;
-  const post = await getPostById(id);
+
+  const [post, comments] = await Promise.all([
+    getPostById(id),
+    getPostComments(id),
+  ]);
 
   if (!post) {
     notFound();
@@ -51,11 +57,13 @@ const PostPage = async ({ params }: PostPageProps) => {
         </Link>
 
         <div className="mt-8">
-          <p className="eyebrow">Community post</p>
+          <p className="eyebrow">Discussion</p>
 
           <div className="mt-5">
             <PostCard post={post} variant="full" />
           </div>
+
+          <CommentList postId={post.id} comments={comments} />
         </div>
       </div>
     </main>

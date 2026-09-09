@@ -1,3 +1,4 @@
+export * from './comments';
 export * from './discover';
 export * from './media';
 export * from './people';
