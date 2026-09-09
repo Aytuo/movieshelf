@@ -5,12 +5,35 @@ import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import CommentCard from './comment-card';
 import CommentComposer from './comment-composer';
-import CommentForm from './comment-form';
 
 type CommentListProps = {
   postId: string;
   comments: Comment[];
 };
+
+function appendReply(
+  comments: Comment[],
+  parentId: string,
+  reply: Comment
+): Comment[] {
+  return comments.map((comment) => {
+    if (comment.id === parentId) {
+      return {
+        ...comment,
+        replies: [...comment.replies, reply],
+      };
+    }
+
+    if (comment.replies.length === 0) {
+      return comment;
+    }
+
+    return {
+      ...comment,
+      replies: appendReply(comment.replies, parentId, reply),
+    };
+  });
+}
 
 const CommentList = ({ postId, comments }: CommentListProps) => {
   const [items, setItems] = useState(comments);
@@ -21,18 +44,13 @@ const CommentList = ({ postId, comments }: CommentListProps) => {
   }
 
   function handleReplyCreated(comment: Comment) {
-    setItems((current) =>
-      current.map((item) => {
-        if (item.id !== comment.parentId) {
-          return item;
-        }
+    const parentId = comment.parentId;
 
-        return {
-          ...item,
-          replies: [...item.replies, comment],
-        };
-      })
-    );
+    if (!parentId) {
+      return;
+    }
+
+    setItems((current) => appendReply(current, parentId, comment));
 
     setReplyingTo(null);
   }
@@ -42,7 +60,7 @@ const CommentList = ({ postId, comments }: CommentListProps) => {
       <div className="mb-8">
         <p className="eyebrow">Community</p>
 
-        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
           Comments
         </h2>
 
@@ -56,23 +74,15 @@ const CommentList = ({ postId, comments }: CommentListProps) => {
       {items.length > 0 ? (
         <div className="space-y-4">
           {items.map((comment) => (
-            <div key={comment.id} className="space-y-3">
-              <CommentCard
-                comment={comment}
-                onReply={(commentId) => setReplyingTo(commentId)}
-              />
-
-              {replyingTo === comment.id && (
-                <div className="ml-8 rounded-2xl p-5 surface sm:ml-12">
-                  <CommentForm
-                    postId={postId}
-                    parentId={comment.id}
-                    onSuccess={handleReplyCreated}
-                    onCancel={() => setReplyingTo(null)}
-                  />
-                </div>
-              )}
-            </div>
+            <CommentCard
+              key={comment.id}
+              comment={comment}
+              postId={postId}
+              replyingTo={replyingTo}
+              onReply={setReplyingTo}
+              onReplyCreated={handleReplyCreated}
+              onReplyCancel={() => setReplyingTo(null)}
+            />
           ))}
         </div>
       ) : (

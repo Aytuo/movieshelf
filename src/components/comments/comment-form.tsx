@@ -26,10 +26,16 @@ const CommentForm = ({
 
     startTransition(async () => {
       try {
+        const trimmedContent = content.trim();
+
+        if (!trimmedContent) {
+          return;
+        }
+
         const comment = await saveComment({
           postId,
           parentId,
-          content,
+          content: trimmedContent,
         });
 
         toast.success(
@@ -50,28 +56,33 @@ const CommentForm = ({
     });
   }
 
+  const textareaId = parentId ? `reply-content-${parentId}` : 'comment-content';
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label
-          htmlFor={parentId ? 'reply-content' : 'comment-content'}
-          className="mb-2 block text-sm font-medium"
-        >
+        <label htmlFor={textareaId} className="mb-2 block text-sm font-medium">
           {parentId ? 'Your reply' : 'Your comment'}
         </label>
 
         <textarea
-          id={parentId ? 'reply-content' : 'comment-content'}
+          id={textareaId}
           value={content}
           onChange={(event) => setContent(event.target.value)}
-          rows={4}
+          rows={3}
           maxLength={2000}
           disabled={isPending}
-          className="min-h-28 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
+          className="min-h-24 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
           placeholder={
             parentId ? 'Write a reply...' : 'Join the conversation...'
           }
         />
+
+        <div className="mt-2 flex justify-end">
+          <span className="text-xs text-muted-foreground">
+            {content.length}/2000
+          </span>
+        </div>
       </div>
 
       <div className="flex items-center justify-end gap-3">

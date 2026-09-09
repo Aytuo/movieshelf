@@ -20,8 +20,14 @@ export type Comment = {
   content: string;
   createdAt: Date;
   updatedAt: Date;
+
   author: CommentAuthor;
+
   postId: string;
   parentId: string | null;
+
   replies: Comment[];
+
+  reactionCount: number;
+  viewerHasReacted: boolean;
 };
