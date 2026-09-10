@@ -4,7 +4,7 @@ import { media } from './media';
 import { mediaActivity } from './media-activity';
 import { mediaInteraction } from './media-interaction';
 import { profile } from './profile';
-import { comment, post, reaction, review } from './social';
+import { comment, commentReaction, post, postReaction, review } from './social';
 import { watchHistory } from './watch-history';
 
 /* ========================================================================== */
@@ -21,7 +21,8 @@ export const userRelations = relations(user, ({ one, many }) => ({
   mediaActivities: many(mediaActivity),
   posts: many(post),
   comments: many(comment),
-  reactions: many(reaction),
+  postReactions: many(postReaction),
+  commentReactions: many(commentReaction),
 }));
 
 /* ========================================================================== */
@@ -132,7 +133,7 @@ export const postRelations = relations(post, ({ one, many }) => ({
 
   comments: many(comment),
 
-  reactions: many(reaction),
+  reactions: many(postReaction),
 }));
 
 /* ========================================================================== */
@@ -151,14 +152,35 @@ export const commentRelations = relations(comment, ({ one, many }) => ({
   }),
 
   replies: many(comment, { relationName: 'commentReplies' }),
+
+  reactions: many(commentReaction),
 }));
 
 /* ========================================================================== */
-/*                             RELATIONS: REACTION                            */
+/*                          RELATIONS: POST REACTION                          */
 /* ========================================================================== */
 
-export const reactionRelations = relations(reaction, ({ one }) => ({
-  user: one(user, { fields: [reaction.userId], references: [user.id] }),
+export const postReactionRelations = relations(postReaction, ({ one }) => ({
+  user: one(user, { fields: [postReaction.userId], references: [user.id] }),
 
-  post: one(post, { fields: [reaction.postId], references: [post.id] }),
+  post: one(post, { fields: [postReaction.postId], references: [post.id] }),
 }));
+
+/* ========================================================================== */
+/*                         RELATIONS: COMMENT REACTION                        */
+/* ========================================================================== */
+
+export const commentReactionRelations = relations(
+  commentReaction,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [commentReaction.userId],
+      references: [user.id],
+    }),
+
+    comment: one(comment, {
+      fields: [commentReaction.commentId],
+      references: [comment.id],
+    }),
+  })
+);

@@ -26,6 +26,8 @@ function mapComment(row: CommentRow): Comment {
     postId: row.comment.postId,
     parentId: row.comment.parentId,
     replies: [],
+    reactionCount: 0,
+    viewerHasReacted: false,
   };
 }
 

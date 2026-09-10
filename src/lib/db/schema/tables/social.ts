@@ -118,8 +118,8 @@ export const comment = pgTable(
 /*                                  REACTION                                  */
 /* ========================================================================== */
 
-export const reaction = pgTable(
-  'reaction',
+export const postReaction = pgTable(
+  'post_reaction',
   {
     id: uuid('id').defaultRandom().primaryKey(),
     userId: text('user_id')
@@ -139,5 +139,29 @@ export const reaction = pgTable(
     ),
     index('reaction_post_idx').on(table.postId),
     index('reaction_user_idx').on(table.userId),
+  ]
+);
+
+export const commentReaction = pgTable(
+  'comment_reaction',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    commentId: uuid('comment_id')
+      .notNull()
+      .references(() => comment.id, { onDelete: 'cascade' }),
+    type: reactionTypeEnum('type').default('like').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('user_comment_reaction_idx').on(
+      table.userId,
+      table.commentId,
+      table.type
+    ),
+    index('comment_reaction_comment_idx').on(table.commentId),
+    index('comment_reaction_user_idx').on(table.userId),
   ]
 );
