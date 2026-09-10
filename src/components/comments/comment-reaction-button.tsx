@@ -50,7 +50,6 @@ export function CommentReactionButton({
     try {
       await toggleCommentReactionAction(commentId, postId);
 
-      // Server/DB is now the source of truth.
       router.refresh();
     } catch (error) {
       console.error('Failed to toggle comment reaction:', error);

@@ -3,7 +3,6 @@
 import type { Comment } from '@/types';
 import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useTransition } from 'react';
 import CommentForm from './comment-form';
 import { CommentReactionButton } from './comment-reaction-button';
 
@@ -15,9 +14,8 @@ type CommentCardProps = {
   onReply?: (commentId: string) => void;
   onReplyCreated?: (comment: Comment) => void;
   onReplyCancel?: () => void;
-  onReactionToggle?: (commentId: string) => void;
-  isReactionPending?: boolean;
 };
+
 function formatCommentDate(date: Date) {
   const diff = Date.now() - date.getTime();
   const minutes = Math.floor(diff / 60_000);
@@ -56,11 +54,7 @@ const CommentCard = ({
   onReply,
   onReplyCreated,
   onReplyCancel,
-  onReactionToggle,
-  isReactionPending = false,
 }: CommentCardProps) => {
-  const [isPending, startTransition] = useTransition();
-
   const { author } = comment;
 
   const authorLabel = author.displayName || `@${author.username}`;
@@ -191,8 +185,6 @@ const CommentCard = ({
                 onReply={onReply}
                 onReplyCreated={onReplyCreated}
                 onReplyCancel={onReplyCancel}
-                onReactionToggle={onReactionToggle}
-                isReactionPending={isReactionPending}
               />
             </div>
           ))}
