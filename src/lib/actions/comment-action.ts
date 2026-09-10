@@ -33,5 +33,5 @@ export async function loadPostComments(postId: string) {
     throw new Error('Unauthorized.');
   }
 
-  return getPostComments(postId);
+  return getPostComments(postId, session.user.id);
 }

@@ -1,5 +1,6 @@
 import CommentList from '@/components/comments/comment-list';
 import PostCard from '@/components/posts/post-card';
+import { requireSession } from '@/lib/auth/require-session';
 import { getPostComments } from '@/lib/services/comment-service';
 import { getPostById } from '@/lib/services/post-service';
 import { ArrowLeft } from 'lucide-react';
@@ -33,10 +34,11 @@ export async function generateMetadata({
 
 const PostPage = async ({ params }: PostPageProps) => {
   const { id } = await params;
+  const session = await requireSession();
 
   const [post, comments] = await Promise.all([
     getPostById(id),
-    getPostComments(id),
+    getPostComments(id, session.user.id),
   ]);
 
   if (!post) {
