@@ -4,6 +4,7 @@ import { toggleCommentReactionAction } from '@/lib/actions/comment-reaction-acti
 import { Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 type CommentReactionState = {
   count: number;
@@ -55,6 +56,10 @@ export function CommentReactionButton({
       console.error('Failed to toggle comment reaction:', error);
 
       setState(previous);
+
+      toast.error("Couldn't update reaction", {
+        description: 'Please try again.',
+      });
     } finally {
       setPending(false);
     }
@@ -67,10 +72,13 @@ export function CommentReactionButton({
       disabled={pending}
       aria-pressed={state.reacted}
       aria-label={state.reacted ? 'Unlike comment' : 'Like comment'}
-      className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+      aria-busy={pending}
+      className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-60"
     >
       <Heart
-        className="size-3.5"
+        className={`size-3.5 transition-transform ${
+          pending ? 'scale-90' : 'scale-100'
+        }`}
         fill={state.reacted ? 'currentColor' : 'none'}
       />
 
