@@ -26,6 +26,9 @@ export type Post = {
   updatedAt: Date;
   author: PostAuthor;
   media: Media;
+  reactionCount: number;
+  viewerHasReacted: boolean;
+  commentCount: number;
 };
 
 export type PostPage = {

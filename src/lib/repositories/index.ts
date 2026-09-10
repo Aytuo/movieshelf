@@ -3,6 +3,7 @@ export * from './comment-repository';
 export * from './media-activity-repository';
 export * from './media-interaction-repository';
 export * from './media-repository';
+export * from './post-reaction-repository';
 export * from './post-repository';
 export * from './profile-repository';
 export * from './review-repository';

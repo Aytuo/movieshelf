@@ -2,7 +2,10 @@ import CommentList from '@/components/comments/comment-list';
 import PostCard from '@/components/posts/post-card';
 import { requireSession } from '@/lib/auth/require-session';
 import { getPostComments } from '@/lib/services/comment-service';
-import { getPostById } from '@/lib/services/post-service';
+import {
+  getPostById,
+  getPostByIdWithReaction,
+} from '@/lib/services/post-service';
 import { ArrowLeft } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -37,7 +40,7 @@ const PostPage = async ({ params }: PostPageProps) => {
   const session = await requireSession();
 
   const [post, comments] = await Promise.all([
-    getPostById(id),
+    getPostByIdWithReaction(id, session.user.id),
     getPostComments(id, session.user.id),
   ]);
 

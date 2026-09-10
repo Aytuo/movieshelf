@@ -16,18 +16,31 @@ type PostFeedProps = {
   tmdbId: number;
 };
 
+function mergePosts(serverPosts: Post[], additionalPosts: Post[]): Post[] {
+  const map = new Map(additionalPosts.map((post) => [post.id, post]));
+
+  for (const post of serverPosts) {
+    map.set(post.id, post);
+  }
+
+  return Array.from(map.values());
+}
+
 const PostFeed = ({
   initialPosts,
   initialCursor,
   type,
   tmdbId,
 }: PostFeedProps) => {
-  const [posts, setPosts] = useState(initialPosts);
+  const [additionalPosts, setAdditionalPosts] = useState<Post[]>([]);
   const [cursor, setCursor] = useState(initialCursor);
+
   const [isPending, startTransition] = useTransition();
 
+  const posts = mergePosts(initialPosts, additionalPosts);
+
   function handlePostCreated(post: Post) {
-    setPosts((current) => [post, ...current]);
+    setAdditionalPosts((current) => [post, ...current]);
   }
 
   function handleLoadMore() {
@@ -39,7 +52,7 @@ const PostFeed = ({
       try {
         const result = await loadMoreMediaPosts(type, tmdbId, cursor);
 
-        setPosts((current) => [...current, ...result.posts]);
+        setAdditionalPosts((current) => [...current, ...result.posts]);
         setCursor(result.nextCursor);
       } catch {
         toast.error("We couldn't load posts. Please try again.");

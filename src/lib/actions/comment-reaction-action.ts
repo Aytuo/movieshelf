@@ -1,8 +1,8 @@
 'use server';
 
+import { requireSession } from '@/lib/auth/require-session';
+import { toggleCommentReaction } from '@/lib/services/comment-reaction-service';
 import { revalidatePath } from 'next/cache';
-import { requireSession } from '../auth/require-session';
-import { toggleCommentReaction } from '../services/comment-reaction-service';
 
 export async function toggleCommentReactionAction(
   commentId: string,

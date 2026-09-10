@@ -1,5 +1,7 @@
 import type { Post } from '@/types';
+import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import { PostReactionButton } from './post-reaction-button';
 
 type PostCardProps = {
   post: Post;
@@ -21,6 +23,7 @@ function getPreviewContent(content: string) {
 const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
   const { author } = post;
   const authorLabel = author.displayName || `@${author.username}`;
+
   const isPreview = variant === 'preview';
 
   return (
@@ -86,6 +89,28 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
           </p>
         </>
       )}
+
+      <div className="mt-5 flex items-center gap-4 text-xs font-semibold text-muted-foreground">
+        <PostReactionButton
+          postId={post.id}
+          count={post.reactionCount}
+          reacted={post.viewerHasReacted}
+        />
+
+        <span aria-hidden="true">·</span>
+
+        <Link
+          href={`/posts/${post.id}#comments`}
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+        >
+          <MessageCircle className="size-3.5" />
+
+          <span>
+            {post.commentCount} comment
+            {post.commentCount === 1 ? '' : 's'}
+          </span>
+        </Link>
+      </div>
     </article>
   );
 };

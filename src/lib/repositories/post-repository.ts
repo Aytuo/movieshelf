@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
-import { media, post, profile } from '@/lib/db/schema';
+import { comment, media, post, profile } from '@/lib/db/schema';
 import type { Post, PostPage, PostPaginationOptions } from '@/types';
-import { and, desc, eq, lt, or } from 'drizzle-orm';
+import { and, desc, eq, inArray, lt, or, sql } from 'drizzle-orm';
 
 const DEFAULT_POST_PAGE_SIZE = 5;
 const MAX_POST_PAGE_SIZE = 20;
@@ -49,6 +49,10 @@ function mapPost(row: PostRow): Post {
       originalLanguage: row.media.originalLanguage,
       genres: row.media.genres,
     },
+
+    reactionCount: 0,
+    viewerHasReacted: false,
+    commentCount: 0,
   };
 }
 
@@ -189,4 +193,26 @@ export async function getPostById(postId: string): Promise<Post | null> {
     .limit(1);
 
   return row ? mapPost(row) : null;
+}
+
+export async function getPostCommentCounts(
+  postIds: string[]
+): Promise<{ postId: string; count: number }[]> {
+  if (postIds.length === 0) {
+    return [];
+  }
+
+  const rows = await db
+    .select({
+      postId: comment.postId,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(comment)
+    .where(inArray(comment.postId, postIds))
+    .groupBy(comment.postId);
+
+  return rows.map((row) => ({
+    postId: row.postId,
+    count: row.count,
+  }));
 }

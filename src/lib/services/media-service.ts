@@ -1,6 +1,5 @@
 import type { MediaDetails, MediaType, TvSeasonDetails } from '@/lib/media';
 import {
-  getMediaPosts as getMediaPostsRepository,
   getMediaRecordByTmdbId,
   getMediaReviews,
   getUserMediaInteraction,
@@ -10,6 +9,7 @@ import {
   upsertMedia,
 } from '@/lib/repositories';
 import type { MediaRecord } from '@/types';
+import { getMediaPosts } from './post-service';
 import { getMediaWatchCountForUser } from './watch-history-service';
 
 function getMediaRepository(type: MediaType) {
@@ -40,7 +40,7 @@ export async function getMediaDetailsPageData(
 
   const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, mediaDetails);
 
-  const postsPagePromise = getMediaPostsRepository(mediaRecord.id, {
+  const postsPagePromise = getMediaPosts(type, tmdbId, userId, {
     limit: 5,
   });
 

@@ -47,7 +47,7 @@ export async function loadMoreMediaPosts(
     throw new Error('Invalid cursor.');
   }
 
-  return getMediaPosts(type, tmdbId, {
+  return getMediaPosts(type, tmdbId, session.user.id, {
     limit: 5,
     cursor,
   });

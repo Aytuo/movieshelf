@@ -56,7 +56,7 @@ const CommentList = ({ postId, comments }: CommentListProps) => {
   }
 
   return (
-    <section className="mt-12 border-t border-border/60 pt-10">
+    <section id="comments" className="mt-12 border-t border-border/60 pt-10">
       <div className="mb-8">
         <p className="eyebrow">Community</p>
 
