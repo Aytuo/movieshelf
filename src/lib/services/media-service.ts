@@ -40,7 +40,7 @@ export async function getMediaDetailsPageData(
 
   const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, mediaDetails);
 
-  const postsPagePromise = getMediaPosts(type, tmdbId, userId, {
+  const postsPagePromise = getMediaPosts(mediaRecord.id, userId, {
     limit: 5,
   });
 

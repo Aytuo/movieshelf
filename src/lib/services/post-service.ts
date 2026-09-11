@@ -5,7 +5,6 @@ import {
   getPostCommentCounts,
 } from '@/lib/repositories';
 import type { Post, PostInput, PostPaginationOptions } from '@/types';
-import { getOrCreateMediaRecord } from './media-service';
 import { getPostReactionStats } from './post-reaction-service';
 
 function attachPostStats(
@@ -31,26 +30,25 @@ function attachPostStats(
   });
 }
 
-export async function createPost(userId: string, input: PostInput) {
-  const media = await getOrCreateMediaRecord(input.type, input.tmdbId);
-
+export async function createPost(
+  userId: string,
+  mediaId: string,
+  input: PostInput
+) {
   return createPostRepository({
     authorId: userId,
-    mediaId: media.id,
+    mediaId,
     title: input.title,
     content: input.content,
   });
 }
 
 export async function getMediaPosts(
-  type: PostInput['type'],
-  tmdbId: number,
+  mediaId: string,
   userId: string,
   options?: PostPaginationOptions
 ) {
-  const media = await getOrCreateMediaRecord(type, tmdbId);
-
-  const page = await getMediaPostsRepository(media.id, options);
+  const page = await getMediaPostsRepository(mediaId, options);
 
   if (page.posts.length === 0) {
     return page;

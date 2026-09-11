@@ -50,62 +50,54 @@ export async function toggleCommentReaction(
   commentId: string,
   userId: string
 ): Promise<CommentReactionToggleResult> {
-  const result = await db.execute<{
-    count: number;
-    reacted: boolean;
-  }>(sql`
-    WITH deleted AS (
-      DELETE FROM comment_reaction
-      WHERE
-        comment_id = ${commentId}
-        AND user_id = ${userId}
-        AND type = 'like'
-      RETURNING id
-    ),
-    inserted AS (
-      INSERT INTO comment_reaction (
-        user_id,
-        comment_id,
-        type
+  const deleted = await db
+    .delete(commentReaction)
+    .where(
+      and(
+        eq(commentReaction.commentId, commentId),
+        eq(commentReaction.userId, userId),
+        eq(commentReaction.type, 'like')
       )
-      SELECT
-        ${userId},
-        ${commentId},
-        'like'
-      WHERE NOT EXISTS (
-        SELECT 1 FROM deleted
-      )
-      ON CONFLICT (
-        user_id,
-        comment_id,
-        type
-      )
-      DO NOTHING
-      RETURNING id
     )
-    SELECT
-      (
-        SELECT count(*)::int
-        FROM comment_reaction
-        WHERE
-          comment_id = ${commentId}
-          AND type = 'like'
-      ) AS count,
-      EXISTS (
-        SELECT 1
-        FROM comment_reaction
-        WHERE
-          comment_id = ${commentId}
-          AND user_id = ${userId}
-          AND type = 'like'
-      ) AS reacted
-  `);
+    .returning({
+      id: commentReaction.id,
+    });
 
-  const row = result.rows[0];
+  if (deleted.length === 0) {
+    await db
+      .insert(commentReaction)
+      .values({
+        commentId,
+        userId,
+        type: 'like',
+      })
+      .onConflictDoNothing({
+        target: [
+          commentReaction.userId,
+          commentReaction.commentId,
+          commentReaction.type,
+        ],
+      });
+  }
+
+  const [stats] = await db
+    .select({
+      count: sql<number>`count(*)::int`,
+      reacted: sql<boolean>`
+        bool_or(${commentReaction.userId} = ${userId})
+      `,
+    })
+    .from(commentReaction)
+    .where(
+      and(
+        eq(commentReaction.commentId, commentId),
+        eq(commentReaction.type, 'like')
+      )
+    );
 
   return {
     commentId,
-    count: row?.count ?? 0,
-    reacted: row?.reacted ?? false,
+    count: stats?.count ?? 0,
+    reacted: stats?.reacted ?? false,
   };
 }

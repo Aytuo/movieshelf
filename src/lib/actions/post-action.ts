@@ -1,6 +1,7 @@
 'use server';
 
 import { requireSession } from '@/lib/auth/require-session';
+import { getOrCreateMediaRecord } from '@/lib/services/media-service';
 import { createPost, getMediaPosts } from '@/lib/services/post-service';
 import { postSchema } from '@/lib/validations/post';
 import type { PostInput } from '@/types';
@@ -19,7 +20,12 @@ export async function savePost(input: PostInput) {
     throw new Error('Invalid post data.');
   }
 
-  const post = await createPost(session.user.id, parsed.data);
+  const media = await getOrCreateMediaRecord(
+    parsed.data.type,
+    parsed.data.tmdbId
+  );
+
+  const post = await createPost(session.user.id, media.id, parsed.data);
 
   if (!post) {
     throw new Error('Unable to create post.');
@@ -47,7 +53,9 @@ export async function loadMoreMediaPosts(
     throw new Error('Invalid cursor.');
   }
 
-  return getMediaPosts(type, tmdbId, session.user.id, {
+  const media = await getOrCreateMediaRecord(type, tmdbId);
+
+  return getMediaPosts(media.id, session.user.id, {
     limit: 5,
     cursor,
   });
