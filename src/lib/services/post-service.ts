@@ -1,5 +1,6 @@
 import {
   createPost as createPostRepository,
+  getMediaAuthorRatings,
   getMediaPosts as getMediaPostsRepository,
   getPostById as getPostByIdRepository,
   getPostCommentCounts,
@@ -30,6 +31,21 @@ function attachPostStats(
   });
 }
 
+function attachAuthorRatings(
+  posts: Post[],
+  ratings: { userId: string; rating: number }[]
+): Post[] {
+  const ratingMap = new Map(ratings.map((item) => [item.userId, item.rating]));
+
+  return posts.map((post) => ({
+    ...post,
+    author: {
+      ...post.author,
+      rating: ratingMap.get(post.author.userId) ?? null,
+    },
+  }));
+}
+
 export async function createPost(
   userId: string,
   mediaId: string,
@@ -56,14 +72,23 @@ export async function getMediaPosts(
 
   const postIds = page.posts.map((post) => post.id);
 
-  const [reactionStats, commentCounts] = await Promise.all([
+  const authorIds = [...new Set(page.posts.map((post) => post.author.userId))];
+
+  const [reactionStats, commentCounts, authorRatings] = await Promise.all([
     getPostReactionStats(postIds, userId),
     getPostCommentCounts(postIds),
+    getMediaAuthorRatings(mediaId, authorIds),
   ]);
+
+  const postsWithStats = attachPostStats(
+    page.posts,
+    reactionStats,
+    commentCounts
+  );
 
   return {
     ...page,
-    posts: attachPostStats(page.posts, reactionStats, commentCounts),
+    posts: attachAuthorRatings(postsWithStats, authorRatings),
   };
 }
 

@@ -1,6 +1,8 @@
 import {
   createComment as createCommentRepository,
+  getMediaAuthorRatings,
   getPostComments as getPostCommentsRepository,
+  getPostMediaId,
 } from '@/lib/repositories';
 import type { Comment, CommentInput } from '@/types';
 import { getCommentReactionStats } from './comment-reaction-service';
@@ -62,13 +64,28 @@ export async function getPostComments(
     return tree;
   }
 
-  const reactionStats = await getCommentReactionStats(
-    flatComments.map((comment) => comment.id),
-    userId
-  );
+  const authorIds = [
+    ...new Set(flatComments.map((comment) => comment.author.userId)),
+  ];
+
+  const [reactionStats, mediaId] = await Promise.all([
+    getCommentReactionStats(
+      flatComments.map((comment) => comment.id),
+      userId
+    ),
+    getPostMediaId(postId),
+  ]);
+
+  const authorRatings = mediaId
+    ? await getMediaAuthorRatings(mediaId, authorIds)
+    : [];
 
   const reactionStatsMap = new Map(
     reactionStats.map((stats) => [stats.commentId, stats])
+  );
+
+  const authorRatingsMap = new Map(
+    authorRatings.map((rating) => [rating.userId, rating.rating])
   );
 
   function attachReactionStats(comments: Comment[]): Comment[] {
@@ -77,6 +94,10 @@ export async function getPostComments(
 
       return {
         ...comment,
+        author: {
+          ...comment.author,
+          rating: authorRatingsMap.get(comment.author.userId) ?? null,
+        },
         reactionCount: stats?.count ?? 0,
         viewerHasReacted: stats?.reacted ?? false,
         replies: attachReactionStats(comment.replies),

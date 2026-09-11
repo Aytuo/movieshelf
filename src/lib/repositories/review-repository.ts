@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { media, mediaActivity, profile, review } from '@/lib/db/schema';
 import type { ReviewInput } from '@/types';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 
 type DbReview = typeof review.$inferSelect;
 type DbMedia = typeof media.$inferSelect;
@@ -138,4 +138,21 @@ export async function deleteReview(
   await db
     .delete(review)
     .where(and(eq(review.id, reviewId), eq(review.userId, userId)));
+}
+
+export async function getMediaAuthorRatings(
+  mediaId: string,
+  userIds: string[]
+): Promise<{ userId: string; rating: number }[]> {
+  if (userIds.length === 0) {
+    return [];
+  }
+
+  return db
+    .select({
+      userId: review.userId,
+      rating: review.rating,
+    })
+    .from(review)
+    .where(and(eq(review.mediaId, mediaId), inArray(review.userId, userIds)));
 }

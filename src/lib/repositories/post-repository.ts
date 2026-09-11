@@ -33,6 +33,7 @@ function mapPost(row: PostRow): Post {
       username: row.profile.username,
       displayName: row.profile.displayName,
       avatarUrl: row.profile.avatarUrl,
+      rating: null,
     },
 
     media: {
@@ -193,6 +194,18 @@ export async function getPostById(postId: string): Promise<Post | null> {
     .limit(1);
 
   return row ? mapPost(row) : null;
+}
+
+export async function getPostMediaId(postId: string): Promise<string | null> {
+  const [row] = await db
+    .select({
+      mediaId: post.mediaId,
+    })
+    .from(post)
+    .where(eq(post.id, postId))
+    .limit(1);
+
+  return row?.mediaId ?? null;
 }
 
 export async function getPostCommentCounts(

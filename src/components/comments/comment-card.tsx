@@ -1,7 +1,7 @@
 'use client';
 
 import type { Comment } from '@/types';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Star } from 'lucide-react';
 import Link from 'next/link';
 import CommentForm from './comment-form';
 import { CommentReactionButton } from './comment-reaction-button';
@@ -9,6 +9,7 @@ import { CommentReactionButton } from './comment-reaction-button';
 type CommentCardProps = {
   comment: Comment;
   postId: string;
+  mediaType: 'movie' | 'tv';
   depth?: number;
   replyingTo?: string | null;
   onReply?: (commentId: string) => void;
@@ -49,6 +50,7 @@ function formatCommentDate(date: Date) {
 const CommentCard = ({
   comment,
   postId,
+  mediaType,
   depth = 0,
   replyingTo,
   onReply,
@@ -103,8 +105,29 @@ const CommentCard = ({
                 {authorLabel}
               </Link>
 
-              <p className="truncate text-xs text-muted-foreground">
-                @{author.username}
+              <p className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                <span className="truncate">@{author.username}</span>
+
+                {author.rating !== null && (
+                  <>
+                    <span aria-hidden="true">·</span>
+
+                    <span className="inline-flex min-w-0 items-center gap-1">
+                      <span className="truncate">
+                        rated this{' '}
+                        {mediaType === 'movie' ? 'movie' : 'TV series'}
+                      </span>
+
+                      <span className="inline-flex shrink-0 items-center gap-0.5 font-semibold text-foreground">
+                        {author.rating}/10
+                        <Star
+                          className="size-3 fill-current"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </span>
+                  </>
+                )}
               </p>
             </div>
 
@@ -117,7 +140,7 @@ const CommentCard = ({
             </time>
           </div>
 
-          <p className="mt-4 text-sm leading-7 whitespace-pre-line text-muted-foreground">
+          <p className="mt-4 rounded-xl border border-border/70 bg-surface-hover/40 px-4 py-3 text-sm leading-7 whitespace-pre-line text-foreground/80">
             {comment.content}
           </p>
 
@@ -167,18 +190,19 @@ const CommentCard = ({
               {/* Vertical branch */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute top-0 left-0 h-full border-l border-border/60 group-last/reply:h-4"
+                className="pointer-events-none absolute -top-3 left-0 h-full border-l border-border/60 group-last/reply:h-0"
               />
 
-              {/* Horizontal branch */}
+              {/* Rounded branch */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute top-4 left-0 w-6 border-t border-border/60"
+                className="pointer-events-none absolute -top-3 left-0 h-7 w-6 rounded-bl-2xl border-b border-l border-border/60"
               />
 
               <CommentCard
                 comment={reply}
                 postId={postId}
+                mediaType={mediaType}
                 depth={depth + 1}
                 replyingTo={replyingTo}
                 onReply={onReply}

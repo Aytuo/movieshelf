@@ -68,7 +68,11 @@ const PostPage = async ({ params }: PostPageProps) => {
             <PostCard post={post} variant="full" />
           </div>
 
-          <CommentList postId={post.id} comments={comments} />
+          <CommentList
+            postId={post.id}
+            comments={comments}
+            mediaType={post.media.type}
+          />
         </div>
       </div>
     </main>

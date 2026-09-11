@@ -22,6 +22,7 @@ function mapComment(row: CommentRow): Comment {
       username: row.profile.username,
       displayName: row.profile.displayName,
       avatarUrl: row.profile.avatarUrl,
+      rating: null,
     },
     postId: row.comment.postId,
     parentId: row.comment.parentId,

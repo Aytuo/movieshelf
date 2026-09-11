@@ -9,6 +9,7 @@ import CommentComposer from './comment-composer';
 type CommentListProps = {
   postId: string;
   comments: Comment[];
+  mediaType: 'movie' | 'tv';
 };
 
 function appendReply(
@@ -35,7 +36,7 @@ function appendReply(
   });
 }
 
-const CommentList = ({ postId, comments }: CommentListProps) => {
+const CommentList = ({ postId, comments, mediaType }: CommentListProps) => {
   const [items, setItems] = useState(comments);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
@@ -78,6 +79,7 @@ const CommentList = ({ postId, comments }: CommentListProps) => {
               key={comment.id}
               comment={comment}
               postId={postId}
+              mediaType={mediaType}
               replyingTo={replyingTo}
               onReply={setReplyingTo}
               onReplyCreated={handleReplyCreated}

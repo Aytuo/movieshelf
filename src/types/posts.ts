@@ -9,6 +9,7 @@ export type PostAuthor = {
   username: string;
   displayName: string | null;
   avatarUrl: string | null;
+  rating: number | null;
 };
 
 export type PostInput = {

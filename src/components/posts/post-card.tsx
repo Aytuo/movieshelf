@@ -1,5 +1,5 @@
 import type { Post } from '@/types';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Star } from 'lucide-react';
 import Link from 'next/link';
 import { PostReactionButton } from './post-reaction-button';
 
@@ -50,8 +50,21 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
               {authorLabel}
             </p>
 
-            <p className="truncate text-xs text-muted-foreground">
-              @{author.username}
+            <p className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+              <span className="truncate">@{author.username}</span>
+              {author.rating !== null && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span className="inline-flex shrink-0 items-center gap-1">
+                    rated this{' '}
+                    {post.media.type === 'movie' ? 'movie' : 'TV series'}{' '}
+                    <span className="font-semibold text-foreground">
+                      {author.rating}/10
+                    </span>
+                    <Star className="size-3 fill-current" aria-hidden="true" />
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </Link>
@@ -90,7 +103,7 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
         </>
       )}
 
-      <div className="mt-5 flex items-center gap-4 text-xs font-semibold text-muted-foreground">
+      <div className="mt-5 flex items-center gap-3 text-xs font-semibold text-muted-foreground">
         <PostReactionButton
           postId={post.id}
           count={post.reactionCount}
