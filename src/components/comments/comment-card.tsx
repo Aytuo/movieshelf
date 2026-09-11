@@ -133,7 +133,6 @@ const CommentCard = ({
 
             <CommentReactionButton
               commentId={comment.id}
-              postId={postId}
               count={comment.reactionCount}
               reacted={comment.viewerHasReacted}
             />

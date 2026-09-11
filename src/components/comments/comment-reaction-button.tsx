@@ -2,7 +2,6 @@
 
 import { toggleCommentReactionAction } from '@/lib/actions/comment-reaction-action';
 import { Heart } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -13,48 +12,43 @@ type CommentReactionState = {
 
 type CommentReactionButtonProps = {
   commentId: string;
-  postId: string;
   count: number;
   reacted: boolean;
 };
 
 export function CommentReactionButton({
   commentId,
-  postId,
-  count,
-  reacted,
+  count: initialCount,
+  reacted: initialReacted,
 }: CommentReactionButtonProps) {
-  const router = useRouter();
-
   const [state, setState] = useState<CommentReactionState>({
-    count,
-    reacted,
+    count: initialCount,
+    reacted: initialReacted,
   });
 
   const [pending, setPending] = useState(false);
 
   async function handleToggle() {
-    if (pending) {
-      return;
-    }
+    if (pending) return;
 
     const previous = state;
 
-    const optimistic = {
+    setState({
       count: previous.count + (previous.reacted ? -1 : 1),
       reacted: !previous.reacted,
-    };
+    });
 
-    setState(optimistic);
     setPending(true);
 
     try {
-      await toggleCommentReactionAction(commentId, postId);
+      const result = await toggleCommentReactionAction(commentId);
 
-      router.refresh();
+      setState({
+        count: result.count,
+        reacted: result.reacted,
+      });
     } catch (error) {
       console.error('Failed to toggle comment reaction:', error);
-
       setState(previous);
 
       toast.error("Couldn't update reaction", {
@@ -81,9 +75,7 @@ export function CommentReactionButton({
         }`}
         fill={state.reacted ? 'currentColor' : 'none'}
       />
-
       <span>{state.reacted ? 'Liked' : 'Like'}</span>
-
       <span>{state.count}</span>
     </button>
   );
