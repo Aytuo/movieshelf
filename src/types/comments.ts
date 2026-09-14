@@ -27,7 +27,8 @@ export type Comment = {
   postId: string;
   parentId: string | null;
 
-  replies: Comment[];
+  replyCount: number;
+  replies?: Comment[];
 
   reactionCount: number;
   viewerHasReacted: boolean;

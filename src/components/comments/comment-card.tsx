@@ -1,8 +1,10 @@
 'use client';
 
+import { loadCommentReplies } from '@/lib/actions/comment-action';
 import type { Comment } from '@/types';
-import { MessageCircle, Star } from 'lucide-react';
+import { CornerDownRight, MessageCircle, Star } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import CommentForm from './comment-form';
 import { CommentReactionButton } from './comment-reaction-button';
 
@@ -11,10 +13,6 @@ type CommentCardProps = {
   postId: string;
   mediaType: 'movie' | 'tv';
   depth?: number;
-  replyingTo?: string | null;
-  onReply?: (commentId: string) => void;
-  onReplyCreated?: (comment: Comment) => void;
-  onReplyCancel?: () => void;
 };
 
 function formatCommentDate(date: Date) {
@@ -52,17 +50,58 @@ const CommentCard = ({
   postId,
   mediaType,
   depth = 0,
-  replyingTo,
-  onReply,
-  onReplyCreated,
-  onReplyCancel,
 }: CommentCardProps) => {
   const { author } = comment;
 
   const authorLabel = author.displayName || `@${author.username}`;
 
   const isReply = depth > 0;
-  const isReplying = replyingTo === comment.id;
+
+  const [replies, setReplies] = useState<Comment[] | undefined>(
+    comment.replies
+  );
+
+  const [replyCount, setReplyCount] = useState(comment.replyCount);
+
+  const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+
+  const [isRepliesOpen, setIsRepliesOpen] = useState(
+    comment.replies !== undefined
+  );
+
+  const [isReplying, setIsReplying] = useState(false);
+
+  async function handleToggleReplies() {
+    if (isRepliesOpen) {
+      setIsRepliesOpen(false);
+      return;
+    }
+
+    if (replies !== undefined) {
+      setIsRepliesOpen(true);
+      return;
+    }
+
+    setIsLoadingReplies(true);
+
+    try {
+      const loaded = await loadCommentReplies(postId, comment.id);
+
+      setReplies(loaded);
+      setIsRepliesOpen(true);
+    } finally {
+      setIsLoadingReplies(false);
+    }
+  }
+
+  function handleReplyCreated(createdComment: Comment) {
+    setReplies((current) => [...(current ?? []), createdComment]);
+
+    setReplyCount((current) => current + 1);
+
+    setIsReplying(false);
+    setIsRepliesOpen(true);
+  }
 
   return (
     <article
@@ -145,14 +184,33 @@ const CommentCard = ({
           </p>
 
           <div className="mt-4 flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => onReply?.(comment.id)}
-              className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <MessageCircle className="size-3.5" />
-              Reply
-            </button>
+            {!isReply && (
+              <button
+                type="button"
+                onClick={() => setIsReplying((current) => !current)}
+                className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <CornerDownRight className="size-3.5" />
+                Reply
+              </button>
+            )}
+
+            {replyCount > 0 && (
+              <button
+                type="button"
+                onClick={handleToggleReplies}
+                disabled={isLoadingReplies}
+                className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+              >
+                <MessageCircle className="size-3.5" />
+
+                {isLoadingReplies
+                  ? 'Loading…'
+                  : isRepliesOpen
+                    ? 'Hide replies'
+                    : `${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`}
+              </button>
+            )}
 
             <CommentReactionButton
               commentId={comment.id}
@@ -163,26 +221,20 @@ const CommentCard = ({
         </div>
       </div>
 
-      {isReplying && (
+      {!isReply && isReplying && (
         <div className="mt-4 border-t border-border/50 pt-4">
           <CommentForm
             postId={postId}
             parentId={comment.id}
-            onSuccess={onReplyCreated}
-            onCancel={onReplyCancel}
+            onSuccess={handleReplyCreated}
+            onCancel={() => setIsReplying(false)}
           />
         </div>
       )}
 
-      {comment.replies.length > 0 && (
-        <div
-          className={
-            isReply
-              ? 'relative mt-5 ml-4 pl-6 sm:ml-5'
-              : 'relative mt-5 ml-8 pl-6 sm:ml-9'
-          }
-        >
-          {comment.replies.map((reply) => (
+      {isRepliesOpen && replies && replies.length > 0 && (
+        <div className="relative mt-5 ml-8 pl-6 sm:ml-9">
+          {replies.map((reply) => (
             <div
               key={reply.id}
               className="group/reply relative pb-4 pl-6 last:pb-0"
@@ -203,11 +255,7 @@ const CommentCard = ({
                 comment={reply}
                 postId={postId}
                 mediaType={mediaType}
-                depth={depth + 1}
-                replyingTo={replyingTo}
-                onReply={onReply}
-                onReplyCreated={onReplyCreated}
-                onReplyCancel={onReplyCancel}
+                depth={1}
               />
             </div>
           ))}

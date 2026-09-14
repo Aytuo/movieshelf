@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { comment, profile } from '@/lib/db/schema';
 import type { Comment } from '@/types';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, count, desc, eq, isNull } from 'drizzle-orm';
 
 type DbComment = typeof comment.$inferSelect;
 type DbProfile = typeof profile.$inferSelect;
@@ -11,12 +11,13 @@ type CommentRow = {
   profile: DbProfile;
 };
 
-function mapComment(row: CommentRow): Comment {
+function mapComment(row: CommentRow, replyCount = 0): Comment {
   return {
     id: row.comment.id,
     content: row.comment.content,
     createdAt: row.comment.createdAt,
     updatedAt: row.comment.updatedAt,
+
     author: {
       userId: row.profile.userId,
       username: row.profile.username,
@@ -24,9 +25,13 @@ function mapComment(row: CommentRow): Comment {
       avatarUrl: row.profile.avatarUrl,
       rating: null,
     },
+
     postId: row.comment.postId,
     parentId: row.comment.parentId,
-    replies: [],
+
+    replyCount,
+    replies: undefined,
+
     reactionCount: 0,
     viewerHasReacted: false,
   };
@@ -43,12 +48,13 @@ export async function createComment(data: {
       .select({
         id: comment.id,
         postId: comment.postId,
+        parentId: comment.parentId,
       })
       .from(comment)
       .where(eq(comment.id, data.parentId))
       .limit(1);
 
-    if (!parent || parent.postId !== data.postId) {
+    if (!parent || parent.postId !== data.postId || parent.parentId !== null) {
       return null;
     }
   }
@@ -77,7 +83,7 @@ export async function createComment(data: {
     .where(eq(comment.id, created.id))
     .limit(1);
 
-  return row ? mapComment(row as CommentRow) : null;
+  return row ? mapComment(row) : null;
 }
 
 export async function getPostComments(postId: string): Promise<Comment[]> {
@@ -88,8 +94,49 @@ export async function getPostComments(postId: string): Promise<Comment[]> {
     })
     .from(comment)
     .innerJoin(profile, eq(profile.userId, comment.authorId))
+    .where(and(eq(comment.postId, postId), isNull(comment.parentId)))
+    .orderBy(desc(comment.createdAt), desc(comment.id));
+
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const replyCounts = await db
+    .select({
+      parentId: comment.parentId,
+      count: count(),
+    })
+    .from(comment)
     .where(eq(comment.postId, postId))
+    .groupBy(comment.parentId);
+
+  const replyCountMap = new Map(
+    replyCounts
+      .filter(({ parentId }) => parentId !== null)
+      .map(({ parentId, count: replyCount }) => [
+        parentId as string,
+        Number(replyCount),
+      ])
+  );
+
+  return rows.map((row) =>
+    mapComment(row, replyCountMap.get(row.comment.id) ?? 0)
+  );
+}
+
+export async function getCommentReplies(
+  parentId: string,
+  postId: string
+): Promise<Comment[]> {
+  const rows = await db
+    .select({
+      comment,
+      profile,
+    })
+    .from(comment)
+    .innerJoin(profile, eq(profile.userId, comment.authorId))
+    .where(and(eq(comment.parentId, parentId), eq(comment.postId, postId)))
     .orderBy(asc(comment.createdAt), asc(comment.id));
 
-  return rows.map((row) => mapComment(row as CommentRow));
+  return rows.map((row) => mapComment(row));
 }

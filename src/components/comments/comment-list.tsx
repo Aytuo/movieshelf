@@ -12,48 +12,11 @@ type CommentListProps = {
   mediaType: 'movie' | 'tv';
 };
 
-function appendReply(
-  comments: Comment[],
-  parentId: string,
-  reply: Comment
-): Comment[] {
-  return comments.map((comment) => {
-    if (comment.id === parentId) {
-      return {
-        ...comment,
-        replies: [...comment.replies, reply],
-      };
-    }
-
-    if (comment.replies.length === 0) {
-      return comment;
-    }
-
-    return {
-      ...comment,
-      replies: appendReply(comment.replies, parentId, reply),
-    };
-  });
-}
-
 const CommentList = ({ postId, comments, mediaType }: CommentListProps) => {
   const [items, setItems] = useState(comments);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
   function handleCommentCreated(comment: Comment) {
     setItems((current) => [comment, ...current]);
-  }
-
-  function handleReplyCreated(comment: Comment) {
-    const parentId = comment.parentId;
-
-    if (!parentId) {
-      return;
-    }
-
-    setItems((current) => appendReply(current, parentId, comment));
-
-    setReplyingTo(null);
   }
 
   return (
@@ -80,10 +43,6 @@ const CommentList = ({ postId, comments, mediaType }: CommentListProps) => {
               comment={comment}
               postId={postId}
               mediaType={mediaType}
-              replyingTo={replyingTo}
-              onReply={setReplyingTo}
-              onReplyCreated={handleReplyCreated}
-              onReplyCancel={() => setReplyingTo(null)}
             />
           ))}
         </div>

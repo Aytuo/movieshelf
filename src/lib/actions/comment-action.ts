@@ -1,7 +1,11 @@
 'use server';
 
 import { requireSession } from '@/lib/auth/require-session';
-import { createComment, getPostComments } from '@/lib/services/comment-service';
+import {
+  createComment,
+  getCommentReplies,
+  getPostComments,
+} from '@/lib/services/comment-service';
 import { commentSchema } from '@/lib/validations/comment';
 import type { CommentInput } from '@/types';
 import { revalidatePath } from 'next/cache';
@@ -34,4 +38,14 @@ export async function loadPostComments(postId: string) {
   }
 
   return getPostComments(postId, session.user.id);
+}
+
+export async function loadCommentReplies(postId: string, parentId: string) {
+  const session = await requireSession();
+
+  if (!session.user.id) {
+    throw new Error('Unauthorized.');
+  }
+
+  return getCommentReplies(parentId, postId, session.user.id);
 }
