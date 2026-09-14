@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { comment, profile } from '@/lib/db/schema';
 import type { Comment } from '@/types';
-import { and, asc, count, desc, eq, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, lt, or, sql } from 'drizzle-orm';
 
 type DbComment = typeof comment.$inferSelect;
 type DbProfile = typeof profile.$inferSelect;
@@ -10,6 +10,31 @@ type CommentRow = {
   comment: DbComment;
   profile: DbProfile;
 };
+
+type CommentCursor = {
+  createdAt: string;
+  id: string;
+};
+
+function encodeCursor(cursor: CommentCursor) {
+  return Buffer.from(JSON.stringify(cursor)).toString('base64url');
+}
+
+function decodeCursor(cursor: string): CommentCursor | null {
+  try {
+    const parsed = JSON.parse(
+      Buffer.from(cursor, 'base64url').toString('utf8')
+    );
+
+    if (typeof parsed.createdAt !== 'string' || typeof parsed.id !== 'string') {
+      return null;
+    }
+
+    return parsed;
+  } catch {
+    return null;
+  }
+}
 
 function mapComment(row: CommentRow, replyCount = 0): Comment {
   return {
@@ -86,42 +111,83 @@ export async function createComment(data: {
   return row ? mapComment(row) : null;
 }
 
-export async function getPostComments(postId: string): Promise<Comment[]> {
-  const rows = await db
+export async function getPostComments(
+  postId: string,
+  cursor?: string,
+  limit = 10
+): Promise<{
+  comments: Comment[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  totalCount: number;
+}> {
+  const decodedCursor = cursor ? decodeCursor(cursor) : null;
+
+  if (cursor && !decodedCursor) {
+    throw new Error('Invalid comment cursor.');
+  }
+
+  const replyCountExpression = sql<number>`
+  (
+    select count(*)
+    from ${comment} as reply
+    where reply.parent_id = ${comment.id}
+  )
+`.mapWith(Number);
+
+  const commentsQuery = db
     .select({
       comment,
       profile,
+      replyCount: replyCountExpression,
     })
     .from(comment)
     .innerJoin(profile, eq(profile.userId, comment.authorId))
-    .where(and(eq(comment.postId, postId), isNull(comment.parentId)))
-    .orderBy(desc(comment.createdAt), desc(comment.id));
+    .where(
+      and(
+        eq(comment.postId, postId),
+        isNull(comment.parentId),
+        decodedCursor
+          ? or(
+              lt(comment.createdAt, new Date(decodedCursor.createdAt)),
+              and(
+                eq(comment.createdAt, new Date(decodedCursor.createdAt)),
+                lt(comment.id, decodedCursor.id)
+              )
+            )
+          : undefined
+      )
+    )
+    .orderBy(desc(comment.createdAt), desc(comment.id))
+    .limit(limit + 1);
 
-  if (rows.length === 0) {
-    return [];
-  }
+  const totalCountQuery = db.$count(comment, eq(comment.postId, postId));
 
-  const replyCounts = await db
-    .select({
-      parentId: comment.parentId,
-      count: count(),
-    })
-    .from(comment)
-    .where(eq(comment.postId, postId))
-    .groupBy(comment.parentId);
+  const [rows, totalCount] = await Promise.all([
+    commentsQuery,
+    totalCountQuery,
+  ]);
 
-  const replyCountMap = new Map(
-    replyCounts
-      .filter(({ parentId }) => parentId !== null)
-      .map(({ parentId, count: replyCount }) => [
-        parentId as string,
-        Number(replyCount),
-      ])
-  );
+  const hasMore = rows.length > limit;
 
-  return rows.map((row) =>
-    mapComment(row, replyCountMap.get(row.comment.id) ?? 0)
-  );
+  const pageRows = hasMore ? rows.slice(0, limit) : rows;
+
+  const lastRow = pageRows[pageRows.length - 1];
+
+  const nextCursor =
+    hasMore && lastRow
+      ? encodeCursor({
+          createdAt: lastRow.comment.createdAt.toISOString(),
+          id: lastRow.comment.id,
+        })
+      : null;
+
+  return {
+    comments: pageRows.map((row) => mapComment(row, Number(row.replyCount))),
+    nextCursor,
+    hasMore,
+    totalCount: Number(totalCount),
+  };
 }
 
 export async function getCommentReplies(

@@ -33,3 +33,10 @@ export type Comment = {
   reactionCount: number;
   viewerHasReacted: boolean;
 };
+
+export type CommentPage = {
+  comments: Comment[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  totalCount: number;
+};

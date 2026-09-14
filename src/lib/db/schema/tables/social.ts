@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import {
   boolean,
   check,
+  foreignKey,
   index,
   integer,
   pgEnum,
@@ -111,6 +112,17 @@ export const comment = pgTable(
     index('comment_post_idx').on(table.postId),
     index('comment_author_idx').on(table.authorId),
     index('comment_parent_idx').on(table.parentId),
+    index('comment_post_created_at_id_idx').on(
+      table.postId,
+      table.createdAt,
+      table.id
+    ),
+
+    foreignKey({
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+      name: 'comment_parent_id_fkey',
+    }),
   ]
 );
 

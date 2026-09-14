@@ -30,14 +30,14 @@ export async function saveComment(input: CommentInput) {
   return created;
 }
 
-export async function loadPostComments(postId: string) {
+export async function loadPostComments(postId: string, cursor?: string) {
   const session = await requireSession();
 
   if (!session.user.id) {
     throw new Error('Unauthorized.');
   }
 
-  return getPostComments(postId, session.user.id);
+  return getPostComments(postId, session.user.id, cursor, 10);
 }
 
 export async function loadCommentReplies(postId: string, parentId: string) {

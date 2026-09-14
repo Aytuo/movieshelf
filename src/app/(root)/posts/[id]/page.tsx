@@ -7,7 +7,7 @@ import {
   getPostByIdWithReaction,
 } from '@/lib/services/post-service';
 import { ArrowLeft } from 'lucide-react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -21,6 +21,7 @@ export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
   const { id } = await params;
+
   const post = await getPostById(id);
 
   if (!post) {
@@ -37,9 +38,10 @@ export async function generateMetadata({
 
 const PostPage = async ({ params }: PostPageProps) => {
   const { id } = await params;
+
   const session = await requireSession();
 
-  const [post, comments] = await Promise.all([
+  const [post, commentPage] = await Promise.all([
     getPostByIdWithReaction(id, session.user.id),
     getPostComments(id, session.user.id),
   ]);
@@ -48,7 +50,9 @@ const PostPage = async ({ params }: PostPageProps) => {
     notFound();
   }
 
-  const mediaPath = `/${post.media.type === 'movie' ? 'movie' : 'tv'}/${post.media.tmdbId}`;
+  const mediaPath = `/${
+    post.media.type === 'movie' ? 'movie' : 'tv'
+  }/${post.media.tmdbId}`;
 
   return (
     <main className="container-content py-14 lg:py-20">
@@ -70,7 +74,10 @@ const PostPage = async ({ params }: PostPageProps) => {
 
           <CommentList
             postId={post.id}
-            comments={comments}
+            comments={commentPage.comments}
+            commentCount={commentPage.totalCount}
+            nextCursor={commentPage.nextCursor}
+            hasMore={commentPage.hasMore}
             mediaType={post.media.type}
           />
         </div>

@@ -13,6 +13,7 @@ type CommentCardProps = {
   postId: string;
   mediaType: 'movie' | 'tv';
   depth?: number;
+  onCommentCountChange?: (delta: number) => void;
 };
 
 function formatCommentDate(date: Date) {
@@ -50,6 +51,7 @@ const CommentCard = ({
   postId,
   mediaType,
   depth = 0,
+  onCommentCountChange,
 }: CommentCardProps) => {
   const { author } = comment;
 
@@ -101,8 +103,9 @@ const CommentCard = ({
 
     setIsReplying(false);
     setIsRepliesOpen(true);
-  }
 
+    onCommentCountChange?.(1);
+  }
   return (
     <article
       className={
@@ -256,6 +259,7 @@ const CommentCard = ({
                 postId={postId}
                 mediaType={mediaType}
                 depth={1}
+                onCommentCountChange={onCommentCountChange}
               />
             </div>
           ))}

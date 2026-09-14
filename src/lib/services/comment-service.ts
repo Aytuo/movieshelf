@@ -5,7 +5,7 @@ import {
   getPostComments as getPostCommentsRepository,
   getPostMediaId,
 } from '@/lib/repositories';
-import type { Comment, CommentInput } from '@/types';
+import type { Comment, CommentInput, CommentPage } from '@/types';
 import { getCommentReactionStats } from './comment-reaction-service';
 
 async function enrichComments(
@@ -69,11 +69,18 @@ export async function createComment(userId: string, input: CommentInput) {
 
 export async function getPostComments(
   postId: string,
-  userId: string
-): Promise<Comment[]> {
-  const comments = await getPostCommentsRepository(postId);
+  userId: string,
+  cursor?: string,
+  limit = 10
+): Promise<CommentPage> {
+  const page = await getPostCommentsRepository(postId, cursor, limit);
 
-  return enrichComments(comments, postId, userId);
+  const enrichedComments = await enrichComments(page.comments, postId, userId);
+
+  return {
+    ...page,
+    comments: enrichedComments,
+  };
 }
 
 export async function getCommentReplies(
