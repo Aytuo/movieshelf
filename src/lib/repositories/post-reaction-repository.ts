@@ -12,6 +12,7 @@ export type PostReactionToggleResult = {
   postId: string;
   count: number;
   reacted: boolean;
+  action: 'added' | 'removed';
 };
 
 export async function getPostReactionStats(
@@ -60,7 +61,11 @@ export async function togglePostReaction(
       id: postReaction.id,
     });
 
-  if (deleted.length === 0) {
+  let action: 'added' | 'removed';
+
+  if (deleted.length > 0) {
+    action = 'removed';
+  } else {
     await db
       .insert(postReaction)
       .values({
@@ -71,6 +76,8 @@ export async function togglePostReaction(
       .onConflictDoNothing({
         target: [postReaction.userId, postReaction.postId, postReaction.type],
       });
+
+    action = 'added';
   }
 
   const [stats] = await db
@@ -87,5 +94,6 @@ export async function togglePostReaction(
     postId,
     count: stats?.count ?? 0,
     reacted: stats?.reacted ?? false,
+    action,
   };
 }

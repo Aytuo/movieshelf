@@ -4,6 +4,7 @@ import {
   getMediaPosts as getMediaPostsRepository,
   getPostById as getPostByIdRepository,
   getPostCommentCounts,
+  getPostMediaId,
 } from '@/lib/repositories';
 import type { Post, PostInput, PostPaginationOptions } from '@/types';
 import { getPostReactionStats } from './post-reaction-service';
@@ -103,14 +104,17 @@ export async function getPostByIdWithReaction(postId: string, userId: string) {
     return null;
   }
 
-  const [reaction] = await getPostReactionStats([post.id], userId);
+  const [reactionStats, commentCounts, mediaId] = await Promise.all([
+    getPostReactionStats([post.id], userId),
+    getPostCommentCounts([post.id]),
+    getPostMediaId(postId),
+  ]);
 
-  const [commentCount] = await getPostCommentCounts([post.id]);
+  const postsWithStats = attachPostStats([post], reactionStats, commentCounts);
 
-  return {
-    ...post,
-    reactionCount: reaction?.count ?? 0,
-    viewerHasReacted: reaction?.reacted ?? false,
-    commentCount: commentCount?.count ?? 0,
-  };
+  const authorRatings = mediaId
+    ? await getMediaAuthorRatings(mediaId, [post.author.userId])
+    : [];
+
+  return attachAuthorRatings(postsWithStats, authorRatings)[0];
 }

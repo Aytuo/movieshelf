@@ -12,6 +12,7 @@ export type CommentReactionToggleResult = {
   commentId: string;
   count: number;
   reacted: boolean;
+  action: 'added' | 'removed';
 };
 
 export async function getCommentReactionStats(
@@ -63,7 +64,11 @@ export async function toggleCommentReaction(
       id: commentReaction.id,
     });
 
-  if (deleted.length === 0) {
+  let action: 'added' | 'removed';
+
+  if (deleted.length > 0) {
+    action = 'removed';
+  } else {
     await db
       .insert(commentReaction)
       .values({
@@ -78,6 +83,8 @@ export async function toggleCommentReaction(
           commentReaction.type,
         ],
       });
+
+    action = 'added';
   }
 
   const [stats] = await db
@@ -99,5 +106,6 @@ export async function toggleCommentReaction(
     commentId,
     count: stats?.count ?? 0,
     reacted: stats?.reacted ?? false,
+    action,
   };
 }

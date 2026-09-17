@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { comment, media, post, profile } from '@/lib/db/schema';
 import type { Post, PostPage, PostPaginationOptions } from '@/types';
-import { and, desc, eq, inArray, lt, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 
 const DEFAULT_POST_PAGE_SIZE = 5;
 const MAX_POST_PAGE_SIZE = 20;
@@ -221,7 +221,7 @@ export async function getPostCommentCounts(
       count: sql<number>`count(*)::int`,
     })
     .from(comment)
-    .where(inArray(comment.postId, postIds))
+    .where(and(inArray(comment.postId, postIds), isNull(comment.deletedAt)))
     .groupBy(comment.postId);
 
   return rows.map((row) => ({
