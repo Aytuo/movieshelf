@@ -18,3 +18,7 @@ export const editCommentSchema = commentSchema
   .extend({
     commentId: z.string().uuid(),
   });
+
+export const deleteCommentSchema = z.object({
+  commentId: z.string().uuid(),
+});

@@ -21,6 +21,7 @@ export type Comment = {
   content: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 
   author: CommentAuthor;
 

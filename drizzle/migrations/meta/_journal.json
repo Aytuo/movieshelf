@@ -57,6 +57,13 @@
       "when": 1789402571839,
       "tag": "0007_melodic_captain_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789664751354,
+      "tag": "0008_premium_jasper_sitwell",
+      "breakpoints": true
     }
   ]
 }

@@ -3,11 +3,16 @@
 import { requireSession } from '@/lib/auth/require-session';
 import {
   createComment,
+  deleteComment,
   getCommentReplies,
   getPostComments,
   updateComment,
 } from '@/lib/services/comment-service';
-import { commentSchema, editCommentSchema } from '@/lib/validations/comment';
+import {
+  commentSchema,
+  deleteCommentSchema,
+  editCommentSchema,
+} from '@/lib/validations/comment';
 import type { CommentInput } from '@/types';
 import { revalidatePath } from 'next/cache';
 
@@ -74,4 +79,22 @@ export async function editCommentAction(input: {
   }
 
   return updated;
+}
+
+export async function deleteCommentAction(input: { commentId: string }) {
+  const session = await requireSession();
+
+  const parsed = deleteCommentSchema.safeParse(input);
+
+  if (!parsed.success) {
+    throw new Error('Invalid comment data.');
+  }
+
+  const deleted = await deleteComment(session.user.id, parsed.data.commentId);
+
+  if (!deleted) {
+    throw new Error('Unable to delete comment.');
+  }
+
+  return deleted;
 }

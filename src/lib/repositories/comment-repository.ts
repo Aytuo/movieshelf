@@ -42,6 +42,7 @@ function mapComment(row: CommentRow, replyCount = 0): Comment {
     content: row.comment.content,
     createdAt: row.comment.createdAt,
     updatedAt: row.comment.updatedAt,
+    deletedAt: row.comment.deletedAt,
 
     author: {
       userId: row.profile.userId,
@@ -128,12 +129,13 @@ export async function getPostComments(
   }
 
   const replyCountExpression = sql<number>`
-  (
-    select count(*)
-    from ${comment} as reply
-    where reply.parent_id = ${comment.id}
-  )
-`.mapWith(Number);
+    (
+      select count(*)
+      from ${comment} as reply
+      where reply.parent_id = comment.id
+        and reply.deleted_at is null
+    )
+  `.mapWith(Number);
 
   const commentsQuery = db
     .select({
@@ -161,7 +163,10 @@ export async function getPostComments(
     .orderBy(desc(comment.createdAt), desc(comment.id))
     .limit(limit + 1);
 
-  const totalCountQuery = db.$count(comment, eq(comment.postId, postId));
+  const totalCountQuery = db.$count(
+    comment,
+    and(eq(comment.postId, postId), isNull(comment.deletedAt))
+  );
 
   const [rows, totalCount] = await Promise.all([
     commentsQuery,
@@ -183,7 +188,7 @@ export async function getPostComments(
       : null;
 
   return {
-    comments: pageRows.map((row) => mapComment(row, Number(row.replyCount))),
+    comments: pageRows.map((row) => mapComment(row, row.replyCount)),
     nextCursor,
     hasMore,
     totalCount: Number(totalCount),
@@ -201,7 +206,13 @@ export async function getCommentReplies(
     })
     .from(comment)
     .innerJoin(profile, eq(profile.userId, comment.authorId))
-    .where(and(eq(comment.parentId, parentId), eq(comment.postId, postId)))
+    .where(
+      and(
+        eq(comment.parentId, parentId),
+        eq(comment.postId, postId),
+        isNull(comment.deletedAt)
+      )
+    )
     .orderBy(asc(comment.createdAt), asc(comment.id));
 
   return rows.map((row) => mapComment(row));
@@ -227,4 +238,40 @@ export async function updateComment(
     });
 
   return updated ?? null;
+}
+
+export async function deleteComment(
+  commentId: string,
+  authorId: string
+): Promise<{
+  postId: string;
+  deletedAt: Date;
+} | null> {
+  const deletedAt = new Date();
+
+  const [deleted] = await db
+    .update(comment)
+    .set({
+      deletedAt,
+      updatedAt: deletedAt,
+    })
+    .where(
+      and(
+        eq(comment.id, commentId),
+        eq(comment.authorId, authorId),
+        isNull(comment.deletedAt)
+      )
+    )
+    .returning({
+      postId: comment.postId,
+    });
+
+  if (!deleted) {
+    return null;
+  }
+
+  return {
+    postId: deleted.postId,
+    deletedAt,
+  };
 }

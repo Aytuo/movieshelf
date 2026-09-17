@@ -107,6 +107,7 @@ export const comment = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    deletedAt: timestamp('deleted_at'),
   },
   (table) => [
     index('comment_post_idx').on(table.postId),

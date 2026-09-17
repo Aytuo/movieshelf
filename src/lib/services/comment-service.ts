@@ -1,5 +1,6 @@
 import {
   createComment as createCommentRepository,
+  deleteComment as deleteCommentRepository,
   getCommentReplies as getCommentRepliesRepository,
   getMediaAuthorRatings,
   getPostComments as getPostCommentsRepository,
@@ -103,4 +104,8 @@ export async function updateComment(
   updatedAt: Date;
 } | null> {
   return updateCommentRepository(commentId, userId, content);
+}
+
+export async function deleteComment(userId: string, commentId: string) {
+  return deleteCommentRepository(commentId, userId);
 }
