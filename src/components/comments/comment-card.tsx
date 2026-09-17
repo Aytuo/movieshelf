@@ -1,6 +1,9 @@
 'use client';
 
-import { loadCommentReplies } from '@/lib/actions/comment-action';
+import {
+  editCommentAction,
+  loadCommentReplies,
+} from '@/lib/actions/comment-action';
 import type { Comment } from '@/types';
 import { CornerDownRight, MessageCircle, Star } from 'lucide-react';
 import Link from 'next/link';
@@ -13,6 +16,7 @@ type CommentCardProps = {
   postId: string;
   mediaType: 'movie' | 'tv';
   depth?: number;
+  viewerUserId?: string;
   onCommentCountChange?: (delta: number) => void;
 };
 
@@ -51,6 +55,7 @@ const CommentCard = ({
   postId,
   mediaType,
   depth = 0,
+  viewerUserId,
   onCommentCountChange,
 }: CommentCardProps) => {
   const { author } = comment;
@@ -58,6 +63,18 @@ const CommentCard = ({
   const authorLabel = author.displayName || `@${author.username}`;
 
   const isReply = depth > 0;
+
+  const isOwner = viewerUserId === comment.author.userId;
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [editContent, setEditContent] = useState(comment.content);
+
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const [updatedAt, setUpdatedAt] = useState(comment.updatedAt);
+
+  const [displayContent, setDisplayContent] = useState(comment.content);
 
   const [replies, setReplies] = useState<Comment[] | undefined>(
     comment.replies
@@ -72,6 +89,34 @@ const CommentCard = ({
   );
 
   const [isReplying, setIsReplying] = useState(false);
+
+  async function handleEditSubmit() {
+    if (isSavingEdit) {
+      return;
+    }
+
+    const content = editContent.trim();
+
+    if (!content) {
+      return;
+    }
+
+    setIsSavingEdit(true);
+
+    try {
+      const updated = await editCommentAction({
+        commentId: comment.id,
+        content,
+      });
+
+      setEditContent(updated.content);
+      setDisplayContent(updated.content);
+      setUpdatedAt(updated.updatedAt);
+      setIsEditing(false);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  }
 
   async function handleToggleReplies() {
     if (isRepliesOpen) {
@@ -106,6 +151,7 @@ const CommentCard = ({
 
     onCommentCountChange?.(1);
   }
+
   return (
     <article
       className={
@@ -173,20 +219,72 @@ const CommentCard = ({
               </p>
             </div>
 
-            <time
-              dateTime={comment.createdAt.toISOString()}
-              title={comment.createdAt.toLocaleString()}
-              className="shrink-0 text-xs text-muted-foreground"
-            >
-              {formatCommentDate(comment.createdAt)}
-            </time>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <time
+                dateTime={updatedAt.toISOString()}
+                title={updatedAt.toLocaleString()}
+                className="text-xs text-muted-foreground"
+              >
+                {formatCommentDate(updatedAt)}
+              </time>
+
+              {updatedAt.getTime() > comment.createdAt.getTime() && (
+                <span className="text-xs text-muted-foreground">· edited</span>
+              )}
+            </div>
           </div>
 
-          <p className="mt-4 rounded-xl border border-border/70 bg-surface-hover/40 px-4 py-3 text-sm leading-7 whitespace-pre-line text-foreground/80">
-            {comment.content}
-          </p>
+          {isEditing ? (
+            <div className="mt-4">
+              <textarea
+                value={editContent}
+                onChange={(event) => setEditContent(event.target.value)}
+                rows={4}
+                autoFocus
+                disabled={isSavingEdit}
+                className="w-full resize-none rounded-xl border border-border/70 bg-surface-hover/40 px-4 py-3 text-sm leading-7 text-foreground transition-colors outline-none focus:border-primary/50 disabled:opacity-60"
+              />
+
+              <div className="mt-3 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditContent(displayContent);
+                    setIsEditing(false);
+                  }}
+                  disabled={isSavingEdit}
+                  className="rounded-lg px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleEditSubmit}
+                  disabled={isSavingEdit || editContent.trim().length === 0}
+                  className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSavingEdit ? 'Saving…' : 'Save changes'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl border border-border/70 bg-surface-hover/40 px-4 py-3 text-sm leading-7 whitespace-pre-line text-foreground/80">
+              {displayContent}
+            </p>
+          )}
 
           <div className="mt-4 flex items-center gap-4">
+            {isOwner && !isEditing && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Edit
+              </button>
+            )}
+
             {!isReply && (
               <button
                 type="button"

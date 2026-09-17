@@ -4,6 +4,7 @@ import {
   getMediaAuthorRatings,
   getPostComments as getPostCommentsRepository,
   getPostMediaId,
+  updateComment as updateCommentRepository,
 } from '@/lib/repositories';
 import type { Comment, CommentInput, CommentPage } from '@/types';
 import { getCommentReactionStats } from './comment-reaction-service';
@@ -91,4 +92,15 @@ export async function getCommentReplies(
   const replies = await getCommentRepliesRepository(parentId, postId);
 
   return enrichComments(replies, postId, userId);
+}
+
+export async function updateComment(
+  userId: string,
+  commentId: string,
+  content: string
+): Promise<{
+  content: string;
+  updatedAt: Date;
+} | null> {
+  return updateCommentRepository(commentId, userId, content);
 }

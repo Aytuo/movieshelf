@@ -5,8 +5,9 @@ import {
   createComment,
   getCommentReplies,
   getPostComments,
+  updateComment,
 } from '@/lib/services/comment-service';
-import { commentSchema } from '@/lib/validations/comment';
+import { commentSchema, editCommentSchema } from '@/lib/validations/comment';
 import type { CommentInput } from '@/types';
 import { revalidatePath } from 'next/cache';
 
@@ -48,4 +49,29 @@ export async function loadCommentReplies(postId: string, parentId: string) {
   }
 
   return getCommentReplies(parentId, postId, session.user.id);
+}
+
+export async function editCommentAction(input: {
+  commentId: string;
+  content: string;
+}) {
+  const session = await requireSession();
+
+  const parsed = editCommentSchema.safeParse(input);
+
+  if (!parsed.success) {
+    throw new Error('Invalid comment data.');
+  }
+
+  const updated = await updateComment(
+    session.user.id,
+    parsed.data.commentId,
+    parsed.data.content
+  );
+
+  if (!updated) {
+    throw new Error('Unable to edit comment.');
+  }
+
+  return updated;
 }

@@ -14,6 +14,7 @@ type CommentListProps = {
   nextCursor: string | null;
   hasMore: boolean;
   mediaType: 'movie' | 'tv';
+  viewerUserId: string;
 };
 
 const CommentList = ({
@@ -23,6 +24,7 @@ const CommentList = ({
   nextCursor,
   hasMore: initialHasMore,
   mediaType,
+  viewerUserId,
 }: CommentListProps) => {
   const [items, setItems] = useState(comments);
   const [currentCursor, setCurrentCursor] = useState(nextCursor);
@@ -85,6 +87,7 @@ const CommentList = ({
                 comment={comment}
                 postId={postId}
                 mediaType={mediaType}
+                viewerUserId={viewerUserId}
                 onCommentCountChange={(delta) =>
                   setCurrentCommentCount((current) => current + delta)
                 }

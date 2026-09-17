@@ -79,6 +79,7 @@ const PostPage = async ({ params }: PostPageProps) => {
             nextCursor={commentPage.nextCursor}
             hasMore={commentPage.hasMore}
             mediaType={post.media.type}
+            viewerUserId={session.user.id}
           />
         </div>
       </div>

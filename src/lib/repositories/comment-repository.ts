@@ -206,3 +206,25 @@ export async function getCommentReplies(
 
   return rows.map((row) => mapComment(row));
 }
+
+export async function updateComment(
+  commentId: string,
+  authorId: string,
+  content: string
+): Promise<{
+  content: string;
+  updatedAt: Date;
+} | null> {
+  const [updated] = await db
+    .update(comment)
+    .set({
+      content,
+    })
+    .where(and(eq(comment.id, commentId), eq(comment.authorId, authorId)))
+    .returning({
+      content: comment.content,
+      updatedAt: comment.updatedAt,
+    });
+
+  return updated ?? null;
+}
