@@ -1,5 +1,12 @@
 import type { Notification } from '@/types';
-import { Bell, Heart, MessageCircle, MessageSquareReply } from 'lucide-react';
+import { Heart, MessageCircle, MessageSquareReply } from 'lucide-react';
+
+export const notificationIconMap = {
+  post_comment: MessageCircle,
+  comment_reply: MessageSquareReply,
+  post_like: Heart,
+  comment_like: Heart,
+} as const;
 
 export function getNotificationMessage(notification: Notification) {
   const actor =
@@ -24,20 +31,7 @@ export function getNotificationMessage(notification: Notification) {
 }
 
 export function getNotificationIcon(notification: Notification) {
-  switch (notification.type) {
-    case 'post_comment':
-      return MessageCircle;
-
-    case 'comment_reply':
-      return MessageSquareReply;
-
-    case 'post_like':
-    case 'comment_like':
-      return Heart;
-
-    default:
-      return Bell;
-  }
+  return notificationIconMap[notification.type];
 }
 
 export function getNotificationHref(notification: Notification) {
