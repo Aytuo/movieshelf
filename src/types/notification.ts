@@ -22,3 +22,9 @@ export type Notification = {
     avatarUrl: string | null;
   };
 };
+
+export type NotificationPage = {
+  notifications: Notification[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};

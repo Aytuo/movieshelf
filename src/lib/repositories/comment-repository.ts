@@ -289,3 +289,19 @@ export async function getCommentAuthorId(
 
   return row?.authorId ?? null;
 }
+
+export async function getCommentContext(commentId: string): Promise<{
+  authorId: string;
+  postId: string;
+} | null> {
+  const [row] = await db
+    .select({
+      authorId: comment.authorId,
+      postId: comment.postId,
+    })
+    .from(comment)
+    .where(eq(comment.id, commentId))
+    .limit(1);
+
+  return row ?? null;
+}

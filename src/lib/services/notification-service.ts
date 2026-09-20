@@ -1,8 +1,14 @@
 import {
   createNotification as createNotificationRepository,
   getCommentAuthorId,
+  getCommentContext,
+  getNotifications as getNotificationsRepository,
   getPostAuthorId,
+  getUnreadNotificationCount as getUnreadNotificationCountRepository,
+  markAllNotificationsAsRead as markAllNotificationsAsReadRepository,
+  markNotificationAsRead as markNotificationAsReadRepository,
 } from '@/lib/repositories';
+import { NotificationPage } from '@/types';
 
 export async function notifyCommentCreated(data: {
   actorId: string;
@@ -55,16 +61,46 @@ export async function notifyCommentLiked(data: {
   actorId: string;
   commentId: string;
 }) {
-  const recipientId = await getCommentAuthorId(data.commentId);
+  const context = await getCommentContext(data.commentId);
 
-  if (!recipientId || recipientId === data.actorId) {
+  if (!context || context.authorId === data.actorId) {
     return null;
   }
 
   return createNotificationRepository({
-    recipientId,
+    recipientId: context.authorId,
     actorId: data.actorId,
     type: 'comment_like',
+    postId: context.postId,
     commentId: data.commentId,
   });
+}
+
+export async function getNotifications(
+  userId: string,
+  options?: {
+    cursor?: string;
+    limit?: number;
+  }
+): Promise<NotificationPage> {
+  return getNotificationsRepository(userId, options);
+}
+
+export async function getUnreadNotificationCount(
+  userId: string
+): Promise<number> {
+  return getUnreadNotificationCountRepository(userId);
+}
+
+export async function markNotificationAsRead(
+  userId: string,
+  notificationId: string
+): Promise<boolean> {
+  return markNotificationAsReadRepository(notificationId, userId);
+}
+
+export async function markAllNotificationsAsRead(
+  userId: string
+): Promise<number> {
+  return markAllNotificationsAsReadRepository(userId);
 }

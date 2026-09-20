@@ -6,6 +6,7 @@ import { Clapperboard, Compass, Film, Menu, Trophy, Tv, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import NotificationBell from '../notifications/notification-bell';
 import GlobalSearch from '../search/global-search';
 import UserMenu from '../user/user-menu';
 
@@ -98,6 +99,8 @@ const Navbar = ({ user, profile }: NavbarProps) => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             <GlobalSearch />
+
+            <NotificationBell />
 
             {user && profile && (
               <UserMenu
