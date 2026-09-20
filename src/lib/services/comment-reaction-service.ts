@@ -2,6 +2,7 @@ import {
   getCommentReactionStats as getCommentReactionStatsRepository,
   toggleCommentReaction as toggleCommentReactionRepository,
 } from '@/lib/repositories';
+import { notifyCommentLiked } from './notification-service';
 
 export async function getCommentReactionStats(
   commentIds: string[],
@@ -11,5 +12,18 @@ export async function getCommentReactionStats(
 }
 
 export async function toggleCommentReaction(commentId: string, userId: string) {
-  return toggleCommentReactionRepository(commentId, userId);
+  const result = await toggleCommentReactionRepository(commentId, userId);
+
+  if (result.action === 'added') {
+    try {
+      await notifyCommentLiked({
+        actorId: userId,
+        commentId,
+      });
+    } catch (error) {
+      console.error('Failed to create comment reaction notification:', error);
+    }
+  }
+
+  return result;
 }

@@ -229,3 +229,15 @@ export async function getPostCommentCounts(
     count: row.count,
   }));
 }
+
+export async function getPostAuthorId(postId: string): Promise<string | null> {
+  const [row] = await db
+    .select({
+      authorId: post.authorId,
+    })
+    .from(post)
+    .where(eq(post.id, postId))
+    .limit(1);
+
+  return row?.authorId ?? null;
+}

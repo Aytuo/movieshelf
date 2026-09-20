@@ -4,7 +4,14 @@ import { media } from './media';
 import { mediaActivity } from './media-activity';
 import { mediaInteraction } from './media-interaction';
 import { profile } from './profile';
-import { comment, commentReaction, post, postReaction, review } from './social';
+import {
+  comment,
+  commentReaction,
+  notification,
+  post,
+  postReaction,
+  review,
+} from './social';
 import { watchHistory } from './watch-history';
 
 /* ========================================================================== */
@@ -23,6 +30,12 @@ export const userRelations = relations(user, ({ one, many }) => ({
   comments: many(comment),
   postReactions: many(postReaction),
   commentReactions: many(commentReaction),
+  notificationsReceived: many(notification, {
+    relationName: 'notificationRecipient',
+  }),
+  notificationsCreated: many(notification, {
+    relationName: 'notificationActor',
+  }),
 }));
 
 /* ========================================================================== */
@@ -184,3 +197,31 @@ export const commentReactionRelations = relations(
     }),
   })
 );
+
+/* ========================================================================== */
+/*                           RELATIONS: NOTIFICATION                          */
+/* ========================================================================== */
+
+export const notificationRelations = relations(notification, ({ one }) => ({
+  recipient: one(user, {
+    fields: [notification.recipientId],
+    references: [user.id],
+    relationName: 'notificationRecipient',
+  }),
+
+  actor: one(user, {
+    fields: [notification.actorId],
+    references: [user.id],
+    relationName: 'notificationActor',
+  }),
+
+  post: one(post, {
+    fields: [notification.postId],
+    references: [post.id],
+  }),
+
+  comment: one(comment, {
+    fields: [notification.commentId],
+    references: [comment.id],
+  }),
+}));

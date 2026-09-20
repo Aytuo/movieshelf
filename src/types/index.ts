@@ -1,6 +1,7 @@
 export * from './comments';
 export * from './discover';
 export * from './media';
+export * from './notification';
 export * from './people';
 export * from './posts';
 export * from './profile';
