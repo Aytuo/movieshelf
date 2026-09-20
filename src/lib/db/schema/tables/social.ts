@@ -21,6 +21,13 @@ import { media } from './media';
 
 export const reactionTypeEnum = pgEnum('reaction_type', ['like']);
 
+export const notificationTypeEnum = pgEnum('notification_type', [
+  'post_comment',
+  'comment_reply',
+  'post_like',
+  'comment_like',
+]);
+
 /* ========================================================================== */
 /*                                   REVIEW                                   */
 /* ========================================================================== */
@@ -176,5 +183,49 @@ export const commentReaction = pgTable(
     ),
     index('comment_reaction_comment_idx').on(table.commentId),
     index('comment_reaction_user_idx').on(table.userId),
+  ]
+);
+
+/* ========================================================================== */
+/*                                NOTIFICATION                                */
+/* ========================================================================== */
+
+export const notification = pgTable(
+  'notification',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    recipientId: text('recipient_id')
+      .notNull()
+      .references(() => user.id, {
+        onDelete: 'cascade',
+      }),
+    actorId: text('actor_id')
+      .notNull()
+      .references(() => user.id, {
+        onDelete: 'cascade',
+      }),
+    type: notificationTypeEnum('type').notNull(),
+    postId: uuid('post_id').references(() => post.id, {
+      onDelete: 'cascade',
+    }),
+    commentId: uuid('comment_id').references(() => comment.id, {
+      onDelete: 'cascade',
+    }),
+    readAt: timestamp('read_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('notification_recipient_created_at_idx').on(
+      table.recipientId,
+      table.createdAt,
+      table.id
+    ),
+    index('notification_recipient_read_at_idx').on(
+      table.recipientId,
+      table.readAt
+    ),
+    index('notification_actor_idx').on(table.actorId),
+    index('notification_post_idx').on(table.postId),
+    index('notification_comment_idx').on(table.commentId),
   ]
 );

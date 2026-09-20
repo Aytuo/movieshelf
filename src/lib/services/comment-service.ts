@@ -9,6 +9,7 @@ import {
 } from '@/lib/repositories';
 import type { Comment, CommentInput, CommentPage } from '@/types';
 import { getCommentReactionStats } from './comment-reaction-service';
+import { notifyCommentCreated } from './notification-service';
 
 async function enrichComments(
   comments: Comment[],
@@ -61,12 +62,29 @@ async function enrichComments(
 }
 
 export async function createComment(userId: string, input: CommentInput) {
-  return createCommentRepository({
+  const created = await createCommentRepository({
     authorId: userId,
     postId: input.postId,
     content: input.content,
     parentId: input.parentId ?? null,
   });
+
+  if (!created) {
+    return null;
+  }
+
+  try {
+    await notifyCommentCreated({
+      actorId: userId,
+      postId: created.postId,
+      commentId: created.id,
+      parentId: created.parentId,
+    });
+  } catch (error) {
+    console.error('Failed to create comment notification:', error);
+  }
+
+  return created;
 }
 
 export async function getPostComments(

@@ -275,3 +275,17 @@ export async function deleteComment(
     deletedAt,
   };
 }
+
+export async function getCommentAuthorId(
+  commentId: string
+): Promise<string | null> {
+  const [row] = await db
+    .select({
+      authorId: comment.authorId,
+    })
+    .from(comment)
+    .where(eq(comment.id, commentId))
+    .limit(1);
+
+  return row?.authorId ?? null;
+}
