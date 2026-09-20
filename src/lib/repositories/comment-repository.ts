@@ -75,12 +75,18 @@ export async function createComment(data: {
         id: comment.id,
         postId: comment.postId,
         parentId: comment.parentId,
+        deletedAt: comment.deletedAt,
       })
       .from(comment)
       .where(eq(comment.id, data.parentId))
       .limit(1);
 
-    if (!parent || parent.postId !== data.postId || parent.parentId !== null) {
+    if (
+      !parent ||
+      parent.postId !== data.postId ||
+      parent.parentId !== null ||
+      parent.deletedAt !== null
+    ) {
       return null;
     }
   }
@@ -231,7 +237,13 @@ export async function updateComment(
     .set({
       content,
     })
-    .where(and(eq(comment.id, commentId), eq(comment.authorId, authorId)))
+    .where(
+      and(
+        eq(comment.id, commentId),
+        eq(comment.authorId, authorId),
+        isNull(comment.deletedAt)
+      )
+    )
     .returning({
       content: comment.content,
       updatedAt: comment.updatedAt,

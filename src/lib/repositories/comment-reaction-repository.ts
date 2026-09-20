@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
-import { commentReaction } from '@/lib/db/schema';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { comment, commentReaction } from '@/lib/db/schema';
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 
 export type CommentReactionStats = {
   commentId: string;
@@ -51,6 +51,18 @@ export async function toggleCommentReaction(
   commentId: string,
   userId: string
 ): Promise<CommentReactionToggleResult> {
+  const [target] = await db
+    .select({
+      id: comment.id,
+    })
+    .from(comment)
+    .where(and(eq(comment.id, commentId), isNull(comment.deletedAt)))
+    .limit(1);
+
+  if (!target) {
+    throw new Error('Comment not found.');
+  }
+
   const deleted = await db
     .delete(commentReaction)
     .where(

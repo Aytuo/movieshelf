@@ -15,9 +15,12 @@ import {
 import type { Notification } from '@/types';
 import { Bell, CheckCheck, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 const NotificationBell = () => {
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -66,28 +69,31 @@ const NotificationBell = () => {
   }
 
   async function handleNotificationClick(notification: Notification) {
-    if (notification.readAt) {
-      return;
+    try {
+      if (!notification.readAt) {
+        const success = await markNotificationAsReadAction(notification.id);
+
+        if (success) {
+          setUnreadCount((current) => Math.max(0, current - 1));
+
+          setNotifications((current) =>
+            current.map((item) =>
+              item.id === notification.id
+                ? {
+                    ...item,
+                    readAt: new Date(),
+                  }
+                : item
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    } finally {
+      setIsOpen(false);
+      router.push(getNotificationHref(notification));
     }
-
-    const success = await markNotificationAsReadAction(notification.id);
-
-    if (!success) {
-      return;
-    }
-
-    setUnreadCount((current) => Math.max(0, current - 1));
-
-    setNotifications((current) =>
-      current.map((item) =>
-        item.id === notification.id
-          ? {
-              ...item,
-              readAt: new Date(),
-            }
-          : item
-      )
-    );
   }
 
   async function handleMarkAllAsRead() {
@@ -221,12 +227,12 @@ const NotificationBell = () => {
                   const isUnread = notification.readAt === null;
 
                   return (
-                    <Link
+                    <button
                       key={notification.id}
-                      href={getNotificationHref(notification)}
+                      type="button"
                       onClick={() => void handleNotificationClick(notification)}
                       className={[
-                        'flex gap-3 px-4 py-3 transition-colors hover:bg-surface-hover',
+                        'flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-hover',
                         isUnread ? 'bg-surface-hover/40' : '',
                       ].join(' ')}
                     >
@@ -257,7 +263,7 @@ const NotificationBell = () => {
                           className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
                         />
                       )}
-                    </Link>
+                    </button>
                   );
                 })}
               </div>
