@@ -1,10 +1,4 @@
-import { FollowUserList } from '@/components/follow/follow-user-list';
-import { requireSession } from '@/lib/auth/require-session';
-import { getUserFollowers } from '@/lib/services/follow-service';
-import { getPublicProfile } from '@/lib/services/profile-service';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import FollowListRoute from '@/components/follow/follow-list-route';
 
 type FollowersPageProps = {
   params: Promise<{
@@ -14,53 +8,9 @@ type FollowersPageProps = {
 
 const FollowersPage = async ({ params }: FollowersPageProps) => {
   const { username } = await params;
-  const session = await requireSession();
-
-  const profileData = await getPublicProfile(username, session.user.id);
-
-  if (!profileData) {
-    notFound();
-  }
-
-  const initialPage = await getUserFollowers(
-    profileData.profile.userId,
-    session.user.id
-  );
 
   return (
-    <main className="container-content py-10 lg:py-14">
-      <div className="mx-auto max-w-2xl">
-        <Link
-          href={`/profile/${profileData.profile.username}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" />
-          Back to profile
-        </Link>
-
-        <div className="mt-8 mb-7">
-          <p className="eyebrow">Community</p>
-
-          <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight">
-            Followers
-          </h1>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-            People following{' '}
-            {profileData.profile.displayName ||
-              `@${profileData.profile.username}`}
-          </p>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl border border-border/60 bg-surface">
-          <FollowUserList
-            profileUserId={profileData.profile.userId}
-            mode="followers"
-            initialPage={initialPage}
-          />
-        </div>
-      </div>
-    </main>
+    <FollowListRoute username={username} mode="followers" variant="page" />
   );
 };
 

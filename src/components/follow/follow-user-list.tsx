@@ -11,12 +11,14 @@ import { FollowUserListItem } from './follow-user-list-item';
 
 type FollowUserListProps = {
   profileUserId: string;
+  viewerUserId: string;
   mode: 'followers' | 'following';
   initialPage: FollowUserPage;
 };
 
 export function FollowUserList({
   profileUserId,
+  viewerUserId,
   mode,
   initialPage,
 }: FollowUserListProps) {
@@ -74,7 +76,11 @@ export function FollowUserList({
     <div>
       <div className="divide-y divide-border/50">
         {users.map((user) => (
-          <FollowUserListItem key={user.userId} user={user} />
+          <FollowUserListItem
+            key={user.userId}
+            user={user}
+            viewerUserId={viewerUserId}
+          />
         ))}
       </div>
 

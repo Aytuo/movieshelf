@@ -6,9 +6,13 @@ import { FollowButton } from './follow-button';
 
 type FollowUserListItemProps = {
   user: FollowUser;
+  viewerUserId: string;
 };
 
-export function FollowUserListItem({ user }: FollowUserListItemProps) {
+export function FollowUserListItem({
+  user,
+  viewerUserId,
+}: FollowUserListItemProps) {
   const label = user.displayName || `@${user.username}`;
 
   return (
@@ -40,10 +44,12 @@ export function FollowUserListItem({ user }: FollowUserListItemProps) {
         </div>
       </Link>
 
-      <FollowButton
-        followingId={user.userId}
-        initialFollowing={user.viewerIsFollowing}
-      />
+      {user.userId !== viewerUserId && (
+        <FollowButton
+          followingId={user.userId}
+          initialFollowing={user.viewerIsFollowing}
+        />
+      )}
     </div>
   );
 }

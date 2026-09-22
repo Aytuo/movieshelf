@@ -4,9 +4,12 @@ import {
   getFollowers,
   getFollowing,
   getFollowStats,
+  getProfileByUsername,
   isFollowing,
 } from '@/lib/repositories';
 import type { FollowStats, FollowUserPage } from '@/types';
+
+export type FollowListMode = 'followers' | 'following';
 
 export async function followUser(
   followerId: string,
@@ -58,4 +61,26 @@ export async function getUserFollowing(
   cursor?: string
 ): Promise<FollowUserPage> {
   return getFollowing(profileUserId, viewerUserId, cursor, 20);
+}
+
+export async function getFollowListData(
+  username: string,
+  viewerUserId: string,
+  mode: FollowListMode
+) {
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return null;
+  }
+
+  const initialPage =
+    mode === 'followers'
+      ? await getUserFollowers(profile.userId, viewerUserId)
+      : await getUserFollowing(profile.userId, viewerUserId);
+
+  return {
+    profile,
+    initialPage,
+  };
 }

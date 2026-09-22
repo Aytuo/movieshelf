@@ -31,8 +31,8 @@ export function FollowListModal({
         }
       }}
     >
-      <DialogContent className="flex max-h-[min(42rem,calc(100vh-2rem))] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 overflow-hidden p-0">
-        <DialogHeader className="shrink-0 border-b border-border/60 px-5 py-4 text-left">
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] w-[min(32rem,calc(100vw-2rem))] max-w-none flex-col gap-0 overflow-hidden p-0">
+        <DialogHeader className="shrink-0 border-b border-border/60 px-6 py-5 text-left">
           <DialogTitle className="font-heading text-lg">{title}</DialogTitle>
 
           <DialogDescription className="text-xs leading-5">
@@ -40,7 +40,9 @@ export function FollowListModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 overflow-y-auto p-4">{children}</div>
+        <div className="min-h-0 overflow-y-auto px-4 py-2 sm:px-5">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   );
