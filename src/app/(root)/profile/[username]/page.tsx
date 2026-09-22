@@ -1,11 +1,10 @@
 import { FollowButton } from '@/components/follow/follow-button';
 import ProfileNavbar from '@/components/profile/profile-navbar';
-import { auth } from '@/lib/auth';
+import { requireSession } from '@/lib/auth/require-session';
 import { getPublicProfile } from '@/lib/services/profile-service';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Film, Heart, Star, Tv } from 'lucide-react';
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -23,11 +22,9 @@ export const metadata: Metadata = {
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const { username } = await params;
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await requireSession();
 
-  const viewerUserId = session?.user.id;
+  const viewerUserId = session.user.id;
 
   const data = await getPublicProfile(username, viewerUserId);
 
@@ -73,24 +70,30 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
               )}
 
               <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                <span>
+                <Link
+                  href={`/profile/${profile.username}/followers`}
+                  className="transition-colors hover:text-foreground"
+                >
                   <strong className="font-semibold text-foreground">
                     {followStats.followerCount}
                   </strong>{' '}
                   {followStats.followerCount === 1 ? 'follower' : 'followers'}
-                </span>
+                </Link>
 
-                <span>
+                <Link
+                  href={`/profile/${profile.username}/following`}
+                  className="transition-colors hover:text-foreground"
+                >
                   <strong className="font-semibold text-foreground">
                     {followStats.followingCount}
                   </strong>{' '}
                   following
-                </span>
+                </Link>
               </div>
             </div>
           </div>
 
-          {viewerUserId !== profile.userId && viewerUserId && (
+          {viewerUserId !== profile.userId && (
             <FollowButton
               followingId={profile.userId}
               initialFollowing={followStats.viewerIsFollowing}

@@ -131,23 +131,14 @@ export async function ensureProfile({
   });
 }
 
-export async function getPublicProfile(
-  username: string,
-  viewerUserId?: string
-) {
+export async function getPublicProfile(username: string, viewerUserId: string) {
   const profile = await getProfileByUsername(username);
 
   if (!profile) {
     return null;
   }
 
-  const followStats = viewerUserId
-    ? await getUserFollowStats(profile.userId, viewerUserId)
-    : {
-        followerCount: 0,
-        followingCount: 0,
-        viewerIsFollowing: false,
-      };
+  const followStats = await getUserFollowStats(profile.userId, viewerUserId);
 
   const [mediaStats, favorites] = await Promise.all([
     getUserMediaStats(profile.userId),

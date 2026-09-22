@@ -1,10 +1,12 @@
 import {
   createFollow,
   deleteFollow,
+  getFollowers,
+  getFollowing,
   getFollowStats,
   isFollowing,
-} from '@/lib/repositories/follow-repository';
-import type { FollowStats } from '@/types';
+} from '@/lib/repositories';
+import type { FollowStats, FollowUserPage } from '@/types';
 
 export async function followUser(
   followerId: string,
@@ -40,4 +42,20 @@ export async function getUserFollowStats(
   viewerUserId: string
 ): Promise<FollowStats> {
   return getFollowStats(profileUserId, viewerUserId);
+}
+
+export async function getUserFollowers(
+  profileUserId: string,
+  viewerUserId: string,
+  cursor?: string
+): Promise<FollowUserPage> {
+  return getFollowers(profileUserId, viewerUserId, cursor, 20);
+}
+
+export async function getUserFollowing(
+  profileUserId: string,
+  viewerUserId: string,
+  cursor?: string
+): Promise<FollowUserPage> {
+  return getFollowing(profileUserId, viewerUserId, cursor, 20);
 }
