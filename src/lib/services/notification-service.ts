@@ -10,6 +10,23 @@ import {
 } from '@/lib/repositories';
 import { NotificationPage } from '@/types';
 
+export async function notifyUserFollow(
+  followerId: string,
+  followingId: string
+): Promise<void> {
+  if (followerId === followingId) {
+    return;
+  }
+
+  await createNotificationRepository({
+    recipientId: followingId,
+    actorId: followerId,
+    type: 'user_follow',
+    postId: null,
+    commentId: null,
+  });
+}
+
 export async function notifyCommentCreated(data: {
   actorId: string;
   postId: string;

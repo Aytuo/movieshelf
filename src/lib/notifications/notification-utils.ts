@@ -1,11 +1,18 @@
-import type { Notification } from '@/types';
-import { Heart, MessageCircle, MessageSquareReply } from 'lucide-react';
+import type { Notification, NotificationType } from '@/types';
+import {
+  Bell,
+  Heart,
+  MessageCircle,
+  MessageSquareReply,
+  UserPlus,
+} from 'lucide-react';
 
-export const notificationIconMap = {
+export const notificationIconMap: Record<NotificationType, typeof Bell> = {
   post_comment: MessageCircle,
   comment_reply: MessageSquareReply,
   post_like: Heart,
   comment_like: Heart,
+  user_follow: UserPlus,
 } as const;
 
 export function getNotificationMessage(notification: Notification) {
@@ -24,6 +31,9 @@ export function getNotificationMessage(notification: Notification) {
 
     case 'comment_like':
       return `${actor} liked your comment.`;
+
+    case 'user_follow':
+      return `${notification.actor.displayName || `@${notification.actor.username}`} started following you.`;
 
     default:
       return 'You have a new notification.';

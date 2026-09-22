@@ -1,8 +1,11 @@
+import { FollowButton } from '@/components/follow/follow-button';
 import ProfileNavbar from '@/components/profile/profile-navbar';
+import { auth } from '@/lib/auth';
 import { getPublicProfile } from '@/lib/services/profile-service';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Film, Heart, Star, Tv } from 'lucide-react';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -20,48 +23,79 @@ export const metadata: Metadata = {
 const ProfilePage = async ({ params }: ProfilePageProps) => {
   const { username } = await params;
 
-  const data = await getPublicProfile(username);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const viewerUserId = session?.user.id;
+
+  const data = await getPublicProfile(username, viewerUserId);
 
   if (!data) {
     notFound();
   }
 
-  const { profile, stats, favorites } = data;
+  const { profile, stats, favorites, followStats } = data;
 
   return (
     <main className="container-content py-12 lg:py-16">
       {/* Profile header */}
       <header>
-        <div className="flex flex-col gap-7 sm:flex-row sm:items-end">
-          <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-2xl font-bold">
-            {profile.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              profile.username.slice(0, 1).toUpperCase()
-            )}
-          </div>
+        <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex min-w-0 items-end gap-5">
+            <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-2xl font-bold">
+              {profile.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                profile.username.slice(0, 1).toUpperCase()
+              )}
+            </div>
 
-          <div>
-            <p className="eyebrow">MovieShelf profile</p>
+            <div className="min-w-0">
+              <p className="eyebrow">MovieShelf profile</p>
 
-            <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-              {profile.displayName || `@${profile.username}`}
-            </h1>
+              <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+                {profile.displayName || `@${profile.username}`}
+              </h1>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              @{profile.username}
-            </p>
-
-            {profile.bio && (
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {profile.bio}
+              <p className="mt-1 text-sm text-muted-foreground">
+                @{profile.username}
               </p>
-            )}
+
+              {profile.bio && (
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {profile.bio}
+                </p>
+              )}
+
+              <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                <span>
+                  <strong className="font-semibold text-foreground">
+                    {followStats.followerCount}
+                  </strong>{' '}
+                  {followStats.followerCount === 1 ? 'follower' : 'followers'}
+                </span>
+
+                <span>
+                  <strong className="font-semibold text-foreground">
+                    {followStats.followingCount}
+                  </strong>{' '}
+                  following
+                </span>
+              </div>
+            </div>
           </div>
+
+          {viewerUserId !== profile.userId && viewerUserId && (
+            <FollowButton
+              followingId={profile.userId}
+              initialFollowing={followStats.viewerIsFollowing}
+            />
+          )}
         </div>
 
         <div className="mt-8">

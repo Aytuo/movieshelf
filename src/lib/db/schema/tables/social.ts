@@ -7,6 +7,7 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -26,6 +27,7 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'comment_reply',
   'post_like',
   'comment_like',
+  'user_follow',
 ]);
 
 /* ========================================================================== */
@@ -227,5 +229,42 @@ export const notification = pgTable(
     index('notification_actor_idx').on(table.actorId),
     index('notification_post_idx').on(table.postId),
     index('notification_comment_idx').on(table.commentId),
+  ]
+);
+
+/* ========================================================================== */
+/*                                   FOLLOW                                   */
+/* ========================================================================== */
+
+export const userFollow = pgTable(
+  'user_follow',
+  {
+    followerId: text('follower_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    followingId: text('following_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.followerId, table.followingId],
+      name: 'user_follow_pkey',
+    }),
+    check(
+      'user_follow_no_self_check',
+      sql`${table.followerId} <> ${table.followingId}`
+    ),
+    index('user_follow_follower_created_at_idx').on(
+      table.followerId,
+      table.createdAt,
+      table.followingId
+    ),
+    index('user_follow_following_created_at_idx').on(
+      table.followingId,
+      table.createdAt,
+      table.followerId
+    ),
   ]
 );

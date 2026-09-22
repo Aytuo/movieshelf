@@ -9,6 +9,7 @@ import {
   usernameExists,
 } from '@/lib/repositories';
 import { getTasteProfile } from '@/lib/services/taste-service';
+import { getUserFollowStats } from './follow-service';
 import { getUserMediaActivity } from './media-activity-service';
 
 const USERNAME_MAX_LENGTH = 14;
@@ -130,12 +131,23 @@ export async function ensureProfile({
   });
 }
 
-export async function getPublicProfile(username: string) {
+export async function getPublicProfile(
+  username: string,
+  viewerUserId?: string
+) {
   const profile = await getProfileByUsername(username);
 
   if (!profile) {
     return null;
   }
+
+  const followStats = viewerUserId
+    ? await getUserFollowStats(profile.userId, viewerUserId)
+    : {
+        followerCount: 0,
+        followingCount: 0,
+        viewerIsFollowing: false,
+      };
 
   const [mediaStats, favorites] = await Promise.all([
     getUserMediaStats(profile.userId),
@@ -146,6 +158,7 @@ export async function getPublicProfile(username: string) {
     profile,
     stats: mapPublicMediaStats(mediaStats),
     favorites,
+    followStats,
   };
 }
 
