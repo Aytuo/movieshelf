@@ -11,6 +11,7 @@ import {
   post,
   postReaction,
   review,
+  userFollow,
 } from './social';
 import { watchHistory } from './watch-history';
 
@@ -35,6 +36,12 @@ export const userRelations = relations(user, ({ one, many }) => ({
   }),
   notificationsCreated: many(notification, {
     relationName: 'notificationActor',
+  }),
+  followers: many(userFollow, {
+    relationName: 'userFollowFollowing',
+  }),
+  following: many(userFollow, {
+    relationName: 'userFollowFollower',
   }),
 }));
 
@@ -223,5 +230,23 @@ export const notificationRelations = relations(notification, ({ one }) => ({
   comment: one(comment, {
     fields: [notification.commentId],
     references: [comment.id],
+  }),
+}));
+
+/* ========================================================================== */
+/*                              RELATIONS: FOLLOW                             */
+/* ========================================================================== */
+
+export const userFollowRelations = relations(userFollow, ({ one }) => ({
+  follower: one(user, {
+    fields: [userFollow.followerId],
+    references: [user.id],
+    relationName: 'userFollowFollower',
+  }),
+
+  following: one(user, {
+    fields: [userFollow.followingId],
+    references: [user.id],
+    relationName: 'userFollowFollowing',
   }),
 }));

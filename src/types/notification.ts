@@ -1,5 +1,13 @@
+/* ========================================================================== */
+/*                              NOTIFICATION                                  */
+/* ========================================================================== */
+
 export type NotificationType =
-  'post_comment' | 'comment_reply' | 'post_like' | 'comment_like';
+  | 'post_comment'
+  | 'comment_reply'
+  | 'post_like'
+  | 'comment_like'
+  | 'user_follow';
 
 export type Notification = {
   id: string;
