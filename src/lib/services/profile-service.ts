@@ -3,6 +3,7 @@ import {
   getProfileByUserId,
   getProfileByUsername,
   getUserFavorites,
+  getUserLatestRated,
   getUserMediaStats,
   getUserReviews,
   type UserMediaStatsRow,
@@ -15,6 +16,10 @@ import { getUserMediaActivity } from './media-activity-service';
 const USERNAME_MAX_LENGTH = 14;
 const RANDOM_SUFFIX_LENGTH = 4;
 const MAX_USERNAME_GENERATION_ATTEMPTS = 5;
+
+function roundRating(value: number | null) {
+  return value === null ? null : Math.round(value * 10) / 10;
+}
 
 function createBaseUsername(name: string | null | undefined, email: string) {
   const fromName = name
@@ -62,16 +67,18 @@ function mapPublicMediaStats(rows: UserMediaStatsRow[]) {
       watched: Number(movie.watched),
       rated: Number(movie.rated),
       favorites: Number(movie.favorites),
-      averageRating:
-        movie.averageRating === null ? null : Number(movie.averageRating),
+      averageRating: roundRating(
+        movie.averageRating === null ? null : Number(movie.averageRating)
+      ),
     },
     tv: {
       total: Number(tv.total),
       watched: Number(tv.watched),
       rated: Number(tv.rated),
       favorites: Number(tv.favorites),
-      averageRating:
-        tv.averageRating === null ? null : Number(tv.averageRating),
+      averageRating: roundRating(
+        tv.averageRating === null ? null : Number(tv.averageRating)
+      ),
     },
   };
 }
@@ -140,15 +147,17 @@ export async function getPublicProfile(username: string, viewerUserId: string) {
 
   const followStats = await getUserFollowStats(profile.userId, viewerUserId);
 
-  const [mediaStats, favorites] = await Promise.all([
+  const [mediaStats, favorites, latestRated] = await Promise.all([
     getUserMediaStats(profile.userId),
     getUserFavorites(profile.userId, 6),
+    getUserLatestRated(profile.userId, 6),
   ]);
 
   return {
     profile,
     stats: mapPublicMediaStats(mediaStats),
     favorites,
+    latestRated,
     followStats,
   };
 }

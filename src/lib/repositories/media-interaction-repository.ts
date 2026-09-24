@@ -6,7 +6,7 @@ import {
   watchHistory,
 } from '@/lib/db/schema';
 import type { MediaType } from '@/lib/media';
-import { and, count, desc, eq, sql } from 'drizzle-orm';
+import { and, count, desc, eq, isNotNull, sql } from 'drizzle-orm';
 
 type DbMedia = typeof media.$inferSelect;
 type DbMediaInteraction = typeof mediaInteraction.$inferSelect;
@@ -118,6 +118,24 @@ export async function getUserFavorites(userId: string, limit = 6) {
       and(
         eq(mediaInteraction.userId, userId),
         eq(mediaInteraction.favorite, true)
+      )
+    )
+    .orderBy(desc(mediaInteraction.updatedAt))
+    .limit(limit);
+}
+
+export async function getUserLatestRated(userId: string, limit = 6) {
+  return db
+    .select({
+      media,
+      interaction: mediaInteraction,
+    })
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(
+      and(
+        eq(mediaInteraction.userId, userId),
+        isNotNull(mediaInteraction.rating)
       )
     )
     .orderBy(desc(mediaInteraction.updatedAt))
