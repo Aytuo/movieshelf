@@ -20,13 +20,18 @@ const ProfileNavbar = ({ username }: ProfileNavbarProps) => {
       exact: true,
     },
     {
-      label: 'Taste',
-      href: `${basePath}/taste`,
+      label: 'Posts',
+      href: `${basePath}/posts`,
       exact: false,
     },
     {
       label: 'Reviews',
       href: `${basePath}/reviews`,
+      exact: false,
+    },
+    {
+      label: 'Taste',
+      href: `${basePath}/taste`,
       exact: false,
     },
     {

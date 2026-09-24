@@ -10,8 +10,10 @@ import {
   usernameExists,
 } from '@/lib/repositories';
 import { getTasteProfile } from '@/lib/services/taste-service';
+import { PostPaginationOptions } from '@/types';
 import { getUserFollowStats } from './follow-service';
 import { getUserMediaActivity } from './media-activity-service';
+import { getUserPosts } from './post-service';
 
 const USERNAME_MAX_LENGTH = 14;
 const RANDOM_SUFFIX_LENGTH = 4;
@@ -174,6 +176,25 @@ export async function getPublicTaste(username: string) {
   return {
     profile,
     taste,
+  };
+}
+
+export async function getPublicPosts(
+  username: string,
+  viewerUserId: string,
+  options?: PostPaginationOptions
+) {
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return null;
+  }
+
+  const posts = await getUserPosts(profile.userId, viewerUserId, options);
+
+  return {
+    profile,
+    ...posts,
   };
 }
 

@@ -49,18 +49,34 @@ const ProfileReviewsPage = async ({ params }: ProfileReviewsPageProps) => {
                   : `/tv/${media.tmdbId}`;
 
               return (
-                <article key={review.id} className="rounded-2xl p-5 surface">
-                  <div className="flex items-center justify-between gap-3">
+                <article
+                  key={review.id}
+                  className="flex h-full flex-col rounded-2xl p-5 surface"
+                >
+                  <div className="flex items-start justify-between gap-4">
                     <Link
                       href={href}
-                      className="text-sm font-medium transition-colors hover:text-primary"
+                      className="min-w-0 transition-colors hover:text-primary"
                     >
-                      {media.title}
+                      <p className="font-medium">
+                        {media.title}
+                        {media.releaseDate && (
+                          <span className="text-muted-foreground">
+                            {' '}
+                            ({media.releaseDate.slice(0, 4)})
+                          </span>
+                        )}
+                      </p>
+
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {media.type === 'movie' ? 'Movie' : 'TV Series'}
+                      </p>
                     </Link>
 
-                    <span className="shrink-0 text-[10px] tracking-wide text-muted-foreground uppercase">
-                      {media.type === 'movie' ? 'Movie' : 'TV Series'}
-                    </span>
+                    <p className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-rating">
+                      <Star className="size-3.5 fill-current" />
+                      {review.rating}/10
+                    </p>
                   </div>
 
                   {review.title && (
@@ -73,10 +89,32 @@ const ProfileReviewsPage = async ({ params }: ProfileReviewsPageProps) => {
                     {review.content}
                   </p>
 
-                  <p className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-rating">
-                    <Star className="size-3.5 fill-current" />
-                    {review.rating}/10
-                  </p>
+                  <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 pt-4 text-xs text-muted-foreground">
+                    <span>
+                      Reviewed:{' '}
+                      {review.createdAt.toLocaleDateString('en', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
+
+                    {review.updatedAt.getTime() >
+                      review.createdAt.getTime() && (
+                      <>
+                        <span aria-hidden="true">·</span>
+
+                        <span>
+                          Edited:{' '}
+                          {review.updatedAt.toLocaleDateString('en', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </article>
               );
             })}

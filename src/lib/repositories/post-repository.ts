@@ -1,7 +1,23 @@
 import { db } from '@/lib/db';
-import { comment, media, post, profile } from '@/lib/db/schema';
+import {
+  comment,
+  media,
+  mediaInteraction,
+  post,
+  profile,
+} from '@/lib/db/schema';
 import type { Post, PostPage, PostPaginationOptions } from '@/types';
-import { and, desc, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm';
+import {
+  and,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  or,
+  sql,
+} from 'drizzle-orm';
 
 const DEFAULT_POST_PAGE_SIZE = 5;
 const MAX_POST_PAGE_SIZE = 20;
@@ -180,6 +196,60 @@ export async function getMediaPosts(
   };
 }
 
+export async function getUserPosts(
+  userId: string,
+  options: PostPaginationOptions = {}
+): Promise<PostPage> {
+  const limit = Math.min(
+    Math.max(options.limit ?? DEFAULT_POST_PAGE_SIZE, 1),
+    MAX_POST_PAGE_SIZE
+  );
+
+  const cursor = options.cursor ? decodePostCursor(options.cursor) : null;
+
+  const rows = await db
+    .select({
+      post,
+      media,
+      profile,
+    })
+    .from(post)
+    .innerJoin(media, eq(media.id, post.mediaId))
+    .innerJoin(profile, eq(profile.userId, post.authorId))
+    .where(
+      cursor
+        ? and(
+            eq(post.authorId, userId),
+            or(
+              lt(post.createdAt, new Date(cursor.createdAt)),
+              and(
+                eq(post.createdAt, new Date(cursor.createdAt)),
+                lt(post.id, cursor.id)
+              )
+            )
+          )
+        : eq(post.authorId, userId)
+    )
+    .orderBy(desc(post.createdAt), desc(post.id))
+    .limit(limit + 1);
+
+  const hasMore = rows.length > limit;
+  const visibleRows = hasMore ? rows.slice(0, limit) : rows;
+
+  const lastRow = visibleRows.at(-1);
+
+  return {
+    posts: visibleRows.map(mapPost),
+    nextCursor:
+      hasMore && lastRow
+        ? encodePostCursor({
+            createdAt: lastRow.post.createdAt.toISOString(),
+            id: lastRow.post.id,
+          })
+        : null,
+  };
+}
+
 export async function getPostById(postId: string): Promise<Post | null> {
   const [row] = await db
     .select({
@@ -240,4 +310,33 @@ export async function getPostAuthorId(postId: string): Promise<string | null> {
     .limit(1);
 
   return row?.authorId ?? null;
+}
+
+export async function getPostAuthorRatings(
+  postIds: string[],
+  userId: string
+): Promise<{ postId: string; rating: number }[]> {
+  if (postIds.length === 0) {
+    return [];
+  }
+
+  const rows = await db
+    .select({
+      postId: post.id,
+      rating: mediaInteraction.rating,
+    })
+    .from(post)
+    .innerJoin(
+      mediaInteraction,
+      and(
+        eq(mediaInteraction.mediaId, post.mediaId),
+        eq(mediaInteraction.userId, userId)
+      )
+    )
+    .where(and(inArray(post.id, postIds), isNotNull(mediaInteraction.rating)));
+
+  return rows.map((row) => ({
+    postId: row.postId,
+    rating: Number(row.rating),
+  }));
 }
