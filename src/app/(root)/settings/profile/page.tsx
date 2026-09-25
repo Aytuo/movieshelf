@@ -28,9 +28,11 @@ const ProfileSettingsPage = async () => {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-sm font-medium text-primary">Profile</p>
+        <p className="eyebrow">Profile</p>
 
-        <h2 className="mt-1 font-heading text-2xl font-bold">Settings</h2>
+        <h2 className="mt-2 font-heading text-2xl font-bold">
+          Profile settings
+        </h2>
 
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Customize how you appear across MovieShelf.

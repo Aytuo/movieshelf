@@ -53,5 +53,10 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,
   },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   plugins: [nextCookies()],
 });

@@ -2,7 +2,7 @@
 
 import { updateProfileSettings } from '@/lib/actions/profile-action';
 import Image from 'next/image';
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 type ProfileSettingsFormProps = {
   initialValues: {
@@ -30,12 +30,6 @@ const ProfileSettingsForm = ({
   const previewAvatar = useMemo(() => {
     return form.avatarUrl.trim() || fallbackAvatar || null;
   }, [form.avatarUrl, fallbackAvatar]);
-
-  useEffect(() => {
-    return () => {
-      setMessage(null);
-    };
-  }, []);
 
   function updateField<T extends keyof typeof form>(
     field: T,
