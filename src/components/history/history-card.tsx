@@ -9,7 +9,6 @@ type HistoryCardProps = {
       id: string;
       watchedAt: Date;
     };
-
     media: {
       type: MediaType;
       tmdbId: number;
@@ -17,7 +16,6 @@ type HistoryCardProps = {
       posterPath: string | null;
       releaseDate: string | null;
     };
-
     watchNumber: number;
   };
 };
@@ -30,10 +28,9 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
 
   const poster = tmdbImage(media.posterPath, 'w500');
 
-  // const mediaLabel = media.type === 'movie' ? 'Movie' : 'TV Series';
-
   const MediaIcon = media.type === 'movie' ? Film : Tv;
 
+  const mediaLabel = media.type === 'movie' ? 'Movie' : 'TV';
   const watchLabel =
     watchNumber === 1 ? 'Watch #1' : `Rewatch #${watchNumber - 1}`;
 
@@ -53,15 +50,14 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
         )}
 
         <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
-          <MediaIcon className="size-3" />
-          {/* {mediaLabel} */}
+          <MediaIcon className="size-3" aria-hidden="true" />
+          {mediaLabel}
         </span>
       </div>
 
       <div className="min-w-0 py-1">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock3 className="size-3.5" />
-
           {new Date(history.watchedAt).toLocaleString('en-US', {
             dateStyle: 'medium',
             timeStyle: 'short',
@@ -74,7 +70,7 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
 
         {media.releaseDate && (
           <p className="mt-1 text-xs text-muted-foreground">
-            {new Date(media.releaseDate).getFullYear()}
+            ({new Date(media.releaseDate).getFullYear()})
           </p>
         )}
 

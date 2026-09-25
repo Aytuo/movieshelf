@@ -5,9 +5,11 @@ import {
   Bookmark,
   Check,
   Clock3,
+  Film,
   Heart,
   MessageSquare,
   Star,
+  Tv,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -101,89 +103,113 @@ const ActivityTimeline = ({ activities }: MediaActivityTimelineProps) => {
 
               {/* Activity card */}
               <div className="flex min-w-0 flex-1 gap-4 rounded-2xl p-4 surface">
-                <Link
-                  href={href}
-                  className="w-20 shrink-0 overflow-hidden rounded-lg"
-                >
-                  {poster ? (
-                    <img
-                      src={poster}
-                      alt={`${media.title} poster`}
-                      className="aspect-[2/3] w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex aspect-[2/3] w-full items-center justify-center bg-surface-hover px-2 text-center text-[10px] text-muted-foreground">
-                      No poster
-                    </div>
-                  )}
-                </Link>
+                <div className="relative aspect-[2/3] w-20 shrink-0 self-start overflow-hidden rounded-lg">
+                  <Link href={href} className="block">
+                    {poster ? (
+                      <img
+                        src={poster}
+                        alt={`${media.title} poster`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-surface-hover px-2 text-center text-[10px] text-muted-foreground">
+                        No poster
+                      </div>
+                    )}
+                  </Link>
 
-                <div className="min-w-0">
-                  {/* Date + media type */}
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span>
+                  <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded-md border border-white/10 bg-black/70 px-1.5 py-1 text-[9px] font-medium text-white backdrop-blur-sm">
+                    {media.type === 'movie' ? (
+                      <Film className="size-3" aria-hidden="true" />
+                    ) : (
+                      <Tv className="size-3" aria-hidden="true" />
+                    )}
+                    {media.type === 'movie' ? 'Movie' : 'TV'}
+                  </span>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  {/* Activity + timestamp */}
+                  <div className="flex items-start justify-between gap-4">
+                    <h2 className="font-heading font-semibold">
+                      {activity.type === 'watched' &&
+                        (activity.watchNumber === 1
+                          ? 'You watched'
+                          : 'You rewatched')}
+
+                      {activity.type === 'reviewed' && 'You reviewed'}
+
+                      {activity.type === 'watchlist_added' &&
+                        'You added to your watchlist'}
+
+                      {activity.type === 'watching_started' &&
+                        'You started watching'}
+
+                      {activity.type === 'dropped' && 'You dropped'}
+
+                      {activity.type === 'favorite_added' &&
+                        'You added to your favorites'}
+
+                      {activity.type === 'favorite_removed' &&
+                        'You removed this from your favorites'}
+
+                      {activity.type === 'rated' &&
+                        `You rated this ${activity.rating}/10`}
+
+                      {activity.type === 'shelf_removed' &&
+                        'You removed this from your shelf'}
+                    </h2>
+
+                    <time
+                      dateTime={new Date(activity.createdAt).toISOString()}
+                      className="shrink-0 text-right text-xs text-muted-foreground"
+                    >
                       {new Date(activity.createdAt).toLocaleString('en-US', {
                         dateStyle: 'medium',
                         timeStyle: 'short',
                       })}
-                    </span>
-
-                    <span>•</span>
-
-                    <span className="font-semibold tracking-wide uppercase">
-                      {media.type === 'movie' ? 'Movie' : 'TV Series'}
-                    </span>
+                    </time>
                   </div>
 
-                  {/* Activity description */}
-                  <h2 className="mt-2 font-heading font-semibold">
-                    {activity.type === 'watched' &&
-                      (activity.watchNumber === 1
-                        ? 'You watched'
-                        : 'You rewatched')}
+                  {/* Media */}
+                  <Link
+                    href={href}
+                    className="mt-2 inline-flex min-w-0 items-center transition-colors hover:text-primary"
+                  >
+                    <span className="truncate text-sm font-medium">
+                      {media.title}
+                      {media.releaseDate && (
+                        <span className="text-muted-foreground">
+                          {' '}
+                          ({media.releaseDate.slice(0, 4)})
+                        </span>
+                      )}
+                    </span>
+                  </Link>
 
-                    {activity.type === 'reviewed' && 'You reviewed'}
-
-                    {activity.type === 'watchlist_added' &&
-                      'You added to your watchlist'}
-
-                    {activity.type === 'watching_started' &&
-                      'You started watching'}
-
-                    {activity.type === 'dropped' && 'You dropped'}
-
-                    {activity.type === 'favorite_added' &&
-                      'You added to your favorites'}
-
-                    {activity.type === 'favorite_removed' &&
-                      'You removed this from your favorites'}
-
-                    {activity.type === 'rated' &&
-                      `You rated this ${activity.rating}/10`}
-
-                    {activity.type === 'shelf_removed' &&
-                      'You removed this from your shelf'}
-                  </h2>
-
+                  {/* Rewatch context */}
                   {activity.type === 'watched' && activity.watchNumber > 1 && (
                     <p className="mt-1 text-xs text-muted-foreground">
                       Rewatch #{activity.watchNumber - 1}
                     </p>
                   )}
 
-                  {/* Media title */}
-                  <Link
-                    href={href}
-                    className="mt-1 block text-sm font-medium hover:text-primary"
-                  >
-                    {media.title}
-                  </Link>
+                  {/* Review context */}
+                  {activity.type === 'reviewed' && activity.review?.content && (
+                    <>
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                        {activity.review.content}
+                      </p>
 
-                  {/* Review content */}
-                  {activity.type === 'reviewed' && activity.review.content && (
-                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                      {activity.review.content}
-                    </p>
+                      <div className="mt-2 flex justify-end">
+                        <Link
+                          href={`${href}#reviews`}
+                          className="text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                        >
+                          Read full review →
+                        </Link>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>

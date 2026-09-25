@@ -350,7 +350,7 @@ const MediaDetailsView = ({
       {/* Review form                                                      */}
       {/* ---------------------------------------------------------------- */}
 
-      <section className="border-t border-border/60">
+      <section id="reviews" className="scroll-mt-24 border-t border-border/60">
         <div className="container-content py-14 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
             <div>

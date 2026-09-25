@@ -107,38 +107,69 @@ export async function getUserWatchlist(userId: string) {
 }
 
 export async function getUserFavorites(userId: string, limit = 6) {
+  const latestFavorites = db
+    .selectDistinctOn([mediaActivity.mediaId], {
+      mediaId: mediaActivity.mediaId,
+      favoritedAt: mediaActivity.createdAt,
+    })
+    .from(mediaActivity)
+    .where(
+      and(
+        eq(mediaActivity.userId, userId),
+        eq(mediaActivity.type, 'favorite_added')
+      )
+    )
+    .orderBy(mediaActivity.mediaId, desc(mediaActivity.createdAt))
+    .as('latest_favorites');
+
   return db
     .select({
       media,
       interaction: mediaInteraction,
     })
-    .from(mediaInteraction)
-    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
-    .where(
+    .from(latestFavorites)
+    .innerJoin(media, eq(media.id, latestFavorites.mediaId))
+    .innerJoin(
+      mediaInteraction,
       and(
+        eq(mediaInteraction.mediaId, latestFavorites.mediaId),
         eq(mediaInteraction.userId, userId),
         eq(mediaInteraction.favorite, true)
       )
     )
-    .orderBy(desc(mediaInteraction.updatedAt))
+    .orderBy(desc(latestFavorites.favoritedAt))
     .limit(limit);
 }
 
 export async function getUserLatestRated(userId: string, limit = 6) {
+  const latestRatings = db
+    .selectDistinctOn([mediaActivity.mediaId], {
+      mediaId: mediaActivity.mediaId,
+      ratedAt: mediaActivity.createdAt,
+    })
+    .from(mediaActivity)
+    .where(
+      and(eq(mediaActivity.userId, userId), eq(mediaActivity.type, 'rated'))
+    )
+    .orderBy(mediaActivity.mediaId, desc(mediaActivity.createdAt))
+    .as('latest_ratings');
+
   return db
     .select({
       media,
       interaction: mediaInteraction,
     })
-    .from(mediaInteraction)
-    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
-    .where(
+    .from(latestRatings)
+    .innerJoin(media, eq(media.id, latestRatings.mediaId))
+    .innerJoin(
+      mediaInteraction,
       and(
+        eq(mediaInteraction.mediaId, latestRatings.mediaId),
         eq(mediaInteraction.userId, userId),
         isNotNull(mediaInteraction.rating)
       )
     )
-    .orderBy(desc(mediaInteraction.updatedAt))
+    .orderBy(desc(latestRatings.ratedAt))
     .limit(limit);
 }
 
