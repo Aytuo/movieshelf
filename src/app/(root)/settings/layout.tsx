@@ -3,7 +3,7 @@ import Link from 'next/link';
 const settingsNavigation = [
   {
     label: 'Profile',
-    href: '/profile',
+    href: '/settings/profile',
   },
   {
     label: 'Security',
