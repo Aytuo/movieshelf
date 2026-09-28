@@ -14,9 +14,16 @@ import { useEffect, useState } from 'react';
 
 type ProviderId = 'google' | 'discord';
 
+type ConnectedAccountProfile = {
+  displayName: string | null;
+  identifier: string | null;
+  image: string | null;
+};
+
 type ConnectedAccount = {
   id: string;
   providerId: string;
+  profile?: ConnectedAccountProfile;
 };
 
 const PENDING_UNLINK_KEY = 'movieshelf:pending-unlink-provider';
@@ -26,12 +33,47 @@ const providerLabels: Record<ProviderId, string> = {
   discord: 'Discord',
 };
 
+function Avatar({
+  profile,
+  label,
+}: {
+  profile?: ConnectedAccountProfile;
+  label: string;
+}) {
+  const initials =
+    profile?.displayName
+      ?.trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() || label.slice(0, 1);
+
+  return (
+    <div
+      className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface-hover text-xs font-semibold text-muted-foreground"
+      role="img"
+      aria-label={`${label} account avatar`}
+    >
+      {profile?.image ? (
+        <div
+          className="size-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url("${profile.image}")` }}
+        />
+      ) : (
+        initials
+      )}
+    </div>
+  );
+}
+
 function AccountRow({
   label,
   connected,
   loading,
   actionPending,
   canDisconnect,
+  profile,
   onConnect,
   onDisconnect,
 }: {
@@ -40,19 +82,40 @@ function AccountRow({
   loading: boolean;
   actionPending: boolean;
   canDisconnect: boolean;
+  profile?: ConnectedAccountProfile;
   onConnect?: () => void;
   onDisconnect?: () => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 p-5">
-      <div className="min-w-0">
-        <p className="text-sm font-semibold">{label}</p>
+      <div className="flex min-w-0 items-center gap-3.5">
+        {connected && <Avatar profile={profile} label={label} />}
 
-        <p className="mt-1 text-xs text-muted-foreground">
-          {connected
-            ? 'Connected to your MovieShelf account.'
-            : 'Not connected.'}
-        </p>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">{label}</p>
+
+          {connected && profile ? (
+            <div className="mt-1 min-w-0">
+              {profile.displayName && (
+                <p className="truncate text-xs text-foreground">
+                  {profile.displayName}
+                </p>
+              )}
+
+              {profile.identifier && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {profile.identifier}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {connected
+                ? 'Connected to your MovieShelf account.'
+                : 'Not connected.'}
+            </p>
+          )}
+        </div>
       </div>
 
       {!loading && onConnect && onDisconnect ? (
@@ -92,6 +155,61 @@ function AccountRow({
   );
 }
 
+async function loadAccountProfile(
+  account: ConnectedAccount
+): Promise<ConnectedAccount> {
+  if (account.providerId !== 'google' && account.providerId !== 'discord') {
+    return account;
+  }
+
+  const { data } = await authClient.accountInfo({
+    query: {
+      accountId: account.id,
+    },
+  });
+
+  if (!data) {
+    return account;
+  }
+
+  const raw = (data.data ?? {}) as Record<string, unknown>;
+
+  const nameFromUser =
+    typeof data.user?.name === 'string' ? data.user.name : null;
+
+  const emailFromUser =
+    typeof data.user?.email === 'string' ? data.user.email : null;
+
+  const rawName = typeof raw.name === 'string' ? raw.name : null;
+
+  const rawGlobalName =
+    typeof raw.global_name === 'string' ? raw.global_name : null;
+
+  const rawUsername = typeof raw.username === 'string' ? raw.username : null;
+
+  const image = typeof data.user?.image === 'string' ? data.user.image : null;
+
+  if (account.providerId === 'discord') {
+    return {
+      ...account,
+      profile: {
+        displayName: rawGlobalName ?? nameFromUser ?? rawUsername,
+        identifier: rawUsername ? `@${rawUsername}` : emailFromUser,
+        image,
+      },
+    };
+  }
+
+  return {
+    ...account,
+    profile: {
+      displayName: nameFromUser ?? rawName,
+      identifier: emailFromUser,
+      image,
+    },
+  };
+}
+
 const ConnectedAccountsPage = () => {
   const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,10 +233,15 @@ const ConnectedAccountsPage = () => {
         setError(
           accountsError.message ?? "We couldn't load your connected accounts."
         );
-      } else {
-        setAccounts(nextAccounts);
+        setLoading(false);
+        return;
       }
 
+      const enrichedAccounts = await Promise.all(
+        nextAccounts.map((account) => loadAccountProfile(account))
+      );
+
+      setAccounts(enrichedAccounts);
       setUserEmail(session?.user.email ?? '');
       setLoading(false);
 
@@ -127,7 +250,7 @@ const ConnectedAccountsPage = () => {
       if (pendingProvider === 'google' || pendingProvider === 'discord') {
         window.sessionStorage.removeItem(PENDING_UNLINK_KEY);
 
-        const account = nextAccounts.find(
+        const account = enrichedAccounts.find(
           (item) => item.providerId === pendingProvider
         );
 
@@ -311,6 +434,7 @@ const ConnectedAccountsPage = () => {
             loading={loading}
             actionPending={actionProvider === 'google'}
             canDisconnect={accounts.length > 1}
+            profile={googleAccount?.profile}
             onConnect={() => void connectProvider('google')}
             onDisconnect={() => void unlinkProvider('google')}
           />
@@ -321,6 +445,7 @@ const ConnectedAccountsPage = () => {
             loading={loading}
             actionPending={actionProvider === 'discord'}
             canDisconnect={accounts.length > 1}
+            profile={discordAccount?.profile}
             onConnect={() => void connectProvider('discord')}
             onDisconnect={() => void unlinkProvider('discord')}
           />
