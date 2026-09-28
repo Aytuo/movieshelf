@@ -20,17 +20,11 @@ export const profileUpdateSchema = z.object({
     .max(50, 'Display name cannot exceed 50 characters.')
     .optional()
     .or(z.literal('')),
+
   bio: z
     .string()
     .trim()
     .max(280, 'Bio cannot exceed 280 characters.')
-    .optional()
-    .or(z.literal('')),
-  avatarUrl: z
-    .string()
-    .trim()
-    .url('Please enter a valid image URL.')
-    .max(500, 'Avatar URL is too long.')
     .optional()
     .or(z.literal('')),
 });

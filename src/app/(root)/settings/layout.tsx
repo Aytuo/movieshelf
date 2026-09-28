@@ -1,19 +1,4 @@
-import Link from 'next/link';
-
-const settingsNavigation = [
-  {
-    label: 'Profile',
-    href: '/settings/profile',
-  },
-  {
-    label: 'Security',
-    href: '/settings/security',
-  },
-  {
-    label: 'Connected accounts',
-    href: '/settings/accounts',
-  },
-];
+import SettingsNavigation from '@/components/settings/settings-navigation';
 
 const SettingsLayout = ({
   children,
@@ -35,19 +20,7 @@ const SettingsLayout = ({
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[220px_1fr] lg:gap-12">
-        <nav className="h-fit">
-          <div className="rounded-xl border border-border p-2 surface">
-            {settingsNavigation.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
+        <SettingsNavigation />
 
         <div className="min-w-0">{children}</div>
       </div>

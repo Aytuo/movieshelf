@@ -8,7 +8,6 @@ type DbProfileUpdate = {
   username: string;
   displayName: string | null;
   bio: string | null;
-  avatarUrl: string | null;
 };
 
 export async function getProfileByUserId(
@@ -60,7 +59,33 @@ export async function updateProfile(userId: string, data: DbProfileUpdate) {
       username: data.username,
       displayName: data.displayName,
       bio: data.bio,
+      updatedAt: new Date(),
+    })
+    .where(eq(profile.userId, userId))
+    .returning();
+
+  return updated;
+}
+
+import type {
+  AvatarProvider,
+  AvatarSource,
+} from '@/lib/db/schema/tables/profile';
+
+export async function updateProfileAvatar(
+  userId: string,
+  data: {
+    avatarUrl: string | null;
+    avatarSource: AvatarSource;
+    avatarProvider: AvatarProvider | null;
+  }
+) {
+  const [updated] = await db
+    .update(profile)
+    .set({
       avatarUrl: data.avatarUrl,
+      avatarSource: data.avatarSource,
+      avatarProvider: data.avatarProvider,
       updatedAt: new Date(),
     })
     .where(eq(profile.userId, userId))

@@ -1,8 +1,7 @@
 'use client';
 
 import { updateProfileSettings } from '@/lib/actions/profile-action';
-import Image from 'next/image';
-import { useMemo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 
 type ProfileSettingsFormProps = {
   initialValues: {
@@ -11,14 +10,9 @@ type ProfileSettingsFormProps = {
     bio: string;
     avatarUrl: string;
   };
-
-  fallbackAvatar: string | null;
 };
 
-const ProfileSettingsForm = ({
-  initialValues,
-  fallbackAvatar,
-}: ProfileSettingsFormProps) => {
+const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
   const [form, setForm] = useState(initialValues);
 
   const [message, setMessage] = useState<string | null>(null);
@@ -26,10 +20,6 @@ const ProfileSettingsForm = ({
   const [error, setError] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
-
-  const previewAvatar = useMemo(() => {
-    return form.avatarUrl.trim() || fallbackAvatar || null;
-  }, [form.avatarUrl, fallbackAvatar]);
 
   function updateField<T extends keyof typeof form>(
     field: T,
@@ -67,49 +57,6 @@ const ProfileSettingsForm = ({
 
   return (
     <form onSubmit={submit} className="space-y-8">
-      <section className="rounded-2xl border border-border p-5 surface sm:p-7">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <div className="relative size-20 shrink-0 overflow-hidden rounded-2xl border border-border bg-surface-hover">
-            {previewAvatar ? (
-              <Image
-                src={previewAvatar}
-                alt=""
-                fill
-                unoptimized
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center font-heading text-2xl font-bold text-muted-foreground">
-                {form.username.slice(0, 1).toUpperCase()}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold">Profile image</h3>
-
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              Paste a public image URL. Your Google image is used automatically
-              when no custom image is provided.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5">
-          <label htmlFor="avatarUrl" className="label">
-            Avatar URL
-          </label>
-
-          <input
-            id="avatarUrl"
-            value={form.avatarUrl}
-            onChange={(event) => updateField('avatarUrl', event.target.value)}
-            placeholder="https://..."
-            className="input"
-          />
-        </div>
-      </section>
-
       <section className="rounded-2xl border border-border p-5 surface sm:p-7">
         <div className="mb-6">
           <h3 className="text-sm font-semibold">Public profile</h3>

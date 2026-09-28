@@ -52,7 +52,6 @@ export async function updateProfileSettings(
       username,
       displayName: parsed.data.displayName?.trim() || null,
       bio: parsed.data.bio?.trim() || null,
-      avatarUrl: parsed.data.avatarUrl?.trim() || null,
     });
   } catch {
     return {

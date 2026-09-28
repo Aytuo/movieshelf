@@ -12,6 +12,9 @@ import { user } from './auth';
 /*                                    PROFILE                                 */
 /* ========================================================================== */
 
+export type AvatarSource = 'default' | 'upload' | 'oauth';
+export type AvatarProvider = 'google' | 'discord';
+
 export const profile = pgTable(
   'profile',
   {
@@ -21,7 +24,14 @@ export const profile = pgTable(
     username: text('username').notNull(),
     displayName: text('display_name'),
     bio: text('bio'),
+
     avatarUrl: text('avatar_url'),
+    avatarSource: text('avatar_source')
+      .$type<AvatarSource>()
+      .default('default')
+      .notNull(),
+    avatarProvider: text('avatar_provider').$type<AvatarProvider | null>(),
+
     onboardingCompleted: boolean('onboarding_completed')
       .default(false)
       .notNull(),
