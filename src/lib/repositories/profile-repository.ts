@@ -78,6 +78,7 @@ export async function updateProfileAvatar(
     avatarUrl: string | null;
     avatarSource: AvatarSource;
     avatarProvider: AvatarProvider | null;
+    avatarPreferenceSet: boolean;
   }
 ) {
   const [updated] = await db
@@ -86,6 +87,7 @@ export async function updateProfileAvatar(
       avatarUrl: data.avatarUrl,
       avatarSource: data.avatarSource,
       avatarProvider: data.avatarProvider,
+      avatarPreferenceSet: data.avatarPreferenceSet,
       updatedAt: new Date(),
     })
     .where(eq(profile.userId, userId))

@@ -31,6 +31,9 @@ export const profile = pgTable(
       .default('default')
       .notNull(),
     avatarProvider: text('avatar_provider').$type<AvatarProvider | null>(),
+    avatarPreferenceSet: boolean('avatar_preference_set')
+      .default(false)
+      .notNull(),
 
     onboardingCompleted: boolean('onboarding_completed')
       .default(false)

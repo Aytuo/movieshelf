@@ -43,6 +43,7 @@ export async function POST(request: Request) {
       avatarUrl: url,
       avatarSource: 'upload',
       avatarProvider: null,
+      avatarPreferenceSet: true,
     });
 
     await deleteStoredAvatar(profile.avatarUrl, profile.avatarSource);

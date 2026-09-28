@@ -85,6 +85,13 @@
       "when": 1790591203458,
       "tag": "0011_charming_kitty_pryde",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790603823172,
+      "tag": "0012_typical_gauntlet",
+      "breakpoints": true
     }
   ]
 }

@@ -8,7 +8,6 @@ type ProfileSettingsFormProps = {
     username: string;
     displayName: string;
     bio: string;
-    avatarUrl: string;
   };
 };
 

@@ -29,6 +29,8 @@ type ProfileAvatarSettingsProps = {
   initialSource: AvatarSource;
   initialProvider: AvatarProvider | null;
   initialAvatarUrl: string | null;
+  fallbackAvatarUrl: string | null;
+  fallbackAvatarProvider: AvatarProvider | null;
   oauthAccounts: OAuthAvatarOption[];
 };
 
@@ -69,6 +71,8 @@ const ProfileAvatarSettings = ({
   initialSource,
   initialProvider,
   initialAvatarUrl,
+  fallbackAvatarUrl,
+  fallbackAvatarProvider,
   oauthAccounts,
 }: ProfileAvatarSettingsProps) => {
   const router = useRouter();
@@ -76,7 +80,7 @@ const ProfileAvatarSettings = ({
   const [open, setOpen] = useState(false);
   const [source, setSource] = useState<AvatarSource>(initialSource);
   const [provider, setProvider] = useState<AvatarProvider | null>(
-    initialProvider
+    initialProvider ?? fallbackAvatarProvider
   );
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
 
@@ -182,10 +186,6 @@ const ProfileAvatarSettings = ({
       return;
     }
 
-    const option = oauthAccounts.find(
-      (account) => account.provider === nextProvider
-    );
-
     setSource('oauth');
     setProvider(nextProvider);
     setAvatarUrl(result.avatarUrl ?? null);
@@ -235,11 +235,25 @@ const ProfileAvatarSettings = ({
 
   const currentDisplayUrl = previewUrl ?? avatarUrl;
 
+  const displayedAvatarUrl = avatarUrl ?? fallbackAvatarUrl;
+
+  const currentLabel = displayedAvatarUrl
+    ? source === 'upload'
+      ? 'Uploaded image'
+      : source === 'oauth'
+        ? provider
+          ? `${providerLabels[provider]} avatar`
+          : 'Connected account avatar'
+        : fallbackAvatarProvider
+          ? `Connected account avatar (${providerLabels[fallbackAvatarProvider]})`
+          : 'Default avatar'
+    : 'Default avatar';
+
   return (
     <>
       <section className="rounded-2xl border border-border p-5 surface sm:p-7">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <AvatarPreview url={avatarUrl} initial={initial} />
+          <AvatarPreview url={displayedAvatarUrl} initial={initial} />
 
           <div className="min-w-0">
             <h3 className="text-sm font-semibold">Profile image</h3>
@@ -258,16 +272,7 @@ const ProfileAvatarSettings = ({
             </button>
 
             <p className="mt-3 text-xs text-muted-foreground">
-              Current:{' '}
-              <span className="text-foreground">
-                {source === 'default'
-                  ? 'Default avatar'
-                  : source === 'upload'
-                    ? 'Uploaded image'
-                    : provider
-                      ? `${providerLabels[provider]} avatar`
-                      : 'Connected account'}
-              </span>
+              Current: <span className="text-foreground">{currentLabel}</span>
             </p>
           </div>
         </div>
@@ -345,7 +350,11 @@ const ProfileAvatarSettings = ({
                   </span>
 
                   <span className="mt-1 text-xs text-muted-foreground">
-                    JPG, PNG or WebP · max 3 MB
+                    JPG, PNG or WebP
+                  </span>
+
+                  <span className="text-xs text-muted-foreground/70">
+                    Maximum file size: 3 MB
                   </span>
 
                   <input

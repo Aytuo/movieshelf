@@ -9,6 +9,7 @@ export type Profile = {
   bio: string | null;
   avatarUrl: string | null;
   onboardingCompleted: boolean;
+  avatarPreferenceSet: boolean;
   createdAt: Date;
   updatedAt: Date;
 } | null;

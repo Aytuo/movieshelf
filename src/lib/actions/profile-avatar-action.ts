@@ -44,6 +44,7 @@ export async function setAvatarSourceAction(
         avatarUrl: null,
         avatarSource: 'default',
         avatarProvider: null,
+        avatarPreferenceSet: true,
       });
 
       await deleteStoredAvatar(profile.avatarUrl, profile.avatarSource);
@@ -103,6 +104,7 @@ export async function setAvatarSourceAction(
         avatarUrl: storedUrl,
         avatarSource: 'oauth',
         avatarProvider: provider,
+        avatarPreferenceSet: true,
       });
 
       await deleteStoredAvatar(profile.avatarUrl, profile.avatarSource);

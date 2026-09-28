@@ -475,20 +475,33 @@ const ConnectedAccountsPage = () => {
         }}
       >
         <DialogContent className="p-6 sm:max-w-md sm:p-7">
-          <DialogHeader className="space-y-3">
-            <DialogTitle>Confirm your identity</DialogTitle>
+          <DialogHeader className="space-y-4">
+            {reauthTarget && (
+              <div className="flex justify-center">
+                <Avatar
+                  profile={getProviderAccount(reauthTarget)?.profile}
+                  label={providerLabels[reauthTarget]}
+                />
+              </div>
+            )}
 
-            <DialogDescription className="leading-6">
-              For security, please sign in again before disconnecting your{' '}
-              {reauthTarget
-                ? providerLabels[reauthTarget]
-                : 'connected account'}{' '}
-              account.
-            </DialogDescription>
+            <div className="text-center">
+              <DialogTitle className="text-lg">
+                Disconnect{' '}
+                {reauthTarget
+                  ? providerLabels[reauthTarget]
+                  : 'connected account'}
+              </DialogTitle>
+
+              <DialogDescription className="mx-auto mt-2 max-w-sm leading-6">
+                For security, please confirm your identity before disconnecting
+                this account from MovieShelf.
+              </DialogDescription>
+            </div>
           </DialogHeader>
 
           {credentialConnected ? (
-            <div className="mt-5">
+            <div className="mt-6">
               <label
                 htmlFor="reauth-password"
                 className="mb-2 block text-sm font-medium"
@@ -515,7 +528,7 @@ const ConnectedAccountsPage = () => {
               </p>
             </div>
           ) : (
-            <div className="mt-5 space-y-3">
+            <div className="mt-6 space-y-3">
               <p className="text-sm font-medium">
                 Continue with a connected account
               </p>
@@ -535,6 +548,16 @@ const ConnectedAccountsPage = () => {
               ))}
             </div>
           )}
+
+          <div className="mt-5 rounded-lg border border-border/60 bg-surface-hover/50 px-3.5 py-3">
+            <p className="text-xs leading-5 text-muted-foreground">
+              Your MovieShelf account will remain active. Only the{' '}
+              {reauthTarget
+                ? `${providerLabels[reauthTarget]} connection`
+                : 'connected account'}{' '}
+              will be disconnected.
+            </p>
+          </div>
 
           <DialogFooter className="mt-7 gap-3 sm:gap-3">
             <DialogClose

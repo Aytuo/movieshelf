@@ -1,7 +1,7 @@
 import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
 import { auth } from '@/lib/auth';
-import { getProfileByUserId } from '@/lib/repositories';
+import { ensureProfile } from '@/lib/services/profile-service';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -18,11 +18,11 @@ const AppLayout = async ({
     redirect('/login');
   }
 
-  let profile = null;
-
-  if (session) {
-    profile = await getProfileByUserId(session.user.id);
-  }
+  const profile = await ensureProfile({
+    userId: session.user.id,
+    name: session.user.name,
+    email: session.user.email,
+  });
 
   return (
     <div className="flex min-h-screen flex-col">

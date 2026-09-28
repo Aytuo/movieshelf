@@ -26,6 +26,7 @@ type UserMenuProps = {
     username: string;
     displayName: string | null;
     avatarUrl: string | null;
+    avatarPreferenceSet: boolean;
   };
 };
 
@@ -36,7 +37,8 @@ const UserMenu = ({ user, profile }: UserMenuProps) => {
 
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const avatar = profile.avatarUrl || user.image;
+  const avatar =
+    profile.avatarUrl || (!profile.avatarPreferenceSet ? user.image : null);
 
   const displayName = profile.displayName || user.name || profile.username;
 

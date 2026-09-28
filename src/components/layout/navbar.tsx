@@ -113,6 +113,7 @@ const Navbar = ({ user, profile }: NavbarProps) => {
                   username: profile.username,
                   displayName: profile.displayName,
                   avatarUrl: profile.avatarUrl,
+                  avatarPreferenceSet: profile.avatarPreferenceSet,
                 }}
               />
             )}

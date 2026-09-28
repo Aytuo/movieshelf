@@ -1,0 +1,1 @@
+ALTER TABLE "profile" ADD COLUMN "avatar_preference_set" boolean DEFAULT false NOT NULL;

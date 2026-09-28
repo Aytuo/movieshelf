@@ -87,6 +87,13 @@ const ProfileSettingsPage = async () => {
     )
   ).filter(Boolean);
 
+  const fallbackOAuthAccount = oauthAvatarAccounts.find(
+    (account) =>
+      account.image &&
+      session.user.image &&
+      account.image === session.user.image
+  );
+
   return (
     <div className="space-y-8">
       <div>
@@ -110,6 +117,14 @@ const ProfileSettingsPage = async () => {
         }
         initialProvider={profile.avatarProvider}
         initialAvatarUrl={profile.avatarUrl}
+        fallbackAvatarUrl={
+          !profile.avatarPreferenceSet ? (session.user.image ?? null) : null
+        }
+        fallbackAvatarProvider={
+          !profile.avatarPreferenceSet
+            ? (fallbackOAuthAccount?.provider ?? null)
+            : null
+        }
         oauthAccounts={oauthAvatarAccounts}
       />
 
@@ -118,7 +133,6 @@ const ProfileSettingsPage = async () => {
           username: profile.username,
           displayName: profile.displayName ?? '',
           bio: profile.bio ?? '',
-          avatarUrl: profile.avatarUrl ?? '',
         }}
       />
     </div>
