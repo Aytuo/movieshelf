@@ -12,6 +12,10 @@ export type MediaRecord = {
   posterPath: string | null;
   backdropPath: string | null;
   releaseDate: string | null;
+  genres: {
+    id: number;
+    name: string;
+  }[];
 };
 
 export type MediaInteraction = {

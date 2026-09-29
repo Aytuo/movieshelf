@@ -7,6 +7,7 @@ import type {
   TasteProfile,
   TasteStats,
 } from '@/types';
+import { getOrCreateMediaRecord } from './media-service';
 
 type ShelfItem = UserShelfRow;
 
@@ -171,7 +172,32 @@ function buildTasteStats(items: ShelfItem[]): TasteStats {
 }
 
 export async function getTasteProfile(userId: string): Promise<TasteProfile> {
-  const items = await getUserShelf(userId);
+  const shelf = await getUserShelf(userId);
+
+  const items = await Promise.all(
+    shelf.map(async (item) => {
+      if (item.media.genres.length > 0) {
+        return item;
+      }
+
+      try {
+        const refreshed = await getOrCreateMediaRecord(
+          item.media.type,
+          item.media.tmdbId
+        );
+
+        return {
+          ...item,
+          media: {
+            ...item.media,
+            genres: refreshed.genres,
+          },
+        };
+      } catch {
+        return item;
+      }
+    })
+  );
 
   const movieItems = items.filter(({ media }) => media.type === 'movie');
 

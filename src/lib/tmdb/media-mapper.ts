@@ -17,9 +17,11 @@ import type {
   TmdbCreditCast,
   TmdbCreditCrew,
   TmdbMovieBundle,
+  TmdbMovieDetails,
   TmdbMovieResult,
   TmdbTvAggregateCast,
   TmdbTvBundle,
+  TmdbTvDetails,
   TmdbTvEpisode,
   TmdbTvResult,
   TmdbTvSeasonDetails,
@@ -30,7 +32,24 @@ import type {
 /*                              BASIC MEDIA                                   */
 /* ========================================================================== */
 
+function isMovieDetails(
+  movie: TmdbMovieResult | TmdbMovieDetails
+): movie is TmdbMovieDetails {
+  return Array.isArray((movie as TmdbMovieDetails).genres);
+}
+
+function isTvDetails(tv: TmdbTvResult | TmdbTvDetails): tv is TmdbTvDetails {
+  return Array.isArray((tv as TmdbTvDetails).genres);
+}
+
 export function mapMovieResult(movie: TmdbMovieResult): Movie {
+  const genres = isMovieDetails(movie)
+    ? movie.genres.map((genre) => ({
+        id: genre.id,
+        name: genre.name,
+      }))
+    : (movie.genre_ids ?? []).map((id) => mapGenre(id, TMDB_MOVIES_GENRES));
+
   return {
     tmdbId: movie.id,
     type: 'movie',
@@ -43,13 +62,18 @@ export function mapMovieResult(movie: TmdbMovieResult): Movie {
     rating: movie.vote_average,
     voteCount: movie.vote_count,
     originalLanguage: movie.original_language,
-    genres: (movie.genre_ids ?? []).map((id) =>
-      mapGenre(id, TMDB_MOVIES_GENRES)
-    ),
+    genres,
   };
 }
 
 export function mapTvResult(tv: TmdbTvResult): TvShow {
+  const genres = isTvDetails(tv)
+    ? tv.genres.map((genre) => ({
+        id: genre.id,
+        name: genre.name,
+      }))
+    : (tv.genre_ids ?? []).map((id) => mapGenre(id, TMDB_TV_GENRES));
+
   return {
     tmdbId: tv.id,
     type: 'tv',
@@ -62,7 +86,7 @@ export function mapTvResult(tv: TmdbTvResult): TvShow {
     rating: tv.vote_average,
     voteCount: tv.vote_count,
     originalLanguage: tv.original_language,
-    genres: (tv.genre_ids ?? []).map((id) => mapGenre(id, TMDB_TV_GENRES)),
+    genres,
   };
 }
 

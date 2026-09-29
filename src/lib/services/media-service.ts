@@ -79,7 +79,11 @@ export async function getOrCreateMediaRecord(
 ): Promise<MediaRecord> {
   const existing = await getMediaRecordByTmdbId(tmdbId, type);
 
-  if (existing) {
+  if (
+    existing &&
+    Array.isArray(existing.genres) &&
+    existing.genres.length > 0
+  ) {
     return existing;
   }
 
