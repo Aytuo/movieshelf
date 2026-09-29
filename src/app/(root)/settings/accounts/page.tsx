@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { authClient } from '@/lib/auth/client';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 type ProviderId = 'google' | 'discord';
 
@@ -218,7 +219,6 @@ const ConnectedAccountsPage = () => {
   const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionProvider, setActionProvider] = useState<ProviderId | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const [userEmail, setUserEmail] = useState('');
   const [reauthOpen, setReauthOpen] = useState(false);
@@ -234,7 +234,7 @@ const ConnectedAccountsPage = () => {
       const nextAccounts = data ?? [];
 
       if (accountsError) {
-        setError(
+        toast.error(
           accountsError.message ?? "We couldn't load your connected accounts."
         );
         setLoading(false);
@@ -260,14 +260,13 @@ const ConnectedAccountsPage = () => {
 
         if (account) {
           setActionProvider(pendingProvider);
-          setError(null);
 
           const result = await authClient.unlinkAccount({
             accountId: account.id,
           });
 
           if (result.error) {
-            setError(
+            toast.error(
               result.error.message ??
                 "We couldn't disconnect this account. Please try again."
             );
@@ -275,6 +274,8 @@ const ConnectedAccountsPage = () => {
             setAccounts((current) =>
               current.filter((item) => item.id !== account.id)
             );
+
+            toast.success(`${providerLabels[pendingProvider]} disconnected.`);
           }
 
           setActionProvider(null);
@@ -303,7 +304,6 @@ const ConnectedAccountsPage = () => {
       return;
     }
 
-    setError(null);
     setActionProvider(provider);
 
     const result = await authClient.unlinkAccount({
@@ -319,7 +319,7 @@ const ConnectedAccountsPage = () => {
         return;
       }
 
-      setError(
+      toast.error(
         result.error.message ??
           `We couldn't disconnect your ${providerLabels[provider]} account.`
       );
@@ -329,11 +329,12 @@ const ConnectedAccountsPage = () => {
 
     setAccounts((current) => current.filter((item) => item.id !== account.id));
 
+    toast.success(`${providerLabels[provider]} disconnected.`);
+
     setActionProvider(null);
   }
 
   async function connectProvider(provider: ProviderId) {
-    setError(null);
     setActionProvider(provider);
 
     const result = await authClient.linkSocial({
@@ -342,7 +343,7 @@ const ConnectedAccountsPage = () => {
     });
 
     if (result.error) {
-      setError(
+      toast.error(
         result.error.message ??
           `We couldn't connect your ${providerLabels[provider]} account.`
       );
@@ -355,7 +356,6 @@ const ConnectedAccountsPage = () => {
       return;
     }
 
-    setError(null);
     setReauthPending(true);
 
     const { error: signInError } = await authClient.signIn.email({
@@ -364,7 +364,7 @@ const ConnectedAccountsPage = () => {
     });
 
     if (signInError) {
-      setError(signInError.message ?? "We couldn't verify your password.");
+      toast.error(signInError.message ?? "We couldn't verify your password.");
       setReauthPending(false);
       return;
     }
@@ -384,7 +384,6 @@ const ConnectedAccountsPage = () => {
       return;
     }
 
-    setError(null);
     setReauthPending(true);
 
     window.sessionStorage.setItem(PENDING_UNLINK_KEY, reauthTarget);
@@ -397,7 +396,7 @@ const ConnectedAccountsPage = () => {
     if (result.error) {
       window.sessionStorage.removeItem(PENDING_UNLINK_KEY);
 
-      setError(
+      toast.error(
         result.error.message ??
           `We couldn't re-authenticate with ${providerLabels[provider]}.`
       );
@@ -454,15 +453,6 @@ const ConnectedAccountsPage = () => {
             onDisconnect={() => void unlinkProvider('discord')}
           />
         </div>
-
-        {error && (
-          <div
-            role="alert"
-            className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {error}
-          </div>
-        )}
       </div>
 
       <Dialog
@@ -519,7 +509,6 @@ const ConnectedAccountsPage = () => {
                 value={reauthPassword}
                 onChange={(event) => {
                   setReauthPassword(event.target.value);
-                  setError(null);
                 }}
                 autoComplete="current-password"
                 className="input"

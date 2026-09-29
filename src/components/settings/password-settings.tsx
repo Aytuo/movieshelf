@@ -71,6 +71,7 @@ const PasswordSettings = () => {
   const [hasCredential, setHasCredential] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const form = useForm<PasswordSettingsInput>({
     resolver: zodResolver(passwordSettingsSchema),
@@ -85,15 +86,24 @@ const PasswordSettings = () => {
     let cancelled = false;
 
     async function loadAccounts() {
-      const { data } = await authClient.listAccounts();
+      const { data, error } = await authClient.listAccounts();
 
       if (cancelled) {
+        return;
+      }
+
+      if (error) {
+        setLoadError(
+          error.message ?? "We couldn't load your password settings."
+        );
+        setIsLoading(false);
         return;
       }
 
       setHasCredential(
         data?.some((account) => account.providerId === 'credential') ?? false
       );
+
       setIsLoading(false);
     }
 
@@ -149,6 +159,17 @@ const PasswordSettings = () => {
     return (
       <div className="mt-6 text-sm text-muted-foreground">
         Loading password settings...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div
+        role="alert"
+        className="mt-6 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+      >
+        {loadError}
       </div>
     );
   }
