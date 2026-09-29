@@ -2,6 +2,7 @@
 
 import { authClient } from '@/lib/auth/client';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 type ActiveSession = {
   token: string;
@@ -24,12 +25,8 @@ const ActiveSessions = ({
 
   const [actionToken, setActionToken] = useState<string | null>(null);
   const [isRevokingOthers, setIsRevokingOthers] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   async function revokeSession(token: string) {
-    setError(null);
-    setMessage(null);
     setActionToken(token);
 
     const { error: revokeError } = await authClient.revokeSession({
@@ -37,7 +34,7 @@ const ActiveSessions = ({
     });
 
     if (revokeError) {
-      setError(revokeError.message ?? "We couldn't revoke this session.");
+      toast.error(revokeError.message ?? "We couldn't revoke this session.");
       setActionToken(null);
 
       return;
@@ -47,19 +44,19 @@ const ActiveSessions = ({
       current.filter((session) => session.token !== token)
     );
 
-    setMessage('Session revoked.');
+    toast.success('Session revoked.');
     setActionToken(null);
   }
 
   async function revokeOtherSessions() {
-    setError(null);
-    setMessage(null);
     setIsRevokingOthers(true);
 
     const { error: revokeError } = await authClient.revokeOtherSessions();
 
     if (revokeError) {
-      setError(revokeError.message ?? "We couldn't revoke the other sessions.");
+      toast.error(
+        revokeError.message ?? "We couldn't revoke the other sessions."
+      );
       setIsRevokingOthers(false);
 
       return;
@@ -69,15 +66,8 @@ const ActiveSessions = ({
       current.filter((session) => session.token === currentSessionToken)
     );
 
-    setMessage('All other sessions have been signed out.');
+    toast.success('All other sessions have been signed out.');
     setIsRevokingOthers(false);
-  }
-  if (error && sessions.length === 0) {
-    return (
-      <div className="mt-6 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-        {error}
-      </div>
-    );
   }
 
   return (
@@ -153,21 +143,6 @@ const ActiveSessions = ({
           );
         })}
       </div>
-
-      {message && (
-        <div className="rounded-xl border border-primary/20 bg-primary-muted px-4 py-3 text-sm text-primary">
-          {message}
-        </div>
-      )}
-
-      {error && (
-        <div
-          role="alert"
-          className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-        >
-          {error}
-        </div>
-      )}
     </div>
   );
 };

@@ -8,8 +8,8 @@ export type Profile = {
   displayName: string | null;
   bio: string | null;
   avatarUrl: string | null;
-  onboardingCompleted: boolean;
   avatarPreferenceSet: boolean;
+  onboardingCompleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 } | null;

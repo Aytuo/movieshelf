@@ -5,6 +5,19 @@ export const passwordSchema = z
   .min(8, 'Password must contain at least 8 characters.')
   .max(128, 'Password cannot exceed 128 characters.');
 
+export const passwordSettingsSchema = z
+  .object({
+    currentPassword: z.string(),
+    newPassword: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match.',
+    path: ['confirmPassword'],
+  });
+
+export type PasswordSettingsInput = z.infer<typeof passwordSettingsSchema>;
+
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
   password: z

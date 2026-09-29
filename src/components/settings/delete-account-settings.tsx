@@ -14,6 +14,7 @@ import { authClient } from '@/lib/auth/client';
 import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const DeleteAccountSettings = () => {
   const router = useRouter();
@@ -22,7 +23,6 @@ const DeleteAccountSettings = () => {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
 
-  const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
   const canDelete =
@@ -31,7 +31,6 @@ const DeleteAccountSettings = () => {
   function resetState() {
     setPassword('');
     setConfirmation('');
-    setError(null);
   }
 
   async function deleteAccount() {
@@ -39,7 +38,6 @@ const DeleteAccountSettings = () => {
       return;
     }
 
-    setError(null);
     setIsPending(true);
 
     const result = password.trim()
@@ -49,7 +47,7 @@ const DeleteAccountSettings = () => {
       : await authClient.deleteUser();
 
     if (result.error) {
-      setError(
+      toast.error(
         result.error.message ??
           "We couldn't delete your account. Please try again."
       );
@@ -57,6 +55,8 @@ const DeleteAccountSettings = () => {
 
       return;
     }
+
+    toast.success('Your MovieShelf account has been deleted.');
 
     setOpen(false);
     resetState();
@@ -143,7 +143,6 @@ const DeleteAccountSettings = () => {
               value={password}
               onChange={(event) => {
                 setPassword(event.target.value);
-                setError(null);
               }}
               autoComplete="current-password"
               className="input"
@@ -169,22 +168,12 @@ const DeleteAccountSettings = () => {
               value={confirmation}
               onChange={(event) => {
                 setConfirmation(event.target.value);
-                setError(null);
               }}
               className="input"
               placeholder="DELETE"
               autoComplete="off"
             />
           </div>
-
-          {error && (
-            <div
-              role="alert"
-              className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-            >
-              {error}
-            </div>
-          )}
         </div>
 
         <DialogFooter className="mt-7 gap-3 sm:gap-3">

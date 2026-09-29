@@ -1,7 +1,9 @@
 'use client';
 
 import { updateProfileSettings } from '@/lib/actions/profile-action';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 type ProfileSettingsFormProps = {
   initialValues: {
@@ -12,11 +14,9 @@ type ProfileSettingsFormProps = {
 };
 
 const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
+  const router = useRouter();
+
   const [form, setForm] = useState(initialValues);
-
-  const [message, setMessage] = useState<string | null>(null);
-
-  const [error, setError] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
@@ -28,29 +28,21 @@ const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
       ...current,
       [field]: value,
     }));
-
-    setMessage(null);
-    setError(null);
   }
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setMessage(null);
-    setError(null);
-
     startTransition(async () => {
       const result = await updateProfileSettings(form);
 
       if (!result.success) {
-        setError(result.message ?? "We couldn't save your profile.");
-
+        toast.error(result.message ?? "We couldn't save your profile.");
         return;
       }
 
-      setMessage(result.message ?? 'Profile updated.');
-
-      window.location.reload();
+      toast.success(result.message ?? 'Profile updated.');
+      router.refresh();
     });
   }
 
@@ -134,18 +126,6 @@ const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
           </div>
         </div>
       </section>
-
-      {error && (
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
-      {message && (
-        <div className="rounded-xl border border-primary/20 bg-primary-muted px-4 py-3 text-sm text-primary">
-          {message}
-        </div>
-      )}
 
       <div className="flex items-center justify-end gap-3">
         <button

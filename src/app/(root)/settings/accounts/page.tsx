@@ -89,7 +89,11 @@ function AccountRow({
   return (
     <div className="flex items-center justify-between gap-4 p-5">
       <div className="flex min-w-0 items-center gap-3.5">
-        {connected && <Avatar profile={profile} label={label} />}
+        {connected && profile ? (
+          <Avatar profile={profile} label={label} />
+        ) : (
+          <div className="size-10 shrink-0" aria-hidden="true" />
+        )}
 
         <div className="min-w-0">
           <p className="text-sm font-semibold">{label}</p>
