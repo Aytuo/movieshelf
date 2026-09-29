@@ -13,6 +13,8 @@ import { paginateSearchItems } from '../search/pagination';
 import { mapTmdbMovie, mapTmdbMovieDetails } from '../tmdb/media-mapper';
 import { MovieRepository } from './types';
 
+const MOVIE_RANKING_MIN_VOTE_COUNT = 10_000;
+
 export const tmdbMovieRepository: MovieRepository = {
   async getById(id) {
     const result = await getMovie(id);
@@ -100,7 +102,7 @@ export const tmdbMovieRepository: MovieRepository = {
         discover({
           page,
           sortBy: 'vote_average.desc',
-          voteCountGte: 10_000,
+          voteCountGte: MOVIE_RANKING_MIN_VOTE_COUNT,
           primaryReleaseDateLte: today,
         }),
       500

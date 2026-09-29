@@ -24,6 +24,8 @@ import {
 } from '../tmdb/media-mapper';
 import { TvRepository } from './types';
 
+const TV_RANKING_MIN_VOTE_COUNT = 2_500;
+
 export const tmdbTvRepository: TvRepository = {
   async getById(id) {
     const result = await getTv(id);
@@ -126,7 +128,7 @@ export const tmdbTvRepository: TvRepository = {
         discover({
           page,
           sortBy: 'vote_average.desc',
-          voteCountGte: 10_000,
+          voteCountGte: TV_RANKING_MIN_VOTE_COUNT,
         }),
       500
     );
