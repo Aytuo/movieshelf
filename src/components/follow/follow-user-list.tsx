@@ -7,6 +7,7 @@ import {
 import type { FollowUser, FollowUserPage } from '@/types';
 import { LoaderCircle, Users } from 'lucide-react';
 import { useState } from 'react';
+import EmptyState from '../ui/empty-state';
 import { FollowUserListItem } from './follow-user-list-item';
 
 type FollowUserListProps = {
@@ -56,18 +57,16 @@ export function FollowUserList({
 
   if (users.length === 0) {
     return (
-      <div className="px-6 py-10 text-center">
-        <Users className="mx-auto size-6 text-muted-foreground" />
-
-        <h2 className="mt-4 font-heading text-lg font-semibold">
-          No {mode} yet
-        </h2>
-
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-          {mode === 'followers'
-            ? 'Nobody is following this profile yet.'
-            : 'This user is not following anyone yet.'}
-        </p>
+      <div className="px-6 py-10">
+        <EmptyState
+          icon={Users}
+          title={`No ${mode} yet`}
+          description={
+            mode === 'followers'
+              ? 'Nobody is following this profile yet.'
+              : 'This user is not following anyone yet.'
+          }
+        />
       </div>
     );
   }

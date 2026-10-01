@@ -1,12 +1,13 @@
 import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { MediaInteraction, Post } from '@/types';
-import { Search, Star } from 'lucide-react';
+import { MessageSquareText, Star } from 'lucide-react';
 import Link from 'next/link';
 import PostList from '../posts/post-list';
 import ReviewCard from '../reviews/review-card';
 import YourReviewSection from '../reviews/your-review-section';
 import TvSeasons from '../tv/tv-seasons';
+import EmptyState from '../ui/empty-state';
 import MediaActions from './media-actions';
 import MediaCast from './media-cast';
 import MediaRecommendations from './media-recommendations';
@@ -404,17 +405,17 @@ const MediaDetailsView = ({
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl p-12 text-center surface">
-              <Search className="mx-auto size-6 text-muted-foreground" />
-
-              <h3 className="mt-4 font-heading text-xl font-semibold">
-                No reviews yet
-              </h3>
-
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                Be the first to share your thoughts about this{' '}
-                {media.type === 'movie' ? 'movie' : 'TV series'}.
-              </p>
+            <div className="rounded-2xl p-12 surface">
+              <EmptyState
+                icon={MessageSquareText}
+                title="No reviews yet"
+                description={
+                  <>
+                    Be the first to share your thoughts about this{' '}
+                    {media.type === 'movie' ? 'movie' : 'TV series'}.
+                  </>
+                }
+              />
             </div>
           )}
         </div>

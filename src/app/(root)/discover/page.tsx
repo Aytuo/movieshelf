@@ -1,10 +1,12 @@
 import DiscoverFilters from '@/components/discover/discover-filters';
 import DiscoverPagination from '@/components/discover/discover-pagination';
 import MediaGrid from '@/components/media/media-grid';
+import EmptyState from '@/components/ui/empty-state';
 import { requireSession } from '@/lib/auth/require-session';
 import { parseDiscoverFilters } from '@/lib/discover/parse-filters';
 import { discoverForUser } from '@/lib/services/discover-service';
 import type { DiscoverFilters as DiscoverFiltersType } from '@/types';
+import { SearchX } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -18,21 +20,20 @@ function FilterChip({ label }: { label: string }) {
 
 function EmptyDiscoverState() {
   return (
-    <div className="rounded-2xl p-12 text-center surface">
-      <h2 className="mt-0 font-heading text-xl font-semibold">
-        Nothing matched those filters
-      </h2>
-
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-        Try relaxing one or two filters and explore again.
-      </p>
-
-      <Link
-        href="/discover"
-        className="mt-6 inline-flex rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-hover"
-      >
-        Clear everything
-      </Link>
+    <div className="rounded-2xl p-12 surface">
+      <EmptyState
+        icon={SearchX}
+        title="Nothing matched those filters"
+        description="Try relaxing one or two filters and explore again."
+        action={
+          <Link
+            href="/discover"
+            className="inline-flex rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium transition-colors hover:bg-surface-hover"
+          >
+            Clear everything
+          </Link>
+        }
+      />
     </div>
   );
 }

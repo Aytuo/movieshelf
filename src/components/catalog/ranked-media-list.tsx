@@ -107,19 +107,16 @@ const RankedMediaList = ({
                         {item.title}
                       </h3>
 
-                      <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-                        {year !== null && (
-                          <>
-                            <span>{year}</span>
-                            <span className="size-1 rounded-full bg-muted-foreground/40" />
-                          </>
-                        )}
+                      {year !== null && (
+                        <p className="mt-1.5 text-sm text-muted-foreground">
+                          {year}
+                        </p>
+                      )}
 
-                        <span className="inline-flex items-center gap-1">
-                          <Star className="size-3 fill-current text-rating" />
-                          {item.rating.toFixed(1)}
-                        </span>
-                      </div>
+                      <p className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
+                        <Star className="size-3.5 fill-current text-rating" />
+                        {item.rating.toFixed(1)}
+                      </p>
                     </div>
                   </div>
                 </article>

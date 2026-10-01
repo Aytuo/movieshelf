@@ -118,13 +118,16 @@ const ActivityTimeline = ({ activities }: MediaActivityTimelineProps) => {
                     )}
                   </Link>
 
-                  <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded-md border border-white/10 bg-black/70 px-1.5 py-1 text-[9px] font-medium text-white backdrop-blur-sm">
+                  <span
+                    className="absolute top-1.5 left-1.5 flex size-6 items-center justify-center rounded-md border border-white/10 bg-black/70 text-white backdrop-blur-sm"
+                    title={media.type === 'movie' ? 'Film' : 'TV'}
+                    aria-label={media.type === 'movie' ? 'Film' : 'TV'}
+                  >
                     {media.type === 'movie' ? (
                       <Film className="size-3" aria-hidden="true" />
                     ) : (
                       <Tv className="size-3" aria-hidden="true" />
                     )}
-                    {media.type === 'movie' ? 'Movie' : 'TV'}
                   </span>
                 </div>
 

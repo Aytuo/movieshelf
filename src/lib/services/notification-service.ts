@@ -1,4 +1,5 @@
 import {
+  clearNotifications as clearNotificationsRepository,
   createNotification as createNotificationRepository,
   getCommentAuthorId,
   getCommentContext,
@@ -120,4 +121,8 @@ export async function markAllNotificationsAsRead(
   userId: string
 ): Promise<number> {
   return markAllNotificationsAsReadRepository(userId);
+}
+
+export async function clearNotifications(userId: string): Promise<number> {
+  return clearNotificationsRepository(userId);
 }

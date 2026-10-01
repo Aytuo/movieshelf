@@ -3,6 +3,7 @@ import PeopleSearchResults from '@/components/search/people-search-results';
 import SearchAllResults from '@/components/search/search-all-results';
 import SearchControls from '@/components/search/search-controls';
 import SearchPagination from '@/components/search/search-pagination';
+import EmptyState from '@/components/ui/empty-state';
 import { search } from '@/lib/services/search-service';
 import type {
   PersonSearchResult,
@@ -10,7 +11,7 @@ import type {
   SearchMediaType,
   SearchResult,
 } from '@/types';
-import { ArrowRight, Search as SearchIcon } from 'lucide-react';
+import { ArrowRight, Search, SearchX } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -146,17 +147,12 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
         />
 
         {!query ? (
-          <div className="mt-10 rounded-2xl p-12 text-center surface">
-            <SearchIcon className="mx-auto size-6 text-muted-foreground" />
-
-            <h2 className="mt-4 font-heading text-xl font-semibold">
-              Search for something
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Start typing a movie, TV series or person name to find something
-              worth watching.
-            </p>
+          <div className="mt-10 rounded-2xl p-12 surface">
+            <EmptyState
+              icon={Search}
+              title="Search for something"
+              description="Start typing a movie, TV series or person name to find something worth watching."
+            />
           </div>
         ) : (
           <>
@@ -211,24 +207,25 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                 />
               </>
             ) : (
-              <div className="mt-10 rounded-2xl p-12 text-center surface">
-                <SearchIcon className="mx-auto size-6 text-muted-foreground" />
-
-                <h2 className="mt-4 font-heading text-xl font-semibold">
-                  Nothing found
-                </h2>
-
-                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                  We couldn&apos;t find any {mediaLabel} matching your search.
-                  Try a different search.
-                </p>
-
-                <Link
-                  href="/discover"
-                  className="mt-6 inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
-                >
-                  Discover
-                </Link>
+              <div className="mt-10 rounded-2xl p-12 surface">
+                <EmptyState
+                  icon={SearchX}
+                  title="Nothing found"
+                  description={
+                    <>
+                      We couldn&apos;t find any {mediaLabel} matching your
+                      search. Try a different search.
+                    </>
+                  }
+                  action={
+                    <Link
+                      href="/discover"
+                      className="inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                    >
+                      Discover
+                    </Link>
+                  }
+                />
               </div>
             )}
           </>

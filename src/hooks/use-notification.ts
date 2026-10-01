@@ -74,6 +74,10 @@ export function useNotification() {
                 : item
             )
           );
+
+          window.dispatchEvent(new Event('movieshelf:notifications-updated'));
+
+          router.refresh();
         }
       }
     } catch (error) {
@@ -104,6 +108,10 @@ export function useNotification() {
           readAt,
         }))
       );
+
+      window.dispatchEvent(new Event('movieshelf:notifications-updated'));
+
+      router.refresh();
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
     } finally {
@@ -151,6 +159,24 @@ export function useNotification() {
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleNotificationsUpdated() {
+      void refreshUnreadCount();
+    }
+
+    window.addEventListener(
+      'movieshelf:notifications-updated',
+      handleNotificationsUpdated
+    );
+
+    return () => {
+      window.removeEventListener(
+        'movieshelf:notifications-updated',
+        handleNotificationsUpdated
+      );
     };
   }, []);
 

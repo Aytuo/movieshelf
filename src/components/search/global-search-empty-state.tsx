@@ -1,18 +1,15 @@
+import EmptyState from '@/components/ui/empty-state';
 import { Search } from 'lucide-react';
 
 const GlobalSearchEmptyState = () => {
   return (
-    <div className="px-6 py-14 text-center">
-      <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-surface">
-        <Search className="size-5 text-muted-foreground" />
-      </div>
-
-      <p className="mt-4 text-sm font-medium">Find something to watch</p>
-
-      <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
-        Start typing a movie, TV series or person name and MovieShelf will show
-        matching results instantly.
-      </p>
+    <div className="px-6 py-14">
+      <EmptyState
+        icon={Search}
+        title="Find something to watch"
+        description="Start typing a movie, TV series or person name and MovieShelf will show matching results instantly."
+        compact
+      />
     </div>
   );
 };

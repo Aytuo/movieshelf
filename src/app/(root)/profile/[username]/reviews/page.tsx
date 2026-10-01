@@ -1,6 +1,7 @@
 import ProfileNavbar from '@/components/profile/profile-navbar';
+import EmptyState from '@/components/ui/empty-state';
 import { getPublicReviews } from '@/lib/services/profile-service';
-import { Search, Star } from 'lucide-react';
+import { MessageSquareText, Star } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -120,17 +121,12 @@ const ProfileReviewsPage = async ({ params }: ProfileReviewsPageProps) => {
             })}
           </div>
         ) : (
-          <div className="rounded-2xl p-12 text-center surface">
-            <Search className="mx-auto size-6 text-muted-foreground" />
-
-            <h2 className="mt-4 font-heading text-xl font-semibold">
-              No reviews yet
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Reviews will appear here when this user starts writing about
-              movies and TV series.
-            </p>
+          <div className="rounded-2xl p-12 surface">
+            <EmptyState
+              icon={MessageSquareText}
+              title="No reviews yet"
+              description="Reviews will appear here when this user starts writing about movies and TV series."
+            />
           </div>
         )}
       </section>

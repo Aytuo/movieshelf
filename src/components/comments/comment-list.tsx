@@ -4,6 +4,7 @@ import { loadPostComments } from '@/lib/actions/comment-action';
 import type { Comment } from '@/types';
 import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
+import EmptyState from '../ui/empty-state';
 import CommentCard from './comment-card';
 import CommentComposer from './comment-composer';
 
@@ -109,16 +110,12 @@ const CommentList = ({
           )}
         </>
       ) : (
-        <div className="rounded-2xl p-12 text-center surface">
-          <MessageCircle className="mx-auto size-6 text-muted-foreground" />
-
-          <h3 className="mt-4 font-heading text-xl font-semibold">
-            No comments yet
-          </h3>
-
-          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            Be the first to join the conversation.
-          </p>
+        <div className="rounded-2xl p-12 surface">
+          <EmptyState
+            icon={MessageCircle}
+            title="No comments yet"
+            description="Be the first to join the conversation."
+          />
         </div>
       )}
     </section>

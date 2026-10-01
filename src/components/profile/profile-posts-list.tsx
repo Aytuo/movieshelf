@@ -3,8 +3,9 @@
 import PostCard from '@/components/posts/post-card';
 import { loadProfilePostsAction } from '@/lib/actions/profile-post-action';
 import type { Post } from '@/types';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
+import EmptyState from '../ui/empty-state';
 
 type ProfilePostsListProps = {
   username: string;
@@ -49,12 +50,12 @@ const ProfilePostsList = ({
 
   if (posts.length === 0) {
     return (
-      <div className="rounded-2xl p-12 text-center surface">
-        <h2 className="font-heading text-xl font-semibold">No posts yet</h2>
-
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-          Posts published by this user will appear here.
-        </p>
+      <div className="rounded-2xl p-12 surface">
+        <EmptyState
+          icon={MessageSquare}
+          title="No posts yet"
+          description="Posts published by this user will appear here."
+        />
       </div>
     );
   }

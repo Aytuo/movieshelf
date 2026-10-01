@@ -30,7 +30,6 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
 
   const MediaIcon = media.type === 'movie' ? Film : Tv;
 
-  const mediaLabel = media.type === 'movie' ? 'Movie' : 'TV';
   const watchLabel =
     watchNumber === 1 ? 'Watch #1' : `Rewatch #${watchNumber - 1}`;
 
@@ -49,9 +48,12 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
           </div>
         )}
 
-        <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+        <span
+          className="absolute top-2 left-2 flex size-6 items-center justify-center rounded-md bg-black/70 text-white backdrop-blur-sm"
+          title={media.type === 'movie' ? 'Film' : 'TV'}
+          aria-label={media.type === 'movie' ? 'Film' : 'TV'}
+        >
           <MediaIcon className="size-3" aria-hidden="true" />
-          {mediaLabel}
         </span>
       </div>
 

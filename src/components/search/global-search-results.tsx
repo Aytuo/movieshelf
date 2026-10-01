@@ -1,7 +1,8 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { SearchAllItem } from '@/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 import Link from 'next/link';
+import MediaPoster from '../media/media-poster';
 
 const GlobalSearchResults = ({
   results,
@@ -38,15 +39,11 @@ const GlobalSearchResults = ({
                   {item.person.name}
                 </p>
 
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  {item.person.knownForDepartment && (
-                    <span>{item.person.knownForDepartment}</span>
-                  )}
-
-                  <span className="text-[10px] font-semibold tracking-wide uppercase">
-                    Person
-                  </span>
-                </div>
+                {item.person.knownForDepartment && (
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
+                    {item.person.knownForDepartment}
+                  </p>
+                )}
               </div>
 
               <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
@@ -55,12 +52,15 @@ const GlobalSearchResults = ({
         }
 
         const media = item.media;
-        const poster = tmdbImage(media.posterPath, 'w185');
 
         const href =
           media.type === 'movie'
             ? `/movie/${media.tmdbId}`
             : `/tv/${media.tmdbId}`;
+
+        const year = media.releaseDate
+          ? new Date(media.releaseDate).getFullYear()
+          : null;
 
         return (
           <Link
@@ -69,38 +69,38 @@ const GlobalSearchResults = ({
             onClick={onResultClick}
             className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-hover"
           >
-            <div className="size-12 shrink-0 overflow-hidden rounded-md bg-surface">
-              {poster ? (
-                <img
-                  src={poster}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : null}
-            </div>
+            <MediaPoster
+              media={media}
+              compact
+              showType
+              className="h-[72px] w-12 shrink-0 rounded-lg"
+            />
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{media.title}</p>
-
-              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                {media.releaseDate && (
-                  <span>{new Date(media.releaseDate).getFullYear()}</span>
+              <p className="truncate text-sm font-semibold">
+                {media.title}
+                {year !== null && (
+                  <span className="ml-1 font-normal text-muted-foreground">
+                    ({year})
+                  </span>
                 )}
+              </p>
 
-                <span className="text-[10px] font-semibold tracking-wide uppercase">
-                  {media.type === 'movie' ? 'Movie' : 'TV Series'}
-                </span>
+              {media.rating > 0 && (
+                <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-foreground">
+                  <Star className="size-3 fill-current text-rating" />
+                  {media.rating.toFixed(1)}
+                </p>
+              )}
 
-                {media.rating > 0 && (
-                  <>
-                    <span>•</span>
-
-                    <span className="text-rating">
-                      ★ {media.rating.toFixed(1)}
-                    </span>
-                  </>
-                )}
-              </div>
+              {media.genres.length > 0 && (
+                <p className="mt-1 truncate text-xs text-muted-foreground">
+                  {media.genres
+                    .slice(0, 2)
+                    .map((genre) => genre.name)
+                    .join(' · ')}
+                </p>
+              )}
             </div>
 
             <ArrowRight className="size-4 shrink-0 text-muted-foreground" />

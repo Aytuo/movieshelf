@@ -1,13 +1,22 @@
-import { tmdbImage } from '@/lib/tmdb/images';
+import MediaCard from '@/components/media/media-card';
+import type { Media } from '@/lib/media';
 import type { LucideIcon } from 'lucide-react';
-import Link from 'next/link';
+import EmptyState from '../ui/empty-state';
 
 type ProfileMediaItem = {
   media: {
-    tmdbId: string | number;
+    tmdbId: number;
     type: 'movie' | 'tv';
     title: string;
+    originalTitle: string;
+    overview: string;
     posterPath: string | null;
+    backdropPath: string | null;
+    releaseDate: string | null;
+    tmdbRating: string | null;
+    tmdbVoteCount: number;
+    originalLanguage: string;
+    genres: Media['genres'];
   };
 };
 
@@ -19,6 +28,23 @@ type ProfileMediaShelfProps = {
   emptyDescription: string;
   emptyIcon: LucideIcon;
 };
+
+function toMedia(record: ProfileMediaItem['media']): Media {
+  return {
+    tmdbId: record.tmdbId,
+    type: record.type,
+    title: record.title,
+    originalTitle: record.originalTitle,
+    overview: record.overview,
+    posterPath: record.posterPath,
+    backdropPath: record.backdropPath,
+    releaseDate: record.releaseDate,
+    rating: Number(record.tmdbRating ?? 0),
+    voteCount: record.tmdbVoteCount,
+    originalLanguage: record.originalLanguage,
+    genres: record.genres,
+  };
+}
 
 export function ProfileMediaShelf({
   eyebrow,
@@ -37,61 +63,26 @@ export function ProfileMediaShelf({
       </div>
 
       {items.length > 0 ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-          {items.map(({ media }) => {
-            const poster = tmdbImage(media.posterPath, 'w500');
-
-            const href =
-              media.type === 'movie'
-                ? `/movie/${media.tmdbId}`
-                : `/tv/${media.tmdbId}`;
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
+          {items.map(({ media: record }) => {
+            const media = toMedia(record);
 
             return (
-              <Link
+              <MediaCard
                 key={`${media.type}:${media.tmdbId}`}
-                href={href}
-                className="group"
-              >
-                <article>
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
-                    {poster ? (
-                      <img
-                        src={poster}
-                        alt={`${media.title} poster`}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-2 text-center text-sm text-muted-foreground">
-                        No poster
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-2">
-                    <p className="line-clamp-1 text-sm font-medium transition-colors group-hover:text-primary">
-                      {media.title}
-                    </p>
-
-                    <p className="mt-1 text-[10px] tracking-wide text-muted-foreground uppercase">
-                      {media.type === 'movie' ? 'Movie' : 'TV Series'}
-                    </p>
-                  </div>
-                </article>
-              </Link>
+                media={media}
+                showGenres={false}
+              />
             );
           })}
         </div>
       ) : (
-        <div className="rounded-2xl p-12 text-center surface">
-          <EmptyIcon className="mx-auto size-6 text-muted-foreground" />
-
-          <h3 className="mt-4 font-heading text-xl font-semibold">
-            {emptyTitle}
-          </h3>
-
-          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            {emptyDescription}
-          </p>
+        <div className="rounded-2xl p-12 surface">
+          <EmptyState
+            icon={EmptyIcon}
+            title={emptyTitle}
+            description={emptyDescription}
+          />
         </div>
       )}
     </section>

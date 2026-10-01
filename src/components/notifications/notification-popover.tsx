@@ -2,6 +2,7 @@ import type { Notification } from '@/types';
 import { Bell, CheckCheck, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { NotificationItem } from './notification-item';
+import EmptyState from '../ui/empty-state';
 
 type NotificationPopoverProps = {
   notifications: Notification[];
@@ -62,15 +63,13 @@ export function NotificationPopover({
             ))}
           </div>
         ) : (
-          <div className="px-4 py-10 text-center">
-            <Bell className="mx-auto size-5 text-muted-foreground" />
-
-            <p className="mt-3 text-sm font-medium">No notifications yet</p>
-
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              When something happens in your social activity, you&apos;ll see it
-              here.
-            </p>
+          <div className="px-4 py-10">
+            <EmptyState
+              icon={Bell}
+              title="No notifications yet"
+              description="When something happens in your social activity, you'll see it here."
+              compact
+            />
           </div>
         )}
       </div>

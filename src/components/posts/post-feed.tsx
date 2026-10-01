@@ -6,6 +6,7 @@ import type { Post } from '@/types';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import EmptyState from '../ui/empty-state';
 import PostCard from './post-card';
 import PostComposer from './post-composer';
 
@@ -86,17 +87,17 @@ const PostFeed = ({
           )}
         </div>
       ) : (
-        <div className="rounded-2xl p-12 text-center surface">
-          <MessageSquare className="mx-auto size-6 text-muted-foreground" />
-
-          <h3 className="mt-4 font-heading text-xl font-semibold">
-            No posts yet
-          </h3>
-
-          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            Be the first to start a conversation about this{' '}
-            {type === 'movie' ? 'movie' : 'TV series'}.
-          </p>
+        <div className="rounded-2xl p-12 surface">
+          <EmptyState
+            icon={MessageSquare}
+            title="No posts yet"
+            description={
+              <>
+                Be the first to start a conversation about this{' '}
+                {type === 'movie' ? 'movie' : 'TV series'}.
+              </>
+            }
+          />
         </div>
       )}
     </div>

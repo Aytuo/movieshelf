@@ -2,6 +2,7 @@
 
 import { requireSession } from '@/lib/auth/require-session';
 import {
+  clearNotifications,
   getNotifications,
   getUnreadNotificationCount,
   markAllNotificationsAsRead,
@@ -33,4 +34,10 @@ export async function markAllNotificationsAsReadAction() {
   const session = await requireSession();
 
   return markAllNotificationsAsRead(session.user.id);
+}
+
+export async function clearNotificationsAction() {
+  const session = await requireSession();
+
+  return clearNotifications(session.user.id);
 }

@@ -208,3 +208,14 @@ export async function markAllNotificationsAsRead(
 
   return updated.length;
 }
+
+export async function clearNotifications(recipientId: string): Promise<number> {
+  const deleted = await db
+    .delete(notification)
+    .where(eq(notification.recipientId, recipientId))
+    .returning({
+      id: notification.id,
+    });
+
+  return deleted.length;
+}

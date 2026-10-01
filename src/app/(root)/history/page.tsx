@@ -1,5 +1,6 @@
 import HistoryCard from '@/components/history/history-card';
 import HistoryPagination from '@/components/history/history-pagination';
+import EmptyState from '@/components/ui/empty-state';
 import { requireSession } from '@/lib/auth/require-session';
 import { getUserWatchHistory } from '@/lib/services/watch-history-service';
 import { ArrowRight, Clock3 } from 'lucide-react';
@@ -64,22 +65,19 @@ const HistoryPage = async ({ searchParams }: HistoryPageProps) => {
           </>
         ) : (
           <div className="rounded-2xl p-12 text-center surface">
-            <Clock3 className="mx-auto size-6 text-muted-foreground" />
-
-            <h2 className="mt-4 font-heading text-xl font-semibold">
-              Your history is empty
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Mark a movie or TV series as watched and it will appear here.
-            </p>
-
-            <Link
-              href="/discover"
-              className="mt-6 inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
-            >
-              Discover
-            </Link>
+            <EmptyState
+              icon={Clock3}
+              title="Your history is empty"
+              description="Mark a movie or TV series as watched and it will appear here."
+              action={
+                <Link
+                  href="/discover"
+                  className="inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                >
+                  Discover
+                </Link>
+              }
+            />
           </div>
         )}
       </section>

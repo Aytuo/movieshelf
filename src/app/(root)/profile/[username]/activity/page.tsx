@@ -1,5 +1,6 @@
 import ActivityTimeline from '@/components/activity/activity-timeline';
 import ProfileNavbar from '@/components/profile/profile-navbar';
+import EmptyState from '@/components/ui/empty-state';
 import { getPublicActivity } from '@/lib/services/profile-service';
 import { Activity } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -44,16 +45,12 @@ const ProfileActivityPage = async ({ params }: ProfileActivityPageProps) => {
         {activities.length > 0 ? (
           <ActivityTimeline activities={activities} />
         ) : (
-          <div className="rounded-2xl p-12 text-center surface">
-            <Activity className="mx-auto size-6 text-muted-foreground" />
-
-            <h2 className="mt-4 font-heading text-xl font-semibold">
-              No activity yet
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              This cinematic journey will appear here as they use MovieShelf.
-            </p>
+          <div className="rounded-2xl p-12 surface">
+            <EmptyState
+              icon={Activity}
+              title="No activity yet"
+              description="This cinematic journey will appear here as they use MovieShelf."
+            />
           </div>
         )}
       </section>

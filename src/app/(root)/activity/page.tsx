@@ -1,4 +1,5 @@
 import ActivityTimeline from '@/components/activity/activity-timeline';
+import EmptyState from '@/components/ui/empty-state';
 import { requireSession } from '@/lib/auth/require-session';
 import { getUserMediaActivity } from '@/lib/services/media-activity-service';
 import { Activity, ArrowRight } from 'lucide-react';
@@ -41,24 +42,20 @@ const ActivityPage = async () => {
 
       <section className="py-10 lg:py-14">
         {activities.length === 0 ? (
-          <div className="mt-0 rounded-2xl p-12 text-center surface">
-            <Activity className="mx-auto size-6 text-muted-foreground" />
-
-            <h2 className="mt-4 font-heading text-xl font-semibold">
-              Your activity is empty
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Your cinematic journey will appear here as you watch, rate,
-              review, and add movies and TV series to your shelf.
-            </p>
-
-            <Link
-              href="/discover"
-              className="mt-6 inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
-            >
-              Discover
-            </Link>
+          <div className="mt-0 rounded-2xl p-12 surface">
+            <EmptyState
+              icon={Activity}
+              title="Your activity is empty"
+              description="Your cinematic journey will appear here as you watch, rate, review, and add movies and TV series to your shelf."
+              action={
+                <Link
+                  href="/discover"
+                  className="inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                >
+                  Discover
+                </Link>
+              }
+            />
           </div>
         ) : (
           <ActivityTimeline activities={activities} />

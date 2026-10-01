@@ -170,21 +170,25 @@ const TvScheduleCarousel = ({
                       )}
                     </div>
 
-                    <div className="flex min-h-[132px] flex-col p-4 sm:min-h-[140px]">
+                    <div className="flex h-[148px] flex-col p-4 sm:h-[156px]">
                       <p className="font-mono text-xs font-medium text-muted-foreground">
                         {formatEpisodeNumber(
                           episode.seasonNumber,
                           episode.episodeNumber
                         )}
-
-                        {airDate && ` · ${airDate}`}
                       </p>
 
-                      <h3 className="mt-1 line-clamp-2 font-heading text-base leading-6 font-semibold tracking-tight transition-colors group-hover:text-primary">
+                      {airDate && (
+                        <p className="mt-1 text-xs font-medium tracking-wide text-primary">
+                          {airDate}
+                        </p>
+                      )}
+
+                      <h3 className="mt-2 line-clamp-2 font-heading text-base leading-6 font-semibold tracking-tight">
                         {episode.name}
                       </h3>
 
-                      <p className="mt-auto pt-2 text-sm text-muted-foreground transition-colors group-hover:text-primary/80">
+                      <p className="mt-auto line-clamp-1 pt-3 text-sm text-muted-foreground transition-colors group-hover:text-primary/80">
                         {media.title}
                       </p>
                     </div>

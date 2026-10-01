@@ -1,7 +1,8 @@
 import type { Media } from '@/lib/media';
-import { tmdbImage } from '@/lib/tmdb/images';
 import type { SearchMediaType } from '@/types';
 import Link from 'next/link';
+import MediaMeta from '../media/media-meta';
+import MediaPoster from '../media/media-poster';
 
 type MediaSearchResultsProps = {
   media: Media[];
@@ -13,12 +14,6 @@ const MediaSearchResults = ({ media, type }: MediaSearchResultsProps) => {
     <>
       <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {media.map((item) => {
-          const poster = tmdbImage(item.posterPath, 'w500');
-
-          const releaseYear = item.releaseDate
-            ? new Date(item.releaseDate).getFullYear()
-            : null;
-
           const href =
             item.type === 'movie'
               ? `/movie/${item.tmdbId}`
@@ -31,36 +26,20 @@ const MediaSearchResults = ({ media, type }: MediaSearchResultsProps) => {
               className="group"
             >
               <article>
-                <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
-                  {poster ? (
-                    <img
-                      src={poster}
-                      alt={`${item.title} poster`}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center px-3 text-center text-sm text-muted-foreground">
-                      No poster
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
-
-                  {type === 'all' && (
-                    <span className="absolute top-3 left-3 rounded-md bg-black/70 px-2 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur-sm">
-                      {item.type === 'movie' ? 'Movie' : 'TV'}
-                    </span>
-                  )}
-                </div>
+                <MediaPoster
+                  media={item}
+                  showTmdbRating
+                  showType={type === 'all'}
+                  className="aspect-[2/3]"
+                />
 
                 <div className="mt-3">
-                  <h3 className="line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">
-                    {item.title}
-                  </h3>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {releaseYear ?? '—'}
-                  </p>
+                  <MediaMeta
+                    title={item.title}
+                    releaseDate={item.releaseDate}
+                    genres={item.genres}
+                    genreLimit={1}
+                  />
                 </div>
               </article>
             </Link>

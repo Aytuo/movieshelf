@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import EmptyState from '../ui/empty-state';
 import ReviewForm from './review-form';
 
 type ReviewData = {
@@ -79,16 +80,17 @@ const YourReviewSection = ({
 
   if (!isWatched) {
     return (
-      <div className="rounded-2xl p-12 text-center surface">
-        <div className="flex justify-center">
-          <Eye className="size-6 text-muted-foreground" />
-        </div>
-
-        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-muted-foreground">
-          Once you&apos;ve marked this{' '}
-          {type === 'movie' ? 'movie' : 'TV series'} as watched, you&apos;ll be
-          able to rate it and write your review.
-        </p>
+      <div className="rounded-2xl p-12 surface">
+        <EmptyState
+          icon={Eye}
+          description={
+            <>
+              Once you&apos;ve marked this{' '}
+              {type === 'movie' ? 'movie' : 'TV series'} as watched, you&apos;ll
+              be able to rate it and write your review.
+            </>
+          }
+        />
       </div>
     );
   }

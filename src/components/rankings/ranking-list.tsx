@@ -82,6 +82,19 @@ const RankingList = ({ items, showType = false }: RankingListProps) => {
                   <span>{media.voteCount.toLocaleString()} votes</span>
                 </div>
 
+                {media.genres.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {media.genres.slice(0, 3).map((genre) => (
+                      <span
+                        key={genre.id}
+                        className="rounded-full border border-border/60 px-2 py-1 text-[10px] text-muted-foreground"
+                      >
+                        {genre.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {media.overview && (
                   <p className="mt-3 line-clamp-2 hidden max-w-2xl text-xs leading-5 text-muted-foreground sm:block">
                     {media.overview}

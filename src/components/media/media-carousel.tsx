@@ -1,10 +1,11 @@
 'use client';
 
 import type { Media } from '@/lib/media';
-import { tmdbImage } from '@/lib/tmdb/images';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import MediaMeta from './media-meta';
+import MediaPoster from './media-poster';
 
 type MediaCarouselProps = {
   media: Media[];
@@ -127,16 +128,10 @@ const MediaCarousel = ({
         className="-mx-1 flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto px-1 pb-2"
       >
         {media.map((item) => {
-          const poster = tmdbImage(item.posterPath, 'w500');
-
           const href =
             item.type === 'movie'
               ? `/movie/${item.tmdbId}`
               : `/tv/${item.tmdbId}`;
-
-          const year = item.releaseDate
-            ? new Date(item.releaseDate).getFullYear()
-            : null;
 
           return (
             <Link
@@ -145,36 +140,21 @@ const MediaCarousel = ({
               className="group w-[155px] shrink-0 snap-start sm:w-[180px] lg:w-[200px]"
             >
               <article>
-                <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
-                  {poster ? (
-                    <img
-                      src={poster}
-                      alt={`${item.title} poster`}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
-                      No poster
-                    </div>
-                  )}
+                <MediaPoster
+                  media={item}
+                  showTmdbRating
+                  showType={showType}
+                  className="aspect-[2/3]"
+                />
+
+                <div className="mt-3">
+                  <MediaMeta
+                    title={item.title}
+                    releaseDate={item.releaseDate}
+                    genres={item.genres}
+                    genreLimit={1}
+                  />
                 </div>
-
-                <div className="mt-3 flex items-start gap-2">
-                  <h3 className="line-clamp-1 flex-1 text-sm font-semibold transition-colors group-hover:text-primary">
-                    {item.title}
-                  </h3>
-
-                  {showType && (
-                    <span className="shrink-0 text-[9px] font-semibold tracking-wide text-muted-foreground uppercase">
-                      {item.type === 'movie' ? 'Movie' : 'TV'}
-                    </span>
-                  )}
-                </div>
-
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {year ?? '—'}
-                </p>
               </article>
             </Link>
           );
