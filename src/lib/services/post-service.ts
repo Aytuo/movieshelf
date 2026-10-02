@@ -5,6 +5,7 @@ import {
   getPostAuthorRatings,
   getPostById as getPostByIdRepository,
   getPostCommentCounts,
+  getPostLatestComments,
   getPostMediaId,
   getUserPosts as getUserPostsRepository,
 } from '@/lib/repositories';
@@ -14,13 +15,16 @@ import { getPostReactionStats } from './post-reaction-service';
 function attachPostStats(
   posts: Post[],
   reactionStats: Awaited<ReturnType<typeof getPostReactionStats>>,
-  commentCounts: Awaited<ReturnType<typeof getPostCommentCounts>>
+  commentCounts: Awaited<ReturnType<typeof getPostCommentCounts>>,
+  latestComments: Awaited<ReturnType<typeof getPostLatestComments>>
 ): Post[] {
   const reactions = new Map(reactionStats.map((item) => [item.postId, item]));
 
   const comments = new Map(
     commentCounts.map((item) => [item.postId, item.count])
   );
+
+  const latest = new Map(latestComments.map((item) => [item.postId, item]));
 
   return posts.map((post) => {
     const reaction = reactions.get(post.id);
@@ -30,6 +34,7 @@ function attachPostStats(
       reactionCount: reaction?.count ?? 0,
       viewerHasReacted: reaction?.reacted ?? false,
       commentCount: comments.get(post.id) ?? 0,
+      lastComment: latest.get(post.id) ?? null,
     };
   });
 }
@@ -95,16 +100,19 @@ export async function getMediaPosts(
 
   const authorIds = [...new Set(page.posts.map((post) => post.author.userId))];
 
-  const [reactionStats, commentCounts, authorRatings] = await Promise.all([
-    getPostReactionStats(postIds, userId),
-    getPostCommentCounts(postIds),
-    getMediaAuthorRatings(mediaId, authorIds),
-  ]);
+  const [reactionStats, commentCounts, authorRatings, latestComments] =
+    await Promise.all([
+      getPostReactionStats(postIds, userId),
+      getPostCommentCounts(postIds),
+      getMediaAuthorRatings(mediaId, authorIds),
+      getPostLatestComments(postIds),
+    ]);
 
   const postsWithStats = attachPostStats(
     page.posts,
     reactionStats,
-    commentCounts
+    commentCounts,
+    latestComments
   );
 
   return {
@@ -126,16 +134,19 @@ export async function getUserPosts(
 
   const postIds = page.posts.map((post) => post.id);
 
-  const [reactionStats, commentCounts, authorRatings] = await Promise.all([
-    getPostReactionStats(postIds, viewerUserId),
-    getPostCommentCounts(postIds),
-    getPostAuthorRatings(postIds, userId),
-  ]);
+  const [reactionStats, commentCounts, authorRatings, latestComments] =
+    await Promise.all([
+      getPostReactionStats(postIds, viewerUserId),
+      getPostCommentCounts(postIds),
+      getPostAuthorRatings(postIds, userId),
+      getPostLatestComments(postIds),
+    ]);
 
   const postsWithStats = attachPostStats(
     page.posts,
     reactionStats,
-    commentCounts
+    commentCounts,
+    latestComments
   );
 
   return {
@@ -155,13 +166,20 @@ export async function getPostByIdWithReaction(postId: string, userId: string) {
     return null;
   }
 
-  const [reactionStats, commentCounts, mediaId] = await Promise.all([
-    getPostReactionStats([post.id], userId),
-    getPostCommentCounts([post.id]),
-    getPostMediaId(postId),
-  ]);
+  const [reactionStats, commentCounts, mediaId, latestComments] =
+    await Promise.all([
+      getPostReactionStats([post.id], userId),
+      getPostCommentCounts([post.id]),
+      getPostMediaId(postId),
+      getPostLatestComments([post.id]),
+    ]);
 
-  const postsWithStats = attachPostStats([post], reactionStats, commentCounts);
+  const postsWithStats = attachPostStats(
+    [post],
+    reactionStats,
+    commentCounts,
+    latestComments
+  );
 
   const authorRatings = mediaId
     ? await getMediaAuthorRatings(mediaId, [post.author.userId])

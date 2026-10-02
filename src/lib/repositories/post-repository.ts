@@ -6,7 +6,12 @@ import {
   post,
   profile,
 } from '@/lib/db/schema';
-import type { Post, PostPage, PostPaginationOptions } from '@/types';
+import type {
+  Post,
+  PostLastComment,
+  PostPage,
+  PostPaginationOptions,
+} from '@/types';
 import {
   and,
   desc,
@@ -70,6 +75,7 @@ function mapPost(row: PostRow): Post {
     reactionCount: 0,
     viewerHasReacted: false,
     commentCount: 0,
+    lastComment: null,
   };
 }
 
@@ -297,6 +303,41 @@ export async function getPostCommentCounts(
   return rows.map((row) => ({
     postId: row.postId,
     count: row.count,
+  }));
+}
+
+export async function getPostLatestComments(
+  postIds: string[]
+): Promise<PostLastComment[]> {
+  if (postIds.length === 0) {
+    return [];
+  }
+
+  const rows = await db
+    .selectDistinctOn([comment.postId], {
+      postId: comment.postId,
+      commentId: comment.id,
+      createdAt: comment.createdAt,
+      userId: profile.userId,
+      username: profile.username,
+      displayName: profile.displayName,
+      avatarUrl: profile.avatarUrl,
+    })
+    .from(comment)
+    .innerJoin(profile, eq(profile.userId, comment.authorId))
+    .where(and(inArray(comment.postId, postIds), isNull(comment.deletedAt)))
+    .orderBy(comment.postId, desc(comment.createdAt), desc(comment.id));
+
+  return rows.map((row) => ({
+    postId: row.postId,
+    id: row.commentId,
+    createdAt: row.createdAt,
+    author: {
+      userId: row.userId,
+      username: row.username,
+      displayName: row.displayName,
+      avatarUrl: row.avatarUrl,
+    },
   }));
 }
 

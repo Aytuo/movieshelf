@@ -30,6 +30,19 @@ export type Post = {
   reactionCount: number;
   viewerHasReacted: boolean;
   commentCount: number;
+  lastComment: PostLastComment | null;
+};
+
+export type PostLastComment = {
+  postId: string;
+  id: string;
+  createdAt: Date;
+  author: {
+    userId: string;
+    username: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  };
 };
 
 export type PostPage = {

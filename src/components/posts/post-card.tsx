@@ -20,6 +20,39 @@ function getPreviewContent(content: string) {
   return `${normalized.slice(0, PREVIEW_CONTENT_LENGTH).trimEnd()}…`;
 }
 
+function formatRelativeTime(date: Date) {
+  const secondsAgo = Math.max(
+    0,
+    Math.floor((Date.now() - date.getTime()) / 1000)
+  );
+
+  if (secondsAgo < 60) {
+    return 'just now';
+  }
+
+  if (secondsAgo < 60 * 60) {
+    return `${Math.floor(secondsAgo / 60)}m ago`;
+  }
+
+  if (secondsAgo < 60 * 60 * 24) {
+    return `${Math.floor(secondsAgo / (60 * 60))}h ago`;
+  }
+
+  if (secondsAgo < 60 * 60 * 24 * 7) {
+    return `${Math.floor(secondsAgo / (60 * 60 * 24))}d ago`;
+  }
+
+  if (secondsAgo < 60 * 60 * 24 * 30) {
+    return `${Math.floor(secondsAgo / (60 * 60 * 24 * 7))}w ago`;
+  }
+
+  if (secondsAgo < 60 * 60 * 24 * 365) {
+    return `${Math.floor(secondsAgo / (60 * 60 * 24 * 30))}mo ago`;
+  }
+
+  return `${Math.floor(secondsAgo / (60 * 60 * 24 * 365))}y ago`;
+}
+
 const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
   const { author } = post;
   const authorLabel = author.displayName || `@${author.username}`;
@@ -103,14 +136,14 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
         </>
       )}
 
-      <div className="mt-5 flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+      <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold text-muted-foreground">
         <PostReactionButton
           postId={post.id}
           count={post.reactionCount}
           reacted={post.viewerHasReacted}
         />
 
-        <span aria-hidden="true">·</span>
+        <span className="h-3 w-px bg-border" aria-hidden="true" />
 
         <Link
           href={`/posts/${post.id}#comments`}
@@ -123,6 +156,24 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
             {post.commentCount === 1 ? '' : 's'}
           </span>
         </Link>
+
+        {post.lastComment && (
+          <>
+            <span className="h-3 w-px bg-border" aria-hidden="true" />
+
+            <Link
+              href={`/posts/${post.id}#comments`}
+              className="min-w-0 truncate font-normal text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Latest comment by{' '}
+              <span className="font-semibold text-foreground/80">
+                {post.lastComment.author.displayName ||
+                  `@${post.lastComment.author.username}`}
+              </span>{' '}
+              · {formatRelativeTime(post.lastComment.createdAt)}
+            </Link>
+          </>
+        )}
       </div>
     </article>
   );
