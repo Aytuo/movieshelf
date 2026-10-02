@@ -4,6 +4,7 @@ import { togglePostReactionAction } from '@/lib/actions/post-reaction-action';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { PostReactionListModal } from './post-reaction-list-modal';
 
 type PostReactionState = {
   count: number;
@@ -25,6 +26,8 @@ export function PostReactionButton({
     count: initialCount,
     reacted: initialReacted,
   });
+
+  const [listOpen, setListOpen] = useState(false);
 
   const [pending, setPending] = useState(false);
 
@@ -63,25 +66,48 @@ export function PostReactionButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      disabled={pending}
-      aria-pressed={state.reacted}
-      aria-busy={pending}
-      aria-label={state.reacted ? 'Unlike post' : 'Like post'}
-      className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-60"
-    >
-      <Heart
-        className={`size-3.5 transition-transform ${
-          pending ? 'scale-90' : 'scale-100'
-        }`}
-        fill={state.reacted ? 'currentColor' : 'none'}
+    <>
+      <div className="inline-flex items-center text-xs font-semibold text-muted-foreground">
+        <button
+          type="button"
+          onClick={handleToggle}
+          disabled={pending}
+          aria-pressed={state.reacted}
+          aria-busy={pending}
+          aria-label={state.reacted ? 'Unlike post' : 'Like post'}
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-60"
+        >
+          <Heart
+            className={`size-3.5 transition-transform ${
+              pending ? 'scale-90' : 'scale-100'
+            }`}
+            fill={state.reacted ? 'currentColor' : 'none'}
+          />
+
+          <span>{state.reacted ? 'Liked' : 'Like'}</span>
+        </button>
+
+        {state.count > 0 ? (
+          <button
+            type="button"
+            onClick={() => setListOpen(true)}
+            className="ml-1 transition-colors hover:text-foreground hover:underline hover:underline-offset-2"
+            aria-label={`View ${state.count} likes`}
+          >
+            {state.count}
+          </button>
+        ) : (
+          <span className="ml-1">{state.count}</span>
+        )}
+      </div>
+
+      <PostReactionListModal
+        key={listOpen ? 'open' : 'closed'}
+        postId={postId}
+        count={state.count}
+        open={listOpen}
+        onOpenChangeAction={setListOpen}
       />
-
-      <span>{state.reacted ? 'Liked' : 'Like'}</span>
-
-      <span>{state.count}</span>
-    </button>
+    </>
   );
 }

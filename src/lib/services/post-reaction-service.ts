@@ -1,11 +1,16 @@
 import {
   getPostReactionStats as getPostReactionStatsRepository,
+  getPostReactionUsers as getPostReactionUsersRepository,
   togglePostReaction as togglePostReactionRepository,
 } from '@/lib/repositories';
 import { notifyPostLiked } from './notification-service';
 
 export async function getPostReactionStats(postIds: string[], userId: string) {
   return getPostReactionStatsRepository(postIds, userId);
+}
+
+export async function getPostReactionUsers(postId: string) {
+  return getPostReactionUsersRepository(postId, 50);
 }
 
 export async function togglePostReaction(postId: string, userId: string) {

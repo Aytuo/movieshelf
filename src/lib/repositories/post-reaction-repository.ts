@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
-import { postReaction } from '@/lib/db/schema';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { postReaction, profile } from '@/lib/db/schema';
+import type { PostReactionUser } from '@/types';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
 export type PostReactionStats = {
   postId: string;
@@ -41,6 +42,33 @@ export async function getPostReactionStats(
     postId: row.postId,
     count: row.count,
     reacted: row.reacted,
+  }));
+}
+
+export async function getPostReactionUsers(
+  postId: string,
+  limit = 50
+): Promise<PostReactionUser[]> {
+  const rows = await db
+    .select({
+      userId: profile.userId,
+      username: profile.username,
+      displayName: profile.displayName,
+      avatarUrl: profile.avatarUrl,
+      createdAt: postReaction.createdAt,
+    })
+    .from(postReaction)
+    .innerJoin(profile, eq(profile.userId, postReaction.userId))
+    .where(and(eq(postReaction.postId, postId), eq(postReaction.type, 'like')))
+    .orderBy(desc(postReaction.createdAt), desc(postReaction.id))
+    .limit(limit);
+
+  return rows.map((row) => ({
+    userId: row.userId,
+    username: row.username,
+    displayName: row.displayName,
+    avatarUrl: row.avatarUrl,
+    createdAt: row.createdAt,
   }));
 }
 
