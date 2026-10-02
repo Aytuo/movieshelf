@@ -12,6 +12,7 @@ import {
   getNotificationIcon,
   getNotificationMessage,
 } from '@/lib/notifications/notification-utils';
+import { cn } from '@/lib/utils';
 import type { Notification, NotificationPage } from '@/types';
 import { Bell, CheckCheck, LoaderCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -212,10 +213,10 @@ const NotificationList = ({
                     key={notification.id}
                     type="button"
                     onClick={() => void handleNotificationClick(notification)}
-                    className={[
+                    className={cn(
                       'flex w-full items-start gap-4 px-5 py-4 text-left transition-colors hover:bg-surface-hover',
-                      isUnread ? 'bg-surface-hover/40' : '',
-                    ].join(' ')}
+                      isUnread ? 'bg-surface-hover/40' : ''
+                    )}
                   >
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-hover text-muted-foreground">
                       <Icon className="size-4" />
@@ -223,12 +224,12 @@ const NotificationList = ({
 
                     <div className="min-w-0 flex-1">
                       <p
-                        className={[
+                        className={cn(
                           'text-sm leading-6',
                           isUnread
                             ? 'font-medium text-foreground'
-                            : 'text-muted-foreground',
-                        ].join(' ')}
+                            : 'text-muted-foreground'
+                        )}
                       >
                         {getNotificationMessage(notification)}
                       </p>

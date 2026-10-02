@@ -3,6 +3,7 @@ import {
   getNotificationMessage,
   notificationIconMap,
 } from '@/lib/notifications/notification-utils';
+import { cn } from '@/lib/utils';
 import type { Notification } from '@/types';
 
 type NotificationItemProps = {
@@ -21,10 +22,10 @@ export function NotificationItem({
     <button
       type="button"
       onClick={() => onClick(notification)}
-      className={[
+      className={cn(
         'flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-hover',
-        isUnread ? 'bg-surface-hover/40' : '',
-      ].join(' ')}
+        isUnread ? 'bg-surface-hover/40' : ''
+      )}
     >
       <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-hover text-muted-foreground">
         <Icon className="size-4" />
@@ -32,10 +33,10 @@ export function NotificationItem({
 
       <div className="min-w-0 flex-1">
         <p
-          className={[
+          className={cn(
             'text-sm leading-5',
-            isUnread ? 'font-medium text-foreground' : 'text-muted-foreground',
-          ].join(' ')}
+            isUnread ? 'font-medium text-foreground' : 'text-muted-foreground'
+          )}
         >
           {getNotificationMessage(notification)}
         </p>

@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -32,12 +33,12 @@ const SettingsNavigation = () => {
               key={item.href}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
-              className={[
+              className={cn(
                 'block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive
                   ? 'bg-surface-hover text-foreground'
-                  : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-              ].join(' ')}
+                  : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+              )}
             >
               {item.label}
             </Link>

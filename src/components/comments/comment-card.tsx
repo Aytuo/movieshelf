@@ -1,6 +1,7 @@
 'use client';
 
 import { useComment } from '@/hooks/use-comment';
+import { cn } from '@/lib/utils';
 import type { Comment } from '@/types';
 import Link from 'next/link';
 import { CommentActions } from './comment-actions';
@@ -83,10 +84,10 @@ const CommentCard = ({
           className="group flex shrink-0"
         >
           <div
-            className={[
+            className={cn(
               'flex items-center justify-center overflow-hidden rounded-full bg-surface-hover text-xs font-semibold',
-              isReply ? 'size-8' : 'size-9',
-            ].join(' ')}
+              isReply ? 'size-8' : 'size-9'
+            )}
           >
             {author.avatarUrl ? (
               <img

@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { postReaction, profile } from '@/lib/db/schema';
-import type { PostReactionUser } from '@/types';
+import type { ReactionUser } from '@/types';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
 export type PostReactionStats = {
@@ -48,7 +48,7 @@ export async function getPostReactionStats(
 export async function getPostReactionUsers(
   postId: string,
   limit = 50
-): Promise<PostReactionUser[]> {
+): Promise<ReactionUser[]> {
   const rows = await db
     .select({
       userId: profile.userId,

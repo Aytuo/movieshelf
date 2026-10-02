@@ -1,5 +1,6 @@
 import RankingList from '@/components/rankings/ranking-list';
 import { getMovieRanking, getTvRanking } from '@/lib/services/ranking-service';
+import { cn } from '@/lib/utils';
 import type { RankingType } from '@/types';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -68,24 +69,24 @@ const RankingsPage = async ({ searchParams }: RankingsPageProps) => {
             <div className="inline-flex w-fit rounded-lg border border-border bg-surface p-1">
               <Link
                 href="/rankings"
-                className={[
+                className={cn(
                   'rounded-md px-3 py-2 text-xs font-semibold transition-colors',
                   type === 'movie'
                     ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                ].join(' ')}
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
               >
                 Movies
               </Link>
 
               <Link
                 href="/rankings?type=tv"
-                className={[
+                className={cn(
                   'rounded-md px-3 py-2 text-xs font-semibold transition-colors',
                   type === 'tv'
                     ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                ].join(' ')}
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
               >
                 TV Series
               </Link>

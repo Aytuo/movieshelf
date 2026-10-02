@@ -2,6 +2,7 @@
 
 import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
+import { cn } from '@/lib/utils';
 
 type OnboardingMediaCardProps = {
   media: Media;
@@ -21,22 +22,22 @@ const OnboardingMediaCard = ({
       type="button"
       onClick={() => onToggle(media.tmdbId)}
       aria-pressed={selected}
-      className={[
+      className={cn(
         'group relative overflow-hidden rounded-xl text-left transition-all duration-200',
         selected
           ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
-          : 'hover:ring-border-strong ring-1 ring-border',
-      ].join(' ')}
+          : 'hover:ring-border-strong ring-1 ring-border'
+      )}
     >
       <div className="aspect-[2/3] bg-surface">
         {poster && (
           <img
             src={poster}
             alt={`${media.title} poster`}
-            className={[
+            className={cn(
               'h-full w-full object-cover transition-all duration-300',
-              selected ? 'scale-[1.02]' : 'group-hover:scale-[1.03]',
-            ].join(' ')}
+              selected ? 'scale-[1.02]' : 'group-hover:scale-[1.03]'
+            )}
           />
         )}
       </div>

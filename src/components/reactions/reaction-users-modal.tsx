@@ -7,59 +7,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { getPostReactionUsersAction } from '@/lib/actions/post-reaction-action';
-import type { PostReactionUser } from '@/types';
+import type { ReactionUser } from '@/types';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-type PostReactionListModalProps = {
-  postId: string;
+type ReactionUsersModalProps = {
+  users: ReactionUser[] | null;
   count: number;
+  subject: 'post' | 'comment';
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
+  error?: boolean;
 };
 
-export function PostReactionListModal({
-  postId,
+export function ReactionUsersModal({
+  users,
   count,
+  subject,
   open,
   onOpenChangeAction,
-}: PostReactionListModalProps) {
-  const [users, setUsers] = useState<PostReactionUser[] | null>(null);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    let active = true;
-
-    getPostReactionUsersAction(postId)
-      .then((result) => {
-        if (!active) {
-          return;
-        }
-
-        setUsers(result);
-        setError(false);
-      })
-      .catch((result) => {
-        console.error('Failed to load post reactions:', result);
-
-        if (!active) {
-          return;
-        }
-
-        setUsers([]);
-        setError(true);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [open, postId]);
+  error = false,
+}: ReactionUsersModalProps) {
+  const subjectLabel = subject === 'post' ? 'post' : 'comment';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
@@ -68,7 +37,8 @@ export function PostReactionListModal({
           <DialogTitle className="font-heading text-lg">Liked by</DialogTitle>
 
           <DialogDescription className="text-xs leading-5">
-            {count} {count === 1 ? 'person likes' : 'people like'} this post.
+            {count} {count === 1 ? 'person likes' : 'people like'} this{' '}
+            {subjectLabel}.
           </DialogDescription>
         </DialogHeader>
 

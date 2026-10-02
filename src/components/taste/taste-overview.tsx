@@ -1,6 +1,7 @@
 'use client';
 
 import { getTasteSummary } from '@/lib/taste/taste-summary';
+import { cn } from '@/lib/utils';
 import type { TasteProfile, TasteStats } from '@/types';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
@@ -59,12 +60,12 @@ const TasteOverview = ({ taste }: TasteOverviewProps) => {
             type="button"
             onClick={() => setType('movie')}
             aria-pressed={type === 'movie'}
-            className={[
+            className={cn(
               'rounded-md px-4 py-2 text-xs font-semibold transition-colors',
               type === 'movie'
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground',
-            ].join(' ')}
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
             Movies
           </button>
@@ -73,12 +74,12 @@ const TasteOverview = ({ taste }: TasteOverviewProps) => {
             type="button"
             onClick={() => setType('tv')}
             aria-pressed={type === 'tv'}
-            className={[
+            className={cn(
               'rounded-md px-4 py-2 text-xs font-semibold transition-colors',
               type === 'tv'
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground',
-            ].join(' ')}
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
             TV Series
           </button>

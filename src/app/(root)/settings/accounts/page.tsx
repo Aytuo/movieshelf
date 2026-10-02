@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { authClient } from '@/lib/auth/client';
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -128,13 +129,13 @@ function AccountRow({
           type="button"
           onClick={connected ? onDisconnect : onConnect}
           disabled={actionPending || (connected && !canDisconnect)}
-          className={[
+          className={cn(
             'shrink-0 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors',
             connected
               ? 'border border-border text-muted-foreground hover:bg-surface-hover hover:text-foreground'
               : 'bg-primary text-primary-foreground hover:opacity-90',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-          ].join(' ')}
+            'disabled:cursor-not-allowed disabled:opacity-50'
+          )}
         >
           {actionPending
             ? 'Please wait...'
@@ -145,12 +146,12 @@ function AccountRow({
       ) : (
         !loading && (
           <span
-            className={[
+            className={cn(
               'rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase',
               connected
                 ? 'bg-primary-muted text-primary'
-                : 'bg-surface-hover text-muted-foreground',
-            ].join(' ')}
+                : 'bg-surface-hover text-muted-foreground'
+            )}
           >
             {connected ? 'Connected' : 'Not connected'}
           </span>

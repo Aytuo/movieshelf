@@ -1,6 +1,7 @@
 'use client';
 
 import { authClient } from '@/lib/auth/client';
+import { cn } from '@/lib/utils';
 import {
   Activity,
   Bookmark,
@@ -110,10 +111,10 @@ const UserMenu = ({ user, profile }: UserMenuProps) => {
         </span>
 
         <ChevronDown
-          className={[
+          className={cn(
             'hidden size-3.5 text-muted-foreground transition-transform sm:block',
-            open ? 'rotate-180' : '',
-          ].join(' ')}
+            open ? 'rotate-180' : ''
+          )}
         />
       </button>
 

@@ -59,9 +59,12 @@ const CommentList = ({
   }
 
   return (
-    <section id="comments" className="mt-12 border-t border-border/60 pt-10">
+    <section
+      id="comments"
+      className="mt-14 scroll-mt-24 border-t border-border/60 pt-10 sm:mt-16 sm:pt-12"
+    >
       <div className="mb-8">
-        <p className="eyebrow">Community</p>
+        <p className="eyebrow">Discussion</p>
 
         <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
           Comments
@@ -71,10 +74,6 @@ const CommentList = ({
             </span>
           )}
         </h2>
-
-        <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-          Join the conversation and share your thoughts with other viewers.
-        </p>
       </div>
 
       <CommentComposer postId={postId} onSuccess={handleCommentCreated} />

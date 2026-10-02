@@ -7,6 +7,7 @@ export * from './people';
 export * from './posts';
 export * from './profile';
 export * from './rankings';
+export * from './reactions';
 export * from './recommendations';
 export * from './reviews';
 export * from './search';

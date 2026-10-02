@@ -1,10 +1,14 @@
 'use client';
 
-import { togglePostReactionAction } from '@/lib/actions/post-reaction-action';
+import {
+  getPostReactionUsersAction,
+  togglePostReactionAction,
+} from '@/lib/actions/post-reaction-action';
+import type { ReactionUser } from '@/types';
 import { Heart } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { PostReactionListModal } from './post-reaction-list-modal';
+import { ReactionUsersModal } from '../reactions/reaction-users-modal';
 
 type PostReactionState = {
   count: number;
@@ -26,10 +30,42 @@ export function PostReactionButton({
     count: initialCount,
     reacted: initialReacted,
   });
-
   const [listOpen, setListOpen] = useState(false);
-
+  const [users, setUsers] = useState<ReactionUser[] | null>(null);
+  const [listError, setListError] = useState(false);
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    if (!listOpen) {
+      return;
+    }
+
+    let active = true;
+
+    getPostReactionUsersAction(postId)
+      .then((result) => {
+        if (!active) {
+          return;
+        }
+
+        setUsers(result);
+        setListError(false);
+      })
+      .catch((error) => {
+        console.error('Failed to load post reaction users:', error);
+
+        if (!active) {
+          return;
+        }
+
+        setUsers([]);
+        setListError(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [listOpen, postId]);
 
   async function handleToggle() {
     if (pending) {
@@ -101,11 +137,13 @@ export function PostReactionButton({
         )}
       </div>
 
-      <PostReactionListModal
+      <ReactionUsersModal
         key={listOpen ? 'open' : 'closed'}
-        postId={postId}
+        users={users}
         count={state.count}
+        subject="post"
         open={listOpen}
+        error={listError}
         onOpenChangeAction={setListOpen}
       />
     </>

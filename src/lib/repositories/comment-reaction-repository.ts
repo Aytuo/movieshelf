@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
-import { comment, commentReaction } from '@/lib/db/schema';
-import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { comment, commentReaction, profile } from '@/lib/db/schema';
+import { ReactionUser } from '@/types';
+import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 
 export type CommentReactionStats = {
   commentId: string;
@@ -45,6 +46,31 @@ export async function getCommentReactionStats(
     count: row.count,
     reacted: row.reacted,
   }));
+}
+
+export async function getCommentReactionUsers(
+  commentId: string,
+  limit = 50
+): Promise<ReactionUser[]> {
+  const rows = await db
+    .select({
+      userId: profile.userId,
+      username: profile.username,
+      displayName: profile.displayName,
+      avatarUrl: profile.avatarUrl,
+    })
+    .from(commentReaction)
+    .innerJoin(profile, eq(profile.userId, commentReaction.userId))
+    .where(
+      and(
+        eq(commentReaction.commentId, commentId),
+        eq(commentReaction.type, 'like')
+      )
+    )
+    .orderBy(desc(commentReaction.createdAt), desc(commentReaction.id))
+    .limit(limit);
+
+  return rows;
 }
 
 export async function toggleCommentReaction(

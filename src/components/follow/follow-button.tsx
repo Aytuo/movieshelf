@@ -4,6 +4,7 @@ import {
   followUserAction,
   unfollowUserAction,
 } from '@/lib/actions/follow-action';
+import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -53,13 +54,13 @@ export function FollowButton({
       onClick={() => void handleClick()}
       disabled={isPending || isLoading}
       aria-pressed={isFollowing}
-      className={[
+      className={cn(
         'inline-flex min-w-24 items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold transition-colors',
         isFollowing
           ? 'border-border bg-surface text-foreground hover:bg-surface-hover'
           : 'border-primary bg-primary text-primary-foreground hover:bg-primary/90',
-        'disabled:cursor-not-allowed disabled:opacity-60',
-      ].join(' ')}
+        'disabled:cursor-not-allowed disabled:opacity-60'
+      )}
     >
       {isLoading || isPending
         ? 'Saving…'

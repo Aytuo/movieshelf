@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { setAvatarSourceAction } from '@/lib/actions/profile-avatar-action';
+import { cn } from '@/lib/utils';
 import { Check, ImagePlus, Upload, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -294,12 +295,12 @@ const ProfileAvatarSettings = ({
                 key={value}
                 type="button"
                 onClick={() => setMode(value as typeof mode)}
-                className={[
+                className={cn(
                   'rounded-lg px-3 py-2 text-xs font-semibold transition-colors',
                   mode === value
                     ? 'bg-surface text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                ].join(' ')}
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
               >
                 {label}
               </button>
@@ -389,12 +390,12 @@ const ProfileAvatarSettings = ({
                       type="button"
                       onClick={() => void selectOAuth(account.provider)}
                       disabled={pending}
-                      className={[
+                      className={cn(
                         'flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors',
                         provider === account.provider
                           ? 'border-primary bg-primary-muted'
-                          : 'border-border hover:bg-surface-hover',
-                      ].join(' ')}
+                          : 'border-border hover:bg-surface-hover'
+                      )}
                     >
                       <div
                         className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface-hover"

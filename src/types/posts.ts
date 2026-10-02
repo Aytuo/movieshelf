@@ -12,14 +12,6 @@ export type PostAuthor = {
   rating: number | null;
 };
 
-export type PostReactionUser = {
-  userId: string;
-  username: string;
-  displayName: string | null;
-  avatarUrl: string | null;
-  createdAt: Date;
-};
-
 export type PostInput = {
   type: MediaType;
   tmdbId: number;

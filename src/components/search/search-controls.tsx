@@ -1,6 +1,7 @@
 'use client';
 
 import { useDebounce } from '@/hooks/use-debounce';
+import { cn } from '@/lib/utils';
 import type { SearchMediaType } from '@/types';
 import { Search, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -163,12 +164,12 @@ const SearchControls = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className={[
+      className={cn(
         'grid gap-3',
         supportsYear(type)
           ? 'sm:grid-cols-[1fr_160px_140px_auto]'
-          : 'sm:grid-cols-[1fr_160px_auto]',
-      ].join(' ')}
+          : 'sm:grid-cols-[1fr_160px_auto]'
+      )}
     >
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />

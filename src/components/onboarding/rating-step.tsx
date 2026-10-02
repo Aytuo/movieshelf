@@ -1,5 +1,6 @@
 import type { Media, MediaType } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
+import { cn } from '@/lib/utils';
 
 type RatingStepProps = {
   media: Media[];
@@ -96,12 +97,12 @@ const RatingStep = ({
                           type="button"
                           aria-label={`Rate ${value} out of 10`}
                           onClick={() => onRating(item.tmdbId, value)}
-                          className={[
+                          className={cn(
                             'flex size-7 items-center justify-center rounded-md text-[10px] font-semibold transition-colors',
                             currentRating === value
                               ? 'bg-rating-muted text-rating'
-                              : 'text-muted-foreground hover:bg-surface-hover',
-                          ].join(' ')}
+                              : 'text-muted-foreground hover:bg-surface-hover'
+                          )}
                         >
                           {value}
                         </button>

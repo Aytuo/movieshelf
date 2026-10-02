@@ -2,6 +2,7 @@
 
 import { saveMediaReview } from '@/lib/actions/review-action';
 import type { MediaType } from '@/lib/media';
+import { cn } from '@/lib/utils';
 import { reviewSchema } from '@/lib/validations/review';
 import type { ReviewInput } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -122,12 +123,12 @@ const ReviewForm = ({
                   shouldValidate: true,
                 })
               }
-              className={[
+              className={cn(
                 'flex size-9 items-center justify-center rounded-lg border text-xs font-semibold transition-colors',
                 form.watch('rating') === value
                   ? 'border-rating/40 bg-rating-muted text-rating'
-                  : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover',
-              ].join(' ')}
+                  : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover'
+              )}
             >
               {value}
             </button>

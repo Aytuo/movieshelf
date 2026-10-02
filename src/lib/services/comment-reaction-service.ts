@@ -1,5 +1,6 @@
 import {
   getCommentReactionStats as getCommentReactionStatsRepository,
+  getCommentReactionUsers as getCommentReactionUsersRepository,
   toggleCommentReaction as toggleCommentReactionRepository,
 } from '@/lib/repositories';
 import { notifyCommentLiked } from './notification-service';
@@ -26,4 +27,8 @@ export async function toggleCommentReaction(commentId: string, userId: string) {
   }
 
   return result;
+}
+
+export async function getCommentReactionUsers(commentId: string) {
+  return getCommentReactionUsersRepository(commentId, 50);
 }

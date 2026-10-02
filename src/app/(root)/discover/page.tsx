@@ -5,6 +5,7 @@ import EmptyState from '@/components/ui/empty-state';
 import { requireSession } from '@/lib/auth/require-session';
 import { parseDiscoverFilters } from '@/lib/discover/parse-filters';
 import { discoverForUser } from '@/lib/services/discover-service';
+import { cn } from '@/lib/utils';
 import type { DiscoverFilters as DiscoverFiltersType } from '@/types';
 import { SearchX } from 'lucide-react';
 import { Metadata } from 'next';
@@ -125,24 +126,24 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
         <div className="mb-6 flex gap-2">
           <Link
             href="/discover"
-            className={[
+            className={cn(
               'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
               isMovie
                 ? 'border-primary/30 bg-primary-muted text-primary'
-                : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-            ].join(' ')}
+                : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+            )}
           >
             Movies
           </Link>
 
           <Link
             href="/discover?type=tv"
-            className={[
+            className={cn(
               'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
               !isMovie
                 ? 'border-primary/30 bg-primary-muted text-primary'
-                : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-            ].join(' ')}
+                : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+            )}
           >
             TV Series
           </Link>

@@ -14,6 +14,7 @@ import {
   canMarkAsWatched,
   canStartWatching,
 } from '@/lib/media/media-status-policy';
+import { cn } from '@/lib/utils';
 import {
   Bookmark,
   Check,
@@ -333,12 +334,12 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
           disabled={isPending}
           onClick={handleToggleFavorite}
           aria-pressed={state.favorite}
-          className={[
+          className={cn(
             'inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
             state.favorite
               ? 'border-primary/30 bg-primary-muted text-primary'
-              : 'border-border bg-surface hover:bg-surface-hover',
-          ].join(' ')}
+              : 'border-border bg-surface hover:bg-surface-hover'
+          )}
         >
           <Heart
             className="size-4"
@@ -362,12 +363,12 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
               disabled={isPending}
               onClick={() => handleRating(value)}
               aria-label={`Rate ${mediaLabel} ${value} out of 10`}
-              className={[
+              className={cn(
                 'flex size-9 items-center justify-center rounded-lg border text-xs font-semibold transition-all',
                 state.rating === value
                   ? 'border-rating/40 bg-rating-muted text-rating'
-                  : 'border-border bg-surface text-muted-foreground hover:border-rating/30 hover:text-rating',
-              ].join(' ')}
+                  : 'border-border bg-surface text-muted-foreground hover:border-rating/30 hover:text-rating'
+              )}
             >
               {value}
             </button>

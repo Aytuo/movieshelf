@@ -3,6 +3,7 @@ import MediaPoster from '@/components/media/media-poster';
 import EmptyState from '@/components/ui/empty-state';
 import { requireSession } from '@/lib/auth/require-session';
 import { getUserShelf } from '@/lib/services/media-interaction-service';
+import { cn } from '@/lib/utils';
 import {
   ArrowRight,
   Bookmark,
@@ -269,15 +270,14 @@ const ShelfPage = async ({ searchParams }: ShelfPageProps) => {
                   <Link
                     key={item.value}
                     href={buildShelfHref(filter, item.value)}
-                    className={[
+                    className={cn(
                       'inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors',
                       active
                         ? 'border-primary/30 bg-primary-muted text-primary'
-                        : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-                    ].join(' ')}
+                        : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+                    )}
                   >
                     {item.label}
-
                     <span className="text-xs opacity-60">{item.count}</span>
                   </Link>
                 );
@@ -299,17 +299,15 @@ const ShelfPage = async ({ searchParams }: ShelfPageProps) => {
                   <Link
                     key={item.value}
                     href={buildShelfHref(item.value, type)}
-                    className={[
+                    className={cn(
                       'inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors',
                       active
                         ? 'border-primary/30 bg-primary-muted text-primary'
-                        : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground',
-                    ].join(' ')}
+                        : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+                    )}
                   >
                     <Icon className="size-3.5" />
-
                     {item.label}
-
                     <span className="text-xs opacity-60">
                       {statusCounts[item.value]}
                     </span>

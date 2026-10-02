@@ -55,22 +55,32 @@ const PostPage = async ({ params }: PostPageProps) => {
   }/${post.media.tmdbId}`;
 
   return (
-    <main className="container-content py-14 lg:py-20">
-      <div className="mx-auto max-w-3xl">
+    <main className="container-content py-10 sm:py-14 lg:py-20">
+      <div className="mx-auto max-w-4xl">
         <Link
           href={mediaPath}
-          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          className="-ml-3 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to {post.media.title}
         </Link>
 
         <div className="mt-8">
-          <p className="eyebrow">Discussion</p>
+          <div className="mb-5">
+            <p className="eyebrow">Community discussion</p>
 
-          <div className="mt-5">
-            <PostCard post={post} variant="full" />
+            <p className="mt-2 text-sm text-muted-foreground">
+              Share your thoughts about{' '}
+              <Link
+                href={mediaPath}
+                className="font-semibold text-foreground transition-colors hover:text-primary"
+              >
+                {post.media.title}
+              </Link>
+            </p>
           </div>
+
+          <PostCard post={post} variant="full" />
 
           <CommentList
             postId={post.id}
