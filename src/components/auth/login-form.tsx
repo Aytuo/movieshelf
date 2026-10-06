@@ -3,17 +3,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { authClient } from '@/lib/auth/client';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
+import { toast } from 'sonner';
 import SocialButtons from './social-buttons';
 
 const LoginForm = () => {
   const router = useRouter();
-
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -24,16 +22,41 @@ const LoginForm = () => {
   });
 
   async function onSubmit(values: LoginInput) {
-    setServerError(null);
-
     const { error } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
+      callbackURL: '/home',
     });
 
     if (error) {
-      setServerError(
-        error.message ?? 'Unable to sign in. Please check your credentials.'
+      if (error.status === 403) {
+        const { error: verificationError } =
+          await authClient.sendVerificationEmail({
+            email: values.email,
+            callbackURL: '/verify-email?verified=true',
+          });
+
+        if (verificationError) {
+          toast.error(
+            verificationError.message ?? "Couldn't send the verification email."
+          );
+
+          return;
+        }
+
+        toast.error('Please verify your email address.', {
+          description: 'We sent you a new verification link.',
+        });
+
+        router.replace(
+          `/verify-email?pending=true&email=${encodeURIComponent(values.email)}`
+        );
+
+        return;
+      }
+
+      toast.error(
+        error.message ?? "Couldn't sign in. Please check your credentials."
       );
 
       return;
@@ -110,15 +133,6 @@ const LoginForm = () => {
             </p>
           )}
         </div>
-
-        {serverError && (
-          <div
-            role="alert"
-            className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {serverError}
-          </div>
-        )}
 
         <button
           type="submit"

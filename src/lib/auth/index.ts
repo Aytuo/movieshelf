@@ -1,8 +1,14 @@
+import {
+  getVerificationEmailText,
+  VerificationEmail,
+  verificationEmailSubject,
+} from '@/emails/verification-email';
 import { db } from '@/lib/db';
 import * as schema from '@/lib/db/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
+import { sendEmail } from '../email/send-email';
 import { ensureProfile } from '../services/profile-service';
 
 export const auth = betterAuth({
@@ -14,6 +20,31 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      try {
+        void sendEmail({
+          to: user.email,
+          subject: verificationEmailSubject,
+          react: VerificationEmail({
+            name: user.name,
+            url,
+          }),
+          text: getVerificationEmailText({
+            name: user.name,
+            url,
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to send verification email:', error);
+      }
+    },
+
+    sendOnSignUp: false,
+    sendOnSignIn: false,
+    autoSignInAfterVerification: true,
+    expiresIn: 60 * 60,
   },
   socialProviders: {
     google: {

@@ -3,17 +3,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { authClient } from '@/lib/auth/client';
 import { registerSchema, type RegisterInput } from '@/lib/validations/auth';
+import { toast } from 'sonner';
 import SocialButtons from './social-buttons';
 
 const RegisterForm = () => {
   const router = useRouter();
-
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -26,25 +24,44 @@ const RegisterForm = () => {
   });
 
   async function onSubmit(values: RegisterInput) {
-    setServerError(null);
-
     const { error } = await authClient.signUp.email({
       name: values.name,
       email: values.email,
       password: values.password,
-      callbackURL: '/home',
+      callbackURL: '/verify-email?verified=true',
     });
 
     if (error) {
-      setServerError(
-        error.message ?? 'Unable to create your account. Please try again.'
+      toast.error(
+        error.message ?? "Couldn't create your account. Please try again."
       );
 
       return;
     }
 
-    router.replace('/home');
-    router.refresh();
+    const { error: verificationError } = await authClient.sendVerificationEmail(
+      {
+        email: values.email,
+        callbackURL: '/verify-email?verified=true',
+      }
+    );
+
+    if (verificationError) {
+      toast.error(
+        verificationError.message ??
+          "Your account was created, but we couldn't send the verification email."
+      );
+
+      return;
+    }
+
+    toast.success('Account created.', {
+      description: 'Check your inbox to verify your email address.',
+    });
+
+    router.replace(
+      `/verify-email?pending=true&email=${encodeURIComponent(values.email)}`
+    );
   }
 
   const isSubmitting = form.formState.isSubmitting;
@@ -152,15 +169,6 @@ const RegisterForm = () => {
             </p>
           )}
         </div>
-
-        {serverError && (
-          <div
-            role="alert"
-            className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {serverError}
-          </div>
-        )}
 
         <button
           type="submit"
