@@ -5,25 +5,35 @@ export const passwordSchema = z
   .min(8, 'Password must contain at least 8 characters.')
   .max(128, 'Password cannot exceed 128 characters.');
 
+const newPasswordFields = {
+  newPassword: passwordSchema,
+  confirmPassword: z.string(),
+};
+
 export const passwordSettingsSchema = z
   .object({
     currentPassword: z.string(),
-    newPassword: passwordSchema,
-    confirmPassword: z.string(),
+    ...newPasswordFields,
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'Passwords do not match.',
     path: ['confirmPassword'],
   });
 
-export type PasswordSettingsInput = z.infer<typeof passwordSettingsSchema>;
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
+});
+
+export const resetPasswordSchema = z
+  .object(newPasswordFields)
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match.',
+    path: ['confirmPassword'],
+  });
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Enter a valid email address.'),
-  password: z
-    .string()
-    .min(8, 'Password must contain at least 8 characters.')
-    .max(128, 'Password cannot exceed 128 characters.'),
+  password: passwordSchema,
 });
 
 export const registerSchema = z
@@ -38,10 +48,7 @@ export const registerSchema = z
       .trim()
       .toLowerCase()
       .email('Enter a valid email address.'),
-    password: z
-      .string()
-      .min(8, 'Password must contain at least 8 characters.')
-      .max(128, 'Password cannot exceed 128 characters.'),
+    password: passwordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -49,5 +56,8 @@ export const registerSchema = z
     path: ['confirmPassword'],
   });
 
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type PasswordSettingsInput = z.infer<typeof passwordSettingsSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

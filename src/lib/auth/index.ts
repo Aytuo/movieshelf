@@ -1,8 +1,18 @@
 import {
+  getPasswordResetEmailText,
+  PasswordResetEmail,
+  passwordResetEmailSubject,
+} from '@/emails/password-reset-email';
+import {
   getVerificationEmailText,
   VerificationEmail,
   verificationEmailSubject,
 } from '@/emails/verification-email';
+import {
+  getWelcomeEmailText,
+  WelcomeEmail,
+  welcomeEmailSubject,
+} from '@/emails/welcome-email';
 import { db } from '@/lib/db';
 import * as schema from '@/lib/db/schema';
 import { betterAuth } from 'better-auth';
@@ -20,25 +30,62 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+
+    sendResetPassword: async ({ user, url }) => {
+      void sendEmail({
+        to: user.email,
+        subject: passwordResetEmailSubject,
+        react: PasswordResetEmail({
+          name: user.name,
+          url,
+        }),
+        text: getPasswordResetEmailText({
+          name: user.name,
+          url,
+        }),
+      }).catch((error) => {
+        console.error('Failed to send password reset email:', error);
+      });
+    },
+
+    resetPasswordTokenExpiresIn: 60 * 60,
+    revokeSessionsOnPasswordReset: true,
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      try {
-        void sendEmail({
-          to: user.email,
-          subject: verificationEmailSubject,
-          react: VerificationEmail({
-            name: user.name,
-            url,
-          }),
-          text: getVerificationEmailText({
-            name: user.name,
-            url,
-          }),
-        });
-      } catch (error) {
+      void sendEmail({
+        to: user.email,
+        subject: verificationEmailSubject,
+        react: VerificationEmail({
+          name: user.name,
+          url,
+        }),
+        text: getVerificationEmailText({
+          name: user.name,
+          url,
+        }),
+      }).catch((error) => {
         console.error('Failed to send verification email:', error);
-      }
+      });
+    },
+
+    afterEmailVerification: async (user) => {
+      const url = new URL('/home', process.env.BETTER_AUTH_URL).toString();
+
+      void sendEmail({
+        to: user.email,
+        subject: welcomeEmailSubject,
+        react: WelcomeEmail({
+          name: user.name,
+          url,
+        }),
+        text: getWelcomeEmailText({
+          name: user.name,
+          url,
+        }),
+      }).catch((error) => {
+        console.error('Failed to send welcome email:', error);
+      });
     },
 
     sendOnSignUp: false,
