@@ -7,6 +7,9 @@ import type { Post } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 
 type PostFormProps = {
   type: MediaType;
@@ -79,7 +82,7 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
           Title
         </label>
 
-        <input
+        <Input
           id="post-title"
           value={title}
           onChange={(event) => {
@@ -92,10 +95,10 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
               }));
             }
           }}
-          className="input"
           placeholder={`A thought about this ${mediaLabel}...`}
           maxLength={120}
           disabled={isPending}
+          aria-invalid={Boolean(errors.title)}
         />
 
         {errors.title && (
@@ -113,7 +116,7 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
           Your post
         </label>
 
-        <textarea
+        <Textarea
           id="post-content"
           value={content}
           onChange={(event) => {
@@ -129,8 +132,8 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
           rows={5}
           maxLength={5000}
           disabled={isPending}
-          className="min-h-32 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
           placeholder="What do you think?"
+          aria-invalid={Boolean(errors.content)}
         />
 
         {errors.content && (
@@ -142,23 +145,20 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
 
       <div className="flex items-center justify-end gap-3">
         {onCancel && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={onCancel}
             disabled={isPending}
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
             Cancel
-          </button>
+          </Button>
         )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <Button type="submit" size="lg" disabled={isPending}>
           {isPending ? 'Publishing...' : 'Publish post'}
-        </button>
+        </Button>
       </div>
     </form>
   );

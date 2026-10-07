@@ -15,6 +15,8 @@ import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 const DeleteAccountSettings = () => {
   const router = useRouter();
@@ -137,7 +139,7 @@ const DeleteAccountSettings = () => {
               </span>
             </label>
 
-            <input
+            <Input
               id="delete-password"
               type="password"
               value={password}
@@ -145,7 +147,6 @@ const DeleteAccountSettings = () => {
                 setPassword(event.target.value);
               }}
               autoComplete="current-password"
-              className="input"
               placeholder="••••••••"
             />
 
@@ -163,13 +164,12 @@ const DeleteAccountSettings = () => {
               Type <span className="font-semibold">DELETE</span> to confirm
             </label>
 
-            <input
+            <Input
               id="delete-confirmation"
               value={confirmation}
               onChange={(event) => {
                 setConfirmation(event.target.value);
               }}
-              className="input"
               placeholder="DELETE"
               autoComplete="off"
             />
@@ -184,14 +184,14 @@ const DeleteAccountSettings = () => {
             Cancel
           </DialogClose>
 
-          <button
+          <Button
             type="button"
-            onClick={() => void deleteAccount()}
+            variant="destructive"
             disabled={!canDelete}
-            className="rounded-lg bg-destructive px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => void deleteAccount()}
           >
             {isPending ? 'Deleting...' : 'Delete permanently'}
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

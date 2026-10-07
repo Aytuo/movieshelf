@@ -3,6 +3,7 @@
 import { authClient } from '@/lib/auth/client';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 type ActiveSession = {
   token: string;
@@ -74,14 +75,16 @@ const ActiveSessions = ({
     <div className="mt-6 space-y-5">
       {sessions.length > 1 && (
         <div className="flex justify-end">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => void revokeOtherSessions()}
             disabled={isRevokingOthers}
-            className="text-xs font-semibold text-primary transition-colors hover:text-primary/80 disabled:cursor-not-allowed disabled:opacity-50"
+            className="text-primary hover:bg-transparent hover:text-primary/80"
           >
             {isRevokingOthers ? 'Signing out...' : 'Sign out other sessions'}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -130,14 +133,16 @@ const ActiveSessions = ({
               </div>
 
               {!isCurrent && (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => void revokeSession(session.token)}
                   disabled={isActionPending || isRevokingOthers}
-                  className="shrink-0 self-start rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-destructive/30 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50 sm:self-center"
+                  className="shrink-0 text-muted-foreground hover:border-destructive/30 hover:text-destructive sm:self-center"
                 >
                   {isActionPending ? 'Revoking...' : 'Revoke'}
-                </button>
+                </Button>
               )}
             </div>
           );

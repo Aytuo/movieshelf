@@ -4,6 +4,8 @@ import { saveComment } from '@/lib/actions/comment-action';
 import type { Comment } from '@/types';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Textarea } from '../ui/textarea';
 
 type CommentFormProps = {
   postId: string;
@@ -69,7 +71,7 @@ const CommentForm = ({
           {parentId ? 'Your reply' : 'Your comment'}
         </label>
 
-        <textarea
+        <Textarea
           id={textareaId}
           value={content}
           onChange={(event) => {
@@ -82,10 +84,10 @@ const CommentForm = ({
           rows={3}
           maxLength={2000}
           disabled={isPending}
-          className="min-h-24 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
           placeholder={
             parentId ? 'Write a reply...' : 'Join the conversation...'
           }
+          aria-invalid={Boolean(validationError)}
         />
 
         <div className="mt-2 flex justify-end">
@@ -103,21 +105,18 @@ const CommentForm = ({
 
       <div className="flex items-center justify-end gap-3">
         {onCancel && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={onCancel}
             disabled={isPending}
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
             Cancel
-          </button>
+          </Button>
         )}
 
-        <button
-          type="submit"
-          disabled={isPending || !content.trim()}
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <Button type="submit" size="lg" disabled={isPending || !content.trim()}>
           {isPending
             ? parentId
               ? 'Replying...'
@@ -125,7 +124,7 @@ const CommentForm = ({
             : parentId
               ? 'Reply'
               : 'Post comment'}
-        </button>
+        </Button>
       </div>
     </form>
   );

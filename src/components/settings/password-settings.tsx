@@ -11,6 +11,8 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 type PasswordFieldProps = {
   id: string;
@@ -40,15 +42,16 @@ function PasswordField({
       </label>
 
       <div className="relative">
-        <input
+        <Input
           id={id}
           type={visible ? 'text' : 'password'}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           autoComplete={autoComplete}
-          className="input pr-11"
+          className="pr-11"
           placeholder="••••••••"
           required={type !== 'currentPassword'}
+          aria-invalid={Boolean(error)}
         />
 
         <button
@@ -225,17 +228,13 @@ const PasswordSettings = () => {
       </p>
 
       <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <Button type="submit" size="xl" disabled={isPending}>
           {isPending
             ? 'Saving...'
             : hasCredential
               ? 'Change password'
               : 'Set password'}
-        </button>
+        </Button>
       </div>
     </form>
   );
