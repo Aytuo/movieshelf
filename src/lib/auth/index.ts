@@ -2,17 +2,17 @@ import {
   getPasswordResetEmailText,
   PasswordResetEmail,
   passwordResetEmailSubject,
-} from '@/emails/password-reset-email';
+} from '@/emails/templates/password-reset-email';
 import {
   getVerificationEmailText,
   VerificationEmail,
   verificationEmailSubject,
-} from '@/emails/verification-email';
+} from '@/emails/templates/verification-email';
 import {
   getWelcomeEmailText,
   WelcomeEmail,
   welcomeEmailSubject,
-} from '@/emails/welcome-email';
+} from '@/emails/templates/welcome-email';
 import { db } from '@/lib/db';
 import * as schema from '@/lib/db/schema';
 import { betterAuth } from 'better-auth';

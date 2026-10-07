@@ -7,6 +7,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 type FollowButtonProps = {
   followingId: string;
@@ -29,20 +30,36 @@ export function FollowButton({
 
     setIsLoading(true);
 
+    const wasFollowing = isFollowing;
+
     try {
-      const changed = isFollowing
+      const changed = wasFollowing
         ? await unfollowUserAction(followingId)
         : await followUserAction(followingId);
 
       if (!changed) {
+        toast.error(
+          wasFollowing
+            ? "Couldn't unfollow this user. Please try again."
+            : "Couldn't follow this user. Please try again."
+        );
+
         return;
       }
 
-      setIsFollowing(!isFollowing);
+      setIsFollowing(!wasFollowing);
+
+      toast.success(wasFollowing ? 'Unfollowed user.' : 'Now following user.');
 
       startTransition(() => {
         router.refresh();
       });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't update follow status. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }

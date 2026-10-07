@@ -7,6 +7,7 @@ import {
 import type { FollowUser, FollowUserPage } from '@/types';
 import { LoaderCircle, Users } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import EmptyState from '../ui/empty-state';
 import { FollowUserListItem } from './follow-user-list-item';
 
@@ -50,6 +51,10 @@ export function FollowUserList({
 
       setNextCursor(page.nextCursor);
       setHasMore(page.hasMore);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Couldn't load more users."
+      );
     } finally {
       setIsLoadingMore(false);
     }

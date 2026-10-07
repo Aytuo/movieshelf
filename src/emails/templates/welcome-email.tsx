@@ -30,7 +30,7 @@ export function getWelcomeEmailText({ name, url }: WelcomeEmailProps) {
     'Open MovieShelf:',
     url,
     '',
-    '© 2026 MovieShelf · Your movies. Your taste.',
+    `© ${new Date().getFullYear()} MovieShelf · Your movies. Your taste.`,
   ].join('\n');
 }
 

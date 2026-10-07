@@ -19,6 +19,7 @@ const CommentForm = ({
   onCancel,
 }: CommentFormProps) => {
   const [content, setContent] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -29,8 +30,11 @@ const CommentForm = ({
         const trimmedContent = content.trim();
 
         if (!trimmedContent) {
+          setValidationError('Comment cannot be empty.');
           return;
         }
+
+        setValidationError(null);
 
         const comment = await saveComment({
           postId,
@@ -68,7 +72,13 @@ const CommentForm = ({
         <textarea
           id={textareaId}
           value={content}
-          onChange={(event) => setContent(event.target.value)}
+          onChange={(event) => {
+            setContent(event.target.value);
+
+            if (validationError) {
+              setValidationError(null);
+            }
+          }}
           rows={3}
           maxLength={2000}
           disabled={isPending}
@@ -83,6 +93,12 @@ const CommentForm = ({
             {content.length}/2000
           </span>
         </div>
+
+        {validationError && (
+          <p className="mt-2 text-xs text-destructive" role="alert">
+            {validationError}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-end gap-3">

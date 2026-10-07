@@ -4,6 +4,7 @@ import { loadPostComments } from '@/lib/actions/comment-action';
 import type { Comment } from '@/types';
 import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import EmptyState from '../ui/empty-state';
 import CommentCard from './comment-card';
 import CommentComposer from './comment-composer';
@@ -53,6 +54,10 @@ const CommentList = ({
 
       setCurrentCursor(page.nextCursor);
       setHasMore(page.hasMore);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Couldn't load more comments."
+      );
     } finally {
       setIsLoadingMore(false);
     }

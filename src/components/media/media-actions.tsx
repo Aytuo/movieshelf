@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 type MediaStatus = 'watchlist' | 'watching' | 'watched' | 'dropped' | null;
 
@@ -57,12 +58,23 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
 
   const mediaLabel = type === 'movie' ? 'movie' : 'TV series';
 
-  function run(action: () => Promise<void>) {
+  function getErrorMessage(error: unknown, fallback: string) {
+    return error instanceof Error ? error.message : fallback;
+  }
+
+  function run(
+    action: () => Promise<void>,
+    successMessage: string,
+    errorMessage = "Couldn't update your shelf. Please try again."
+  ) {
     startTransition(async () => {
       try {
         await action();
+        toast.success(successMessage);
       } catch (error) {
         console.error(error);
+
+        toast.error(getErrorMessage(error, errorMessage));
       }
     });
   }
@@ -82,7 +94,7 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         inShelf: true,
         status: 'watchlist',
       });
-    });
+    }, 'Added to your watchlist.');
   }
 
   function handleStartWatching() {
@@ -93,7 +105,7 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         inShelf: true,
         status: 'watching',
       });
-    });
+    }, 'Started watching.');
   }
 
   function handleMarkAsWatched() {
@@ -105,7 +117,7 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         status: 'watched',
         watchNumber,
       });
-    });
+    }, 'Marked as watched.');
   }
 
   function handleMarkAsDropped() {
@@ -116,7 +128,7 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         inShelf: true,
         status: 'dropped',
       });
-    });
+    }, 'Marked as dropped.');
   }
 
   function handleRemoveFromShelf() {
@@ -130,18 +142,23 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         rating: null,
         watchNumber: null,
       });
-    });
+    }, 'Removed from your shelf.');
   }
 
   function handleToggleFavorite() {
-    run(async () => {
-      await toggleMediaFavorite(type, tmdbId);
+    const nextFavorite = !state.favorite;
 
-      updateState({
-        inShelf: true,
-        favorite: !state.favorite,
-      });
-    });
+    run(
+      async () => {
+        await toggleMediaFavorite(type, tmdbId);
+
+        updateState({
+          inShelf: true,
+          favorite: nextFavorite,
+        });
+      },
+      nextFavorite ? 'Added to favorites.' : 'Removed from favorites.'
+    );
   }
 
   function handleRating(rating: number) {
@@ -155,7 +172,7 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
       });
 
       router.refresh();
-    });
+    }, 'Rating saved.');
   }
 
   function getWatchLabel() {

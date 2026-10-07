@@ -2,6 +2,7 @@
 
 import { savePost } from '@/lib/actions/post-action';
 import type { MediaType } from '@/lib/media';
+import { postSchema } from '@/lib/validations/post';
 import type { Post } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -14,26 +15,53 @@ type PostFormProps = {
   onCancel?: () => void;
 };
 
+type PostFormErrors = {
+  title?: string;
+  content?: string;
+};
+
 const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [errors, setErrors] = useState<PostFormErrors>({});
+
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const parsed = postSchema.safeParse({
+      type,
+      tmdbId,
+      title,
+      content,
+    });
+
+    if (!parsed.success) {
+      const nextErrors: PostFormErrors = {};
+
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0];
+
+        if (field === 'title' || field === 'content') {
+          nextErrors[field] ??= issue.message;
+        }
+      }
+
+      setErrors(nextErrors);
+      return;
+    }
+
+    setErrors({});
+
     startTransition(async () => {
       try {
-        const post = await savePost({
-          type,
-          tmdbId,
-          title,
-          content,
-        });
+        const post = await savePost(parsed.data);
 
         toast.success('Your post has been published.');
+
         router.refresh();
         onSuccess?.(post);
       } catch {
@@ -54,12 +82,27 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
         <input
           id="post-title"
           value={title}
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={(event) => {
+            setTitle(event.target.value);
+
+            if (errors.title) {
+              setErrors((current) => ({
+                ...current,
+                title: undefined,
+              }));
+            }
+          }}
           className="input"
           placeholder={`A thought about this ${mediaLabel}...`}
           maxLength={120}
           disabled={isPending}
         />
+
+        {errors.title && (
+          <p className="mt-2 text-xs text-destructive" role="alert">
+            {errors.title}
+          </p>
+        )}
       </div>
 
       <div>
@@ -73,13 +116,28 @@ const PostForm = ({ type, tmdbId, onSuccess, onCancel }: PostFormProps) => {
         <textarea
           id="post-content"
           value={content}
-          onChange={(event) => setContent(event.target.value)}
+          onChange={(event) => {
+            setContent(event.target.value);
+
+            if (errors.content) {
+              setErrors((current) => ({
+                ...current,
+                content: undefined,
+              }));
+            }
+          }}
           rows={5}
           maxLength={5000}
           disabled={isPending}
           className="min-h-32 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
           placeholder="What do you think?"
         />
+
+        {errors.content && (
+          <p className="mt-2 text-xs text-destructive" role="alert">
+            {errors.content}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-end gap-3">

@@ -95,6 +95,8 @@ export function CommentReactionButton({
         count: result.count,
         reacted: result.reacted,
       });
+
+      toast.success(result.reacted ? 'Comment liked.' : 'Like removed.');
     } catch (error) {
       console.error('Failed to toggle comment reaction:', error);
 

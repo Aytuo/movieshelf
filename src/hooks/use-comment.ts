@@ -5,6 +5,7 @@ import {
 } from '@/lib/actions/comment-action';
 import type { Comment } from '@/types';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 type UseCommentProps = {
   comment: Comment;
@@ -60,6 +61,12 @@ export function useComment({
 
       setReplies(loaded);
       setIsRepliesOpen(true);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't load replies. Please try again."
+      );
     } finally {
       setIsLoadingReplies(false);
     }
@@ -98,6 +105,14 @@ export function useComment({
       setEditContent(updated.content);
       setUpdatedAt(updated.updatedAt);
       setIsEditing(false);
+
+      toast.success('Comment updated.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't edit your comment. Please try again."
+      );
     } finally {
       setIsSavingEdit(false);
     }
@@ -133,6 +148,14 @@ export function useComment({
       if (isReply) {
         onDeleted?.();
       }
+
+      toast.success('Comment deleted.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't delete your comment. Please try again."
+      );
     } finally {
       setIsDeleting(false);
     }

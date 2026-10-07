@@ -88,6 +88,8 @@ export function PostReactionButton({
         count: result.count,
         reacted: result.reacted,
       });
+
+      toast.success(result.reacted ? 'Post liked.' : 'Like removed.');
     } catch (error) {
       console.error('Failed to toggle post reaction:', error);
 

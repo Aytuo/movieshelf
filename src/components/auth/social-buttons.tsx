@@ -3,6 +3,7 @@
 import { authClient } from '@/lib/auth/client';
 import { Gamepad, Gamepad2 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const SocialButtons = () => {
   const [loading, setLoading] = useState<'google' | 'discord' | null>(null);
@@ -10,12 +11,23 @@ const SocialButtons = () => {
   async function signIn(provider: 'google' | 'discord') {
     setLoading(provider);
 
-    await authClient.signIn.social({
-      provider,
-      callbackURL: '/home',
-    });
+    try {
+      const { error } = await authClient.signIn.social({
+        provider,
+        callbackURL: '/home',
+      });
 
-    setLoading(null);
+      if (error) {
+        toast.error(
+          error.message ??
+            `Couldn't continue with ${provider}. Please try again.`
+        );
+      }
+    } catch {
+      toast.error(`Couldn't continue with ${provider}. Please try again.`);
+    } finally {
+      setLoading(null);
+    }
   }
 
   return (

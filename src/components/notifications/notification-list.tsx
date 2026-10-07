@@ -17,6 +17,7 @@ import type { Notification, NotificationPage } from '@/types';
 import { Bell, CheckCheck, LoaderCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -105,6 +106,14 @@ const NotificationList = ({
       window.dispatchEvent(new Event('movieshelf:notifications-updated'));
 
       router.refresh();
+
+      toast.success('All notifications marked as read.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't mark notifications as read."
+      );
     } finally {
       setIsMarkingAllRead(false);
     }
@@ -124,6 +133,12 @@ const NotificationList = ({
 
       setCurrentCursor(page.nextCursor);
       setHasMore(page.hasMore);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't load more notifications."
+      );
     } finally {
       setIsLoadingMore(false);
     }
@@ -149,8 +164,12 @@ const NotificationList = ({
       setIsClearDialogOpen(false);
 
       router.refresh();
+
+      toast.success('Notifications cleared.');
     } catch (error) {
-      console.error('Failed to clear notifications:', error);
+      toast.error(
+        error instanceof Error ? error.message : "Couldn't clear notifications."
+      );
     } finally {
       setIsClearing(false);
     }
