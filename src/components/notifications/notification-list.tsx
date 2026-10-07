@@ -18,6 +18,7 @@ import { Bell, CheckCheck, LoaderCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogContent,
@@ -289,18 +290,20 @@ const NotificationList = ({
 
         {hasMore && (
           <div className="mt-6 flex justify-center">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="lg"
               onClick={() => void handleLoadMore()}
               disabled={isLoadingMore}
-              className="inline-flex items-center gap-2 rounded-xl border border-border/60 px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              className="text-muted-foreground hover:border-border hover:bg-surface-hover hover:text-foreground"
             >
               {isLoadingMore && (
                 <LoaderCircle className="size-4 animate-spin" />
               )}
 
               {isLoadingMore ? 'Loading…' : 'Load more notifications'}
-            </button>
+            </Button>
           </div>
         )}
       </section>
@@ -330,26 +333,25 @@ const NotificationList = ({
           </DialogHeader>
 
           <DialogFooter className="mt-6 gap-2 sm:justify-end">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setIsClearDialogOpen(false)}
               disabled={isClearing}
-              className="inline-flex items-center justify-center rounded-xl border border-border/60 bg-surface px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:border-border hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="destructive"
               onClick={() => void handleClearNotifications()}
               disabled={isClearing}
-              className="inline-flex items-center justify-center rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-colors hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isClearing && (
-                <LoaderCircle className="mr-2 size-4 animate-spin" />
-              )}
+              {isClearing && <LoaderCircle className="size-4" />}
+
               {isClearing ? 'Clearing…' : 'Clear notifications'}
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

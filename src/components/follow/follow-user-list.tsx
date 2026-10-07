@@ -8,6 +8,7 @@ import type { FollowUser, FollowUserPage } from '@/types';
 import { LoaderCircle, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 import EmptyState from '../ui/empty-state';
 import { FollowUserListItem } from './follow-user-list-item';
 
@@ -90,18 +91,20 @@ export function FollowUserList({
 
       {hasMore && (
         <div className="pt-4">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={() => void handleLoadMore()}
             disabled={isLoadingMore}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full text-muted-foreground hover:bg-surface-hover hover:text-foreground"
           >
             {isLoadingMore && (
               <LoaderCircle className="size-3.5 animate-spin" />
             )}
 
             {isLoadingMore ? 'Loading…' : 'Load more'}
-          </button>
+          </Button>
         </div>
       )}
     </div>

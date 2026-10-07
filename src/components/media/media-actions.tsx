@@ -28,6 +28,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 type MediaStatus = 'watchlist' | 'watching' | 'watched' | 'dropped' | null;
 
@@ -48,7 +49,6 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
   const router = useRouter();
 
   const [state, setState] = useState<MediaActionsState>(initialState);
-
   const [isPending, startTransition] = useTransition();
 
   const { type, tmdbId } = media;
@@ -232,26 +232,29 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
       <div className="flex flex-wrap gap-3">
         {state.status === null && (
           <>
-            <button
+            <Button
               type="button"
+              size="lg"
               disabled={isPending}
               onClick={handleAddToWatchlist}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-10 px-4 hover:bg-primary-hover"
             >
               <Bookmark className="size-4" />
               Add to watchlist
-            </button>
+            </Button>
 
             {canMarkWatched && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="lg"
                 disabled={isPending}
                 onClick={handleMarkAsWatched}
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 border-border bg-surface hover:bg-surface-hover"
               >
                 <Check className="size-4" />
                 Mark as watched
-              </button>
+              </Button>
             )}
           </>
         )}
@@ -259,27 +262,30 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         {state.status === 'watchlist' && (
           <>
             {canWatch && (
-              <button
+              <Button
                 type="button"
+                size="lg"
                 disabled={isPending}
                 onClick={handleStartWatching}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 px-4 hover:bg-primary-hover"
               >
                 <Play className="size-4" />
                 Start watching
-              </button>
+              </Button>
             )}
 
             {canMarkWatched && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="lg"
                 disabled={isPending}
                 onClick={handleMarkAsWatched}
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 border-border bg-surface hover:bg-surface-hover"
               >
                 <Check className="size-4" />
                 Mark as watched
-              </button>
+              </Button>
             )}
           </>
         )}
@@ -287,74 +293,83 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
         {state.status === 'watching' && (
           <>
             {canMarkWatched && (
-              <button
+              <Button
                 type="button"
+                size="lg"
                 disabled={isPending}
                 onClick={handleMarkAsWatched}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 px-4 hover:bg-primary-hover"
               >
                 <Check className="size-4" />
                 Mark as watched
-              </button>
+              </Button>
             )}
 
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="lg"
               disabled={isPending}
               onClick={handleMarkAsDropped}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-10 border-border bg-surface hover:bg-surface-hover"
             >
               <X className="size-4" />
               Drop
-            </button>
+            </Button>
           </>
         )}
 
         {state.status === 'watched' && (
-          <button
+          <Button
             type="button"
+            size="lg"
             disabled={isPending}
             onClick={handleMarkAsWatched}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-10 px-4 hover:bg-primary-hover"
           >
             <Play className="size-4" />
             Watch again
-          </button>
+          </Button>
         )}
 
         {state.status === 'dropped' && canWatch && (
-          <button
+          <Button
             type="button"
+            size="lg"
             disabled={isPending}
             onClick={handleStartWatching}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-10 px-4 hover:bg-primary-hover"
           >
             <Play className="size-4" />
             Start watching
-          </button>
+          </Button>
         )}
 
         {state.inShelf && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             disabled={isPending}
             onClick={handleRemoveFromShelf}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-10 border-border bg-surface hover:bg-surface-hover"
           >
             <Trash2 className="size-4" />
             Remove from shelf
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="lg"
           disabled={isPending}
           onClick={handleToggleFavorite}
           aria-pressed={state.favorite}
           className={cn(
-            'inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+            'h-10 px-4',
             state.favorite
-              ? 'border-primary/30 bg-primary-muted text-primary'
+              ? 'border-primary/30 bg-primary-muted text-primary hover:bg-primary-muted'
               : 'border-border bg-surface hover:bg-surface-hover'
           )}
         >
@@ -363,7 +378,7 @@ const MediaActions = ({ media, initialState }: MediaActionsProps) => {
             fill={state.favorite ? 'currentColor' : 'none'}
           />
           Favorite
-        </button>
+        </Button>
       </div>
 
       {/* Rating */}

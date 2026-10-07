@@ -5,6 +5,7 @@ import type { Comment } from '@/types';
 import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 import EmptyState from '../ui/empty-state';
 import CommentCard from './comment-card';
 import CommentComposer from './comment-composer';
@@ -102,14 +103,16 @@ const CommentList = ({
 
           {hasMore && (
             <div className="mt-6 flex justify-center">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="lg"
                 onClick={handleLoadMore}
                 disabled={isLoadingMore}
-                className="rounded-xl border border-border/60 px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-muted-foreground hover:border-border hover:bg-surface-hover hover:text-foreground"
               >
                 {isLoadingMore ? 'Loading…' : 'Load more comments'}
-              </button>
+              </Button>
             </div>
           )}
         </>

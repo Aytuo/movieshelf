@@ -4,10 +4,10 @@ import {
   followUserAction,
   unfollowUserAction,
 } from '@/lib/actions/follow-action';
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 type FollowButtonProps = {
   followingId: string;
@@ -66,24 +66,24 @@ export function FollowButton({
   }
 
   return (
-    <button
+    <Button
       type="button"
       onClick={() => void handleClick()}
       disabled={isPending || isLoading}
       aria-pressed={isFollowing}
-      className={cn(
-        'inline-flex min-w-24 items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold transition-colors',
+      size="lg"
+      variant={isFollowing ? 'outline' : 'default'}
+      className={
         isFollowing
-          ? 'border-border bg-surface text-foreground hover:bg-surface-hover'
-          : 'border-primary bg-primary text-primary-foreground hover:bg-primary/90',
-        'disabled:cursor-not-allowed disabled:opacity-60'
-      )}
+          ? 'min-w-24 border-border bg-surface hover:bg-surface-hover'
+          : 'min-w-24 border-primary bg-primary text-primary-foreground hover:bg-primary-hover'
+      }
     >
       {isLoading || isPending
         ? 'Saving…'
         : isFollowing
           ? 'Following'
           : 'Follow'}
-    </button>
+    </Button>
   );
 }
