@@ -3,6 +3,7 @@
 import type { Comment } from '@/types';
 import { MessageCirclePlus, X } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '../ui/button';
 import CommentForm from './comment-form';
 
 type CommentComposerProps = {
@@ -21,14 +22,16 @@ const CommentComposer = ({ postId, onSuccess }: CommentComposerProps) => {
   return (
     <div className="mb-8">
       {!isOpen ? (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="lg"
           onClick={() => setIsOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover"
+          className="h-10 border-border bg-surface px-4 hover:bg-surface-hover"
         >
           <MessageCirclePlus className="size-4" />
           Join the conversation
-        </button>
+        </Button>
       ) : (
         <div className="rounded-2xl p-5 surface sm:p-7">
           <div className="mb-6 flex items-center justify-between gap-4">
@@ -40,14 +43,16 @@ const CommentComposer = ({ postId, onSuccess }: CommentComposerProps) => {
               </p>
             </div>
 
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => setIsOpen(false)}
-              className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+              className="size-8 rounded-lg text-muted-foreground hover:bg-surface-hover hover:text-foreground"
               aria-label="Close comment form"
             >
               <X className="size-4" />
-            </button>
+            </Button>
           </div>
 
           <CommentForm

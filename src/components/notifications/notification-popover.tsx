@@ -1,8 +1,9 @@
 import type { Notification } from '@/types';
 import { Bell, CheckCheck, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
-import { NotificationItem } from './notification-item';
+import { Button } from '../ui/button';
 import EmptyState from '../ui/empty-state';
+import { NotificationItem } from './notification-item';
 
 type NotificationPopoverProps = {
   notifications: Notification[];
@@ -36,15 +37,17 @@ export function NotificationPopover({
           )}
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="xs"
           onClick={onMarkAllAsRead}
           disabled={unreadCount === 0 || isMarkingAllRead}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-auto px-0 text-xs font-semibold text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
           <CheckCheck className="size-3.5" />
           {isMarkingAllRead ? 'Saving…' : 'Mark all as read'}
-        </button>
+        </Button>
       </div>
 
       <div className="max-h-[28rem] overflow-y-auto">

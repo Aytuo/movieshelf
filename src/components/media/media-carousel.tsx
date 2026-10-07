@@ -4,6 +4,7 @@ import type { Media } from '@/lib/media';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '../ui/button';
 import MediaMeta from './media-meta';
 import MediaPoster from './media-poster';
 
@@ -100,25 +101,29 @@ const MediaCarousel = ({
             </Link>
           )}
 
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon-lg"
             disabled={!canScrollLeft}
             onClick={() => scroll('left')}
             aria-label="Scroll left"
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground disabled:opacity-30"
+            className="size-9 border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground"
           >
             <ChevronLeft className="size-4" />
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon-lg"
             disabled={!canScrollRight}
             onClick={() => scroll('right')}
             aria-label="Scroll right"
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground disabled:opacity-30"
+            className="size-9 border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground"
           >
             <ChevronRight className="size-4" />
-          </button>
+          </Button>
         </div>
       </div>
 

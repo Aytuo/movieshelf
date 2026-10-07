@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 import EmptyState from '../ui/empty-state';
 import ReviewForm from './review-form';
 
@@ -122,13 +123,14 @@ const YourReviewSection = ({
           </p>
         </div>
 
-        <button
+        <Button
           type="button"
+          size="lg"
           onClick={() => setIsFormOpen(true)}
-          className="inline-flex w-fit shrink-0 items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+          className="h-10 w-fit shrink-0 px-4 hover:bg-primary-hover"
         >
           Write a review
-        </button>
+        </Button>
       </div>
     );
   }
@@ -193,16 +195,18 @@ const YourReviewSection = ({
                   : review.createdAt.toLocaleDateString()}
               </p>
 
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   setIsFormOpen(true);
                 }}
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background/40 px-3 py-2 text-xs font-semibold transition-colors hover:bg-background/60"
+                className="h-8 border-border bg-background/40 text-xs hover:bg-background/60"
               >
                 <Edit3 className="size-3.5" />
                 Edit
-              </button>
+              </Button>
             </div>
           </div>
         </div>

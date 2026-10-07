@@ -10,6 +10,16 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { RotateCcw, SlidersHorizontal } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
 type FilterState = {
   genre: string;
@@ -51,7 +61,6 @@ const DiscoverFilters = () => {
   const searchParams = useSearchParams();
 
   const urlString = searchParams.toString();
-
   const type = searchParams.get('type') === 'tv' ? 'tv' : 'movie';
 
   const genres = type === 'movie' ? MOVIE_GENRES : TV_GENRES;
@@ -61,6 +70,43 @@ const DiscoverFilters = () => {
       ? !option.value.startsWith('first_air_date')
       : !option.value.startsWith('primary_release_date')
   );
+
+  const genreOptions = [
+    { label: 'All genres', value: null },
+    ...genres.map((genre) => ({
+      label: genre.name,
+      value: String(genre.id),
+    })),
+  ];
+
+  const ratingOptions = [
+    { label: 'Any rating', value: null },
+    ...[6, 7, 7.5, 8, 8.5, 9].map((rating) => ({
+      label: `${rating.toFixed(1)}+`,
+      value: String(rating),
+    })),
+  ];
+
+  const runtimeOptions = [
+    { label: 'Any runtime', value: null },
+    { label: 'Under 90 min', value: '90' },
+    { label: 'Under 2 hours', value: '120' },
+    { label: 'Under 2h 30m', value: '150' },
+    { label: 'Under 3 hours', value: '180' },
+  ];
+
+  const languageOptions = [
+    { label: 'Any language', value: null },
+    ...LANGUAGE_OPTIONS.map((language) => ({
+      label: language.label,
+      value: language.value,
+    })),
+  ];
+
+  const sortSelectOptions = sortOptions.map((option) => ({
+    label: option.label,
+    value: option.value,
+  }));
 
   const [draft, setDraft] = useState<FilterState>(() =>
     readFilters(new URLSearchParams(urlString))
@@ -192,14 +238,16 @@ const DiscoverFilters = () => {
         </div>
 
         {hasFilters && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="xs"
             onClick={reset}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            className="h-auto rounded-none px-0 text-xs text-muted-foreground hover:bg-transparent hover:text-foreground"
           >
             <RotateCcw className="size-3" />
             Reset
-          </button>
+          </Button>
         )}
       </div>
 
@@ -207,32 +255,37 @@ const DiscoverFilters = () => {
         <div>
           <label className="label">Genre</label>
 
-          <select
-            value={draft.genre}
-            onChange={(event) => update('genre', event.target.value)}
-            className="input"
+          <Select
+            items={genreOptions}
+            value={draft.genre || null}
+            onValueChange={(value) => update('genre', value ?? '')}
           >
-            <option value="">All genres</option>
+            <SelectTrigger id="discover-genre" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
 
-            {genres.map((genre) => (
-              <option key={genre.id} value={genre.id}>
-                {genre.name}
-              </option>
-            ))}
-          </select>
+            <SelectContent>
+              <SelectGroup>
+                {genreOptions.map((option) => (
+                  <SelectItem key={option.value ?? 'all'} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="label">From year</label>
 
-            <input
+            <Input
               type="number"
               min="1888"
               max={new Date().getFullYear()}
               value={draft.yearFrom}
               onChange={(event) => update('yearFrom', event.target.value)}
-              className="input"
               placeholder="2010"
             />
           </div>
@@ -240,13 +293,12 @@ const DiscoverFilters = () => {
           <div>
             <label className="label">To year</label>
 
-            <input
+            <Input
               type="number"
               min="1888"
               max={new Date().getFullYear()}
               value={draft.yearTo}
               onChange={(event) => update('yearTo', event.target.value)}
-              className="input"
               placeholder="2025"
             />
           </div>
@@ -255,73 +307,101 @@ const DiscoverFilters = () => {
         <div>
           <label className="label">Minimum rating</label>
 
-          <select
-            value={draft.rating}
-            onChange={(event) => update('rating', event.target.value)}
-            className="input"
+          <Select
+            items={ratingOptions}
+            value={draft.rating || null}
+            onValueChange={(value) => update('rating', value ?? '')}
           >
-            <option value="">Any rating</option>
+            <SelectTrigger id="discover-rating" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
 
-            {[6, 7, 7.5, 8, 8.5, 9].map((rating) => (
-              <option key={rating} value={rating}>
-                {rating.toFixed(1)}+
-              </option>
-            ))}
-          </select>
+            <SelectContent>
+              <SelectGroup>
+                {ratingOptions.map((option) => (
+                  <SelectItem key={option.value ?? 'any'} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <label className="label">Maximum runtime</label>
 
-          <select
-            value={draft.runtime}
-            onChange={(event) => update('runtime', event.target.value)}
-            className="input"
+          <Select
+            items={runtimeOptions}
+            value={draft.runtime || null}
+            onValueChange={(value) => update('runtime', value ?? '')}
           >
-            <option value="">Any runtime</option>
+            <SelectTrigger id="discover-runtime" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
 
-            <option value="90">Under 90 min</option>
-
-            <option value="120">Under 2 hours</option>
-
-            <option value="150">Under 2h 30m</option>
-
-            <option value="180">Under 3 hours</option>
-          </select>
+            <SelectContent>
+              <SelectGroup>
+                {runtimeOptions.map((option) => (
+                  <SelectItem key={option.value ?? 'any'} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <label className="label">Original language</label>
 
-          <select
-            value={draft.language}
-            onChange={(event) => update('language', event.target.value)}
-            className="input"
+          <Select
+            items={languageOptions}
+            value={draft.language || null}
+            onValueChange={(value) => update('language', value ?? '')}
           >
-            <option value="">Any language</option>
+            <SelectTrigger id="discover-language" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
 
-            {LANGUAGE_OPTIONS.map((language) => (
-              <option key={language.value} value={language.value}>
-                {language.label}
-              </option>
-            ))}
-          </select>
+            <SelectContent>
+              <SelectGroup>
+                {languageOptions.map((option) => (
+                  <SelectItem key={option.value ?? 'any'} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <label className="label">Sort by</label>
 
-          <select
+          <Select
+            items={sortSelectOptions}
             value={draft.sort}
-            onChange={(event) => update('sort', event.target.value)}
-            className="input"
+            onValueChange={(value) => {
+              if (value) {
+                update('sort', value);
+              }
+            }}
           >
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="discover-sort" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                {sortSelectOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="border-t border-border/60 pt-5">
@@ -349,9 +429,9 @@ const DiscoverFilters = () => {
         </div>
       </div>
 
-      <p className="mt-5 text-[11px] leading-5 text-muted-foreground">
+      {/* <p className="mt-5 text-[11px] leading-5 text-muted-foreground">
         Changes are applied automatically when you stop editing.
-      </p>
+      </p> */}
     </aside>
   );
 };

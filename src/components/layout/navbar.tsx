@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import NotificationBell from '../notifications/notification-bell';
 import GlobalSearch from '../search/global-search';
+import { Button } from '../ui/button';
 import UserMenu from '../user/user-menu';
 
 const navLinks = [
@@ -47,19 +48,21 @@ const Navbar = ({ user, profile }: NavbarProps) => {
       <div className="container-content">
         <div className="flex h-(--header-height) items-center justify-between">
           {/* Mobile trigger */}
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon-lg"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((current) => !current)}
-            className="flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground md:hidden"
+            className="size-9 border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground md:hidden"
           >
             {mobileOpen ? (
               <X className="size-4" />
             ) : (
               <Menu className="size-4" />
             )}
-          </button>
+          </Button>
 
           {/* Brand */}
           <Link

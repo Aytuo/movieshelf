@@ -6,6 +6,8 @@ import { ArrowRight, Command, Loader2, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import GlobalSearchEmptyState from './global-search-empty-state';
 import GlobalSearchResults from './global-search-results';
 
@@ -157,11 +159,12 @@ const GlobalSearch = () => {
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={openSearch}
         aria-label="Search"
-        className="hover:border-border-strong hidden h-10 w-64 items-center gap-3 rounded-lg border border-border bg-surface/80 px-3 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-hover lg:flex xl:w-72"
+        className="hover:border-border-strong hidden h-10 w-64 justify-start gap-3 rounded-lg border border-border bg-surface/80 px-3 text-left text-sm text-muted-foreground hover:bg-surface-hover hover:text-muted-foreground lg:flex xl:w-72"
       >
         <Search className="size-4 shrink-0" />
 
@@ -170,16 +173,18 @@ const GlobalSearch = () => {
         <kbd className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
           <Command className="size-2.5" />K
         </kbd>
-      </button>
+      </Button>
 
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon-lg"
         onClick={openSearch}
         aria-label="Search"
-        className="inline-flex size-10 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground lg:hidden"
+        className="size-10 rounded-lg border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground lg:hidden"
       >
         <Search className="size-4" />
-      </button>
+      </Button>
 
       {open &&
         mounted &&
@@ -204,12 +209,12 @@ const GlobalSearch = () => {
               <div className="flex items-center gap-3 border-b border-border px-4">
                 <Search className="size-5 shrink-0 text-muted-foreground" />
 
-                <input
+                <Input
                   ref={inputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search movies, TV series & people..."
-                  className="h-16 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/60 sm:text-lg"
+                  className="h-16 flex-1 rounded-none border-0 bg-transparent px-0 text-base shadow-none focus-visible:border-0 focus-visible:ring-0 sm:text-lg"
                   autoComplete="off"
                   spellCheck={false}
                 />
@@ -219,14 +224,16 @@ const GlobalSearch = () => {
                 )}
 
                 {query && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={clearSearch}
                     aria-label="Clear search"
-                    className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+                    className="size-8 rounded-md text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                   >
                     <X className="size-4" />
-                  </button>
+                  </Button>
                 )}
               </div>
 

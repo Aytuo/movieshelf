@@ -4,6 +4,9 @@ import { updateProfileSettings } from '@/lib/actions/profile-action';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 
 type ProfileSettingsFormProps = {
   initialValues: {
@@ -68,13 +71,13 @@ const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
                 @
               </span>
 
-              <input
+              <Input
                 id="username"
                 value={form.username}
                 onChange={(event) =>
                   updateField('username', event.target.value.toLowerCase())
                 }
-                className="input pl-7"
+                className="pl-7"
                 autoComplete="username"
               />
             </div>
@@ -93,13 +96,12 @@ const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
               Display name
             </label>
 
-            <input
+            <Input
               id="displayName"
               value={form.displayName}
               onChange={(event) =>
                 updateField('displayName', event.target.value)
               }
-              className="input"
               placeholder="Alex Johnson"
               autoComplete="name"
             />
@@ -110,13 +112,13 @@ const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
               Bio
             </label>
 
-            <textarea
+            <Textarea
               id="bio"
               value={form.bio}
               onChange={(event) => updateField('bio', event.target.value)}
               rows={5}
               maxLength={280}
-              className="min-h-28 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="min-h-28"
               placeholder="A few words about your relationship with movies..."
             />
 
@@ -128,13 +130,14 @@ const ProfileSettingsForm = ({ initialValues }: ProfileSettingsFormProps) => {
       </section>
 
       <div className="flex items-center justify-end gap-3">
-        <button
+        <Button
           type="submit"
+          size="lg"
           disabled={isPending}
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-10 px-5 hover:bg-primary-hover"
         >
           {isPending ? 'Saving...' : 'Save changes'}
-        </button>
+        </Button>
       </div>
     </form>
   );

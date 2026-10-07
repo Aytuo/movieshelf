@@ -8,6 +8,9 @@ import type { ReviewInput } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 
 type ReviewFormProps = {
   type: MediaType;
@@ -74,10 +77,9 @@ const ReviewForm = ({
         >
           Title
         </label>
-        <input
+        <Input
           id="review-title"
           {...form.register('title')}
-          className="input"
           placeholder={`A few words about this ${mediaLabel}...`}
         />
 
@@ -95,11 +97,11 @@ const ReviewForm = ({
         >
           Your review
         </label>
-        <textarea
+        <Textarea
           id="review-content"
           {...form.register('content')}
           rows={6}
-          className="min-h-36 w-full resize-y rounded-lg border border-border bg-surface px-3 py-3 text-sm transition-colors outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="min-h-36"
           placeholder="What did you think?"
         />
 
@@ -159,23 +161,26 @@ const ReviewForm = ({
 
       <div className="flex items-center justify-end gap-3">
         {onCancel && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={onCancel}
             disabled={isPending}
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-10 px-4"
           >
             Cancel
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           type="submit"
+          size="lg"
           disabled={isPending}
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-10 px-5 hover:bg-primary-hover"
         >
           {isPending ? 'Saving...' : 'Publish review'}
-        </button>
+        </Button>
       </div>
     </form>
   );

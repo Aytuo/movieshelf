@@ -5,6 +5,7 @@ import { loadProfilePostsAction } from '@/lib/actions/profile-post-action';
 import type { Post } from '@/types';
 import { LoaderCircle, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '../ui/button';
 import EmptyState from '../ui/empty-state';
 
 type ProfilePostsListProps = {
@@ -70,16 +71,18 @@ const ProfilePostsList = ({
 
       {hasMore && (
         <div className="mt-6 flex justify-center">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={() => void handleLoadMore()}
             disabled={isLoadingMore}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-10 border-border bg-surface px-4 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
           >
             {isLoadingMore && <LoaderCircle className="size-4 animate-spin" />}
 
             {isLoadingMore ? 'Loading…' : 'Load more'}
-          </button>
+          </Button>
         </div>
       )}
     </div>

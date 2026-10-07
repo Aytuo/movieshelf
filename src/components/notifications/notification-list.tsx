@@ -202,28 +202,31 @@ const NotificationList = ({
 
           <div className="flex shrink-0 items-center gap-4">
             {unreadCount > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => void handleMarkAllAsRead()}
                 disabled={isMarkingAllRead}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-auto px-0 text-sm font-semibold text-muted-foreground hover:bg-transparent hover:text-foreground"
               >
                 <CheckCheck className="size-4" />
-
                 {isMarkingAllRead ? 'Saving…' : 'Mark all as read'}
-              </button>
+              </Button>
             )}
 
             {items.length > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setIsClearDialogOpen(true)}
                 disabled={isClearing}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-destructive transition-colors hover:text-destructive/80 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-auto px-0 text-sm font-semibold text-destructive hover:bg-transparent hover:text-destructive/80"
               >
                 <Trash2 className="size-4" />
                 Clear
-              </button>
+              </Button>
             )}
           </div>
         </div>

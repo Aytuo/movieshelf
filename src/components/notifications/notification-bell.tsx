@@ -2,6 +2,7 @@
 
 import { useNotification } from '@/hooks/use-notification';
 import { Bell } from 'lucide-react';
+import { Button } from '../ui/button';
 import { NotificationPopover } from './notification-popover';
 
 const NotificationBell = () => {
@@ -20,12 +21,14 @@ const NotificationBell = () => {
 
   return (
     <div ref={containerRef} className="relative">
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon-lg"
         aria-label="Notifications"
         aria-expanded={isOpen}
         onClick={() => void handleOpen()}
-        className="relative flex size-10 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+        className="relative size-10 border-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground"
       >
         <Bell className="size-4" />
 
@@ -37,7 +40,7 @@ const NotificationBell = () => {
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
-      </button>
+      </Button>
 
       {isOpen && (
         <NotificationPopover

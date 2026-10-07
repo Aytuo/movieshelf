@@ -12,6 +12,16 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
 type SearchControlsProps = {
   initialQuery: string;
@@ -23,6 +33,13 @@ type SearchControlsProps = {
 function supportsYear(type: SearchMediaType) {
   return type === 'movie' || type === 'tv';
 }
+
+const searchTypeOptions = [
+  { label: 'All', value: 'all' },
+  { label: 'Movies', value: 'movie' },
+  { label: 'TV Series', value: 'tv' },
+  { label: 'People', value: 'person' },
+];
 
 const SearchControls = ({
   initialQuery,
@@ -122,8 +139,12 @@ const SearchControls = ({
     });
   }
 
-  function handleTypeChange(event: ChangeEvent<HTMLSelectElement>) {
-    const nextType = event.target.value as SearchMediaType;
+  function handleTypeChange(value: string | null) {
+    if (!value) {
+      return;
+    }
+
+    const nextType = value as SearchMediaType;
 
     setType(nextType);
 
@@ -174,42 +195,56 @@ const SearchControls = ({
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
-        <input
+        <Input
           ref={inputRef}
           name="q"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search titles..."
-          className="input h-12 pr-10 pl-10"
+          className="h-12 pr-10 pl-10"
         />
 
         {query && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={clearQuery}
             aria-label="Clear search"
-            className="absolute top-1/2 right-3 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+            className="absolute top-1/2 right-2 size-8 -translate-y-1/2 rounded-md text-muted-foreground hover:bg-surface-hover hover:text-foreground"
           >
             <X className="size-3.5" />
-          </button>
+          </Button>
         )}
       </div>
 
-      <select
+      <Select
+        items={searchTypeOptions}
         name="type"
         value={type}
-        onChange={handleTypeChange}
-        className="input h-12"
-        aria-label="Search media type"
+        onValueChange={handleTypeChange}
       >
-        <option value="all">All</option>
-        <option value="movie">Movies</option>
-        <option value="tv">TV Series</option>
-        <option value="person">People</option>
-      </select>
+        <SelectTrigger
+          id="search-type"
+          className="h-12 w-full"
+          aria-label="Search media type"
+        >
+          <SelectValue />
+        </SelectTrigger>
+
+        <SelectContent>
+          <SelectGroup>
+            {searchTypeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
 
       {supportsYear(type) && (
-        <input
+        <Input
           name="year"
           type="number"
           min="1888"
@@ -217,16 +252,17 @@ const SearchControls = ({
           value={year}
           onChange={handleYearChange}
           placeholder="Year"
-          className="input h-12"
+          className="h-12"
         />
       )}
 
-      <button
+      <Button
         type="submit"
-        className="h-12 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+        size="lg"
+        className="h-12 px-6 hover:bg-primary-hover"
       >
         Search
-      </button>
+      </Button>
     </form>
   );
 };

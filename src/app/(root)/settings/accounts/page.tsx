@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -9,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth/client';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -125,16 +127,17 @@ function AccountRow({
       </div>
 
       {!loading && onConnect && onDisconnect ? (
-        <button
+        <Button
           type="button"
+          size="sm"
+          variant={connected ? 'outline' : 'default'}
           onClick={connected ? onDisconnect : onConnect}
           disabled={actionPending || (connected && !canDisconnect)}
           className={cn(
-            'shrink-0 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors',
+            'h-8 px-3.5 text-xs',
             connected
-              ? 'border border-border text-muted-foreground hover:bg-surface-hover hover:text-foreground'
-              : 'bg-primary text-primary-foreground hover:opacity-90',
-            'disabled:cursor-not-allowed disabled:opacity-50'
+              ? 'bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+              : 'hover:bg-primary-hover'
           )}
         >
           {actionPending
@@ -142,7 +145,7 @@ function AccountRow({
             : connected
               ? 'Disconnect'
               : 'Connect'}
-        </button>
+        </Button>
       ) : (
         !loading && (
           <span
@@ -504,7 +507,7 @@ const ConnectedAccountsPage = () => {
                 Current password
               </label>
 
-              <input
+              <Input
                 id="reauth-password"
                 type="password"
                 value={reauthPassword}
@@ -512,7 +515,6 @@ const ConnectedAccountsPage = () => {
                   setReauthPassword(event.target.value);
                 }}
                 autoComplete="current-password"
-                className="input"
                 placeholder="••••••••"
                 disabled={reauthPending}
               />
@@ -528,17 +530,19 @@ const ConnectedAccountsPage = () => {
               </p>
 
               {connectedSocialProviders.map((provider) => (
-                <button
+                <Button
                   key={provider}
                   type="button"
+                  variant="outline"
+                  size="lg"
                   onClick={() => void reauthenticateWithSocial(provider)}
                   disabled={reauthPending}
-                  className="w-full rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-10 w-full"
                 >
                   {reauthPending
                     ? 'Redirecting...'
                     : `Continue with ${providerLabels[provider]}`}
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -562,14 +566,15 @@ const ConnectedAccountsPage = () => {
             </DialogClose>
 
             {credentialConnected && (
-              <button
+              <Button
                 type="button"
+                size="lg"
                 onClick={() => void reauthenticateWithPassword()}
                 disabled={!reauthPassword.trim() || reauthPending}
-                className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 px-4 hover:bg-primary-hover"
               >
                 {reauthPending ? 'Verifying...' : 'Continue'}
-              </button>
+              </Button>
             )}
           </DialogFooter>
         </DialogContent>
