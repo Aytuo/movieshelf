@@ -4,6 +4,7 @@ import { authClient } from '@/lib/auth/client';
 import { Gamepad, Gamepad2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 const SocialButtons = () => {
   const [loading, setLoading] = useState<'google' | 'discord' | null>(null);
@@ -32,28 +33,29 @@ const SocialButtons = () => {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="xl"
+        className="w-full bg-surface hover:bg-surface-hover"
         disabled={loading !== null}
         onClick={() => signIn('google')}
-        className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface text-sm font-medium transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {/* TODO: Replace with Google logo */}
         <Gamepad className="size-4" />
-
         {loading === 'google' ? 'Connecting...' : 'Google'}
-      </button>
+      </Button>
 
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="xl"
+        className="w-full bg-surface hover:bg-surface-hover"
         disabled={loading !== null}
         onClick={() => signIn('discord')}
-        className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface text-sm font-medium transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60"
       >
         <Gamepad2 className="size-4" />
-
         {loading === 'discord' ? 'Connecting...' : 'Discord'}
-      </button>
+      </Button>
     </div>
   );
 };

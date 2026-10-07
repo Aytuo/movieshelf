@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 const ForgotPasswordForm = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -104,13 +106,13 @@ const ForgotPasswordForm = () => {
             Email
           </label>
 
-          <input
+          <Input
             id="email"
             type="email"
             autoComplete="email"
             {...form.register('email')}
-            className="input"
             placeholder="you@example.com"
+            aria-invalid={Boolean(form.formState.errors.email)}
           />
 
           {form.formState.errors.email && (
@@ -120,13 +122,14 @@ const ForgotPasswordForm = () => {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
+          size="xl"
+          className="w-full"
           disabled={isSubmitting}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? 'Sending link...' : 'Send reset link'}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-8 text-center text-sm text-muted-foreground">

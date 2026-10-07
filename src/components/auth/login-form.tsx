@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form';
 import { authClient } from '@/lib/auth/client';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import SocialButtons from './social-buttons';
 
 const LoginForm = () => {
@@ -88,13 +90,13 @@ const LoginForm = () => {
             Email
           </label>
 
-          <input
+          <Input
             id="email"
             type="email"
             autoComplete="email"
             {...form.register('email')}
-            className="input"
             placeholder="you@example.com"
+            aria-invalid={Boolean(form.formState.errors.email)}
           />
 
           {form.formState.errors.email && (
@@ -118,13 +120,13 @@ const LoginForm = () => {
             </Link>
           </div>
 
-          <input
+          <Input
             id="password"
             type="password"
             autoComplete="current-password"
             {...form.register('password')}
-            className="input"
             placeholder="••••••••"
+            aria-invalid={Boolean(form.formState.errors.password)}
           />
 
           {form.formState.errors.password && (
@@ -134,13 +136,14 @@ const LoginForm = () => {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
+          size="xl"
+          className="w-full"
           disabled={isSubmitting}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? 'Signing in...' : 'Sign in'}
-        </button>
+        </Button>
       </form>
 
       <div className="my-6 flex items-center gap-3">

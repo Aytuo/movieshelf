@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 type ResetPasswordFormProps = {
   token: string;
@@ -73,13 +75,13 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
             New password
           </label>
 
-          <input
+          <Input
             id="newPassword"
             type="password"
             autoComplete="new-password"
             {...form.register('newPassword')}
-            className="input"
             placeholder="••••••••"
+            aria-invalid={Boolean(form.formState.errors.newPassword)}
           />
 
           {form.formState.errors.newPassword && (
@@ -97,13 +99,13 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
             Confirm new password
           </label>
 
-          <input
+          <Input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
             {...form.register('confirmPassword')}
-            className="input"
             placeholder="••••••••"
+            aria-invalid={Boolean(form.formState.errors.confirmPassword)}
           />
 
           {form.formState.errors.confirmPassword && (
@@ -113,13 +115,14 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
+          size="xl"
+          className="w-full"
           disabled={isSubmitting}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? 'Updating password...' : 'Update password'}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-8 text-center text-sm text-muted-foreground">

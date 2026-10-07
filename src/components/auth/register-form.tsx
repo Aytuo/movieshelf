@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form';
 import { authClient } from '@/lib/auth/client';
 import { registerSchema, type RegisterInput } from '@/lib/validations/auth';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import SocialButtons from './social-buttons';
 
 const RegisterForm = () => {
@@ -88,13 +90,13 @@ const RegisterForm = () => {
             Name
           </label>
 
-          <input
+          <Input
             id="name"
             type="text"
             autoComplete="name"
             {...form.register('name')}
-            className="input"
             placeholder="John Doe"
+            aria-invalid={Boolean(form.formState.errors.name)}
           />
 
           {form.formState.errors.name && (
@@ -109,13 +111,13 @@ const RegisterForm = () => {
             Email
           </label>
 
-          <input
+          <Input
             id="email"
             type="email"
             autoComplete="email"
             {...form.register('email')}
-            className="input"
             placeholder="you@example.com"
+            aria-invalid={Boolean(form.formState.errors.email)}
           />
 
           {form.formState.errors.email && (
@@ -130,13 +132,13 @@ const RegisterForm = () => {
             Password
           </label>
 
-          <input
+          <Input
             id="password"
             type="password"
             autoComplete="new-password"
             {...form.register('password')}
-            className="input"
             placeholder="••••••••"
+            aria-invalid={Boolean(form.formState.errors.password)}
           />
 
           {form.formState.errors.password && (
@@ -154,13 +156,13 @@ const RegisterForm = () => {
             Confirm password
           </label>
 
-          <input
+          <Input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
             {...form.register('confirmPassword')}
-            className="input"
             placeholder="••••••••"
+            aria-invalid={Boolean(form.formState.errors.confirmPassword)}
           />
 
           {form.formState.errors.confirmPassword && (
@@ -170,13 +172,14 @@ const RegisterForm = () => {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
+          size="xl"
+          className="w-full"
           disabled={isSubmitting}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? 'Creating account...' : 'Create account'}
-        </button>
+        </Button>
       </form>
 
       <div className="my-6 flex items-center gap-3">

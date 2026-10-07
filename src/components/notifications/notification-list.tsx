@@ -57,25 +57,33 @@ const NotificationList = ({
 
   async function handleNotificationClick(notification: Notification) {
     if (!notification.readAt) {
-      const success = await markNotificationAsReadAction(notification.id);
+      try {
+        const success = await markNotificationAsReadAction(notification.id);
 
-      if (success) {
-        setUnreadCount((current) => Math.max(0, current - 1));
+        if (success) {
+          setUnreadCount((current) => Math.max(0, current - 1));
 
-        setItems((current) =>
-          current.map((item) =>
-            item.id === notification.id
-              ? {
-                  ...item,
-                  readAt: new Date(),
-                }
-              : item
-          )
+          setItems((current) =>
+            current.map((item) =>
+              item.id === notification.id
+                ? {
+                    ...item,
+                    readAt: new Date(),
+                  }
+                : item
+            )
+          );
+
+          window.dispatchEvent(new Event('movieshelf:notifications-updated'));
+
+          router.refresh();
+        }
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Couldn't mark notification as read."
         );
-
-        window.dispatchEvent(new Event('movieshelf:notifications-updated'));
-
-        router.refresh();
       }
     }
 
