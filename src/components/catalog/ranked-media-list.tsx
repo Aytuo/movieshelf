@@ -1,6 +1,7 @@
 import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type RankedMediaListProps = {
@@ -61,24 +62,25 @@ const RankedMediaList = ({
                 href={href}
                 className="group"
               >
-                <article className="relative isolate min-h-[240px] overflow-hidden rounded-2xl border border-border/60 bg-surface">
+                <article className="min-h-240px relative isolate overflow-hidden rounded-2xl border border-border/60 bg-surface">
                   {/* Giant ranking number */}
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute -top-8 -left-4 z-0 font-heading text-[11rem] leading-none font-black tracking-[-0.08em] text-foreground/[0.055] transition-all duration-500 select-none group-hover:translate-x-2 group-hover:text-primary/[0.10]"
+                    className="pointer-events-none absolute -top-8 -left-4 z-0 font-heading text-[11rem] leading-none font-black tracking-[-0.08em] text-foreground/5.5 transition-all duration-500 select-none group-hover:translate-x-2 group-hover:text-primary/10"
                   >
                     {rank}
                   </span>
 
-                  <div className="relative z-10 flex min-h-[240px] items-center gap-5 p-5 sm:p-6">
+                  <div className="min-h-240px relative z-10 flex items-center gap-5 p-5 sm:p-6">
                     {/* Poster */}
-                    <div className="relative h-[190px] w-[128px] shrink-0 overflow-hidden rounded-xl shadow-2xl">
+                    <div className="h-190px w-128px relative shrink-0 overflow-hidden rounded-xl shadow-2xl">
                       {posterUrl ? (
-                        <img
+                        <Image
                           src={posterUrl}
                           alt={`${item.title} poster`}
+                          fill
                           sizes="128px"
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-surface-hover px-3 text-center text-xs text-muted-foreground">
@@ -86,7 +88,7 @@ const RankedMediaList = ({
                         </div>
                       )}
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
                     </div>
 
                     {/* Details */}

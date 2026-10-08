@@ -12,6 +12,7 @@ import {
   Tv,
   X,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type MediaActivityTimelineProps = {
@@ -103,13 +104,15 @@ const ActivityTimeline = ({ activities }: MediaActivityTimelineProps) => {
 
               {/* Activity card */}
               <div className="flex min-w-0 flex-1 gap-4 rounded-2xl p-4 surface">
-                <div className="relative aspect-[2/3] w-20 shrink-0 self-start overflow-hidden rounded-lg">
+                <div className="relative aspect-2/3 w-20 shrink-0 self-start overflow-hidden rounded-lg">
                   <Link href={href} className="block">
                     {poster ? (
-                      <img
+                      <Image
                         src={poster}
                         alt={`${media.title} poster`}
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="80px"
+                        className="object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-surface-hover px-2 text-center text-[10px] text-muted-foreground">

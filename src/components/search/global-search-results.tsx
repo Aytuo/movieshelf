@@ -1,6 +1,7 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { SearchAllItem } from '@/types';
 import { ArrowRight, Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import MediaPoster from '../media/media-poster';
 
@@ -24,12 +25,14 @@ const GlobalSearchResults = ({
               onClick={onResultClick}
               className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-hover"
             >
-              <div className="size-12 shrink-0 overflow-hidden rounded-md bg-surface">
+              <div className="relative size-12 shrink-0 overflow-hidden rounded-md bg-surface">
                 {portrait ? (
-                  <img
+                  <Image
                     src={portrait}
                     alt=""
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="48px"
+                    className="object-cover"
                   />
                 ) : null}
               </div>
@@ -73,7 +76,7 @@ const GlobalSearchResults = ({
               media={media}
               compact
               showType
-              className="h-[72px] w-12 shrink-0 rounded-lg"
+              className="h-72px w-12 shrink-0 rounded-lg"
             />
 
             <div className="min-w-0 flex-1">

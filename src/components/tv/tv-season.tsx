@@ -4,6 +4,7 @@ import { getTvSeasonAction } from '@/lib/actions/tv-action';
 import type { TvSeason } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { ChevronDown, Clock3 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 
 type TvSeasonProps = {
@@ -71,15 +72,17 @@ const TvSeason = ({ tvId, season }: TvSeasonProps) => {
         aria-expanded={isOpen}
         className="group flex w-full items-stretch gap-6 p-4 text-left transition-colors hover:bg-surface-hover sm:gap-7 sm:p-5"
       >
-        <div className="w-28 shrink-0 overflow-hidden rounded-xl bg-surface-hover sm:w-32 lg:w-36">
+        <div className="relative w-28 shrink-0 overflow-hidden rounded-xl bg-surface-hover sm:w-32 lg:w-36">
           {seasonPoster ? (
-            <img
+            <Image
               src={seasonPoster}
               alt={`${season.name} poster`}
-              className="aspect-[2/3] h-full w-full object-cover"
+              fill
+              sizes="(max-width: 640px) 112px, (max-width: 1024px) 128px, 144px"
+              className="object-cover"
             />
           ) : (
-            <div className="aspect-[2/3] w-full" />
+            <div className="aspect-2/3 w-full" />
           )}
         </div>
 
@@ -147,11 +150,13 @@ const TvSeason = ({ tvId, season }: TvSeasonProps) => {
                   >
                     <div className="flex gap-4 px-4 py-4 sm:px-5 sm:py-5">
                       {still && (
-                        <div className="hidden aspect-video w-48 shrink-0 overflow-hidden rounded-lg bg-surface-hover sm:block">
-                          <img
+                        <div className="relative hidden aspect-video w-48 shrink-0 overflow-hidden rounded-lg bg-surface-hover sm:block">
+                          <Image
                             src={still}
                             alt=""
-                            className="block h-full w-full object-cover"
+                            fill
+                            sizes="192px"
+                            className="object-cover"
                           />
                         </div>
                       )}

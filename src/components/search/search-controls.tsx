@@ -8,6 +8,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   type ChangeEvent,
   type FormEvent,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -60,6 +61,47 @@ const SearchControls = ({
   const debouncedYear = useDebounce(year, 300);
   const previousDebouncedYear = useRef(debouncedYear);
 
+  const buildUrl = useCallback(
+    ({
+      nextQuery = query,
+      nextType = type,
+      nextYear = year,
+      preservePage = true,
+    }: {
+      nextQuery?: string;
+      nextType?: SearchMediaType;
+      nextYear?: string;
+      preservePage?: boolean;
+    } = {}) => {
+      const params = new URLSearchParams();
+
+      const trimmedQuery = nextQuery.trim();
+
+      if (trimmedQuery) {
+        params.set('q', trimmedQuery);
+      }
+
+      if (nextType !== 'all') {
+        params.set('type', nextType);
+
+        if (supportsYear(nextType) && nextYear) {
+          params.set('year', nextYear);
+        }
+      }
+
+      if (preservePage) {
+        const existingPage = searchParams.get('page');
+
+        if (existingPage) {
+          params.set('page', existingPage);
+        }
+      }
+
+      return params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    },
+    [pathname, query, type, year, searchParams]
+  );
+
   useEffect(() => {
     if (!supportsYear(type)) {
       previousDebouncedYear.current = debouncedYear;
@@ -81,45 +123,7 @@ const SearchControls = ({
     router.push(nextUrl, {
       scroll: false,
     });
-  }, [debouncedYear, type]);
-
-  function buildUrl({
-    nextQuery = query,
-    nextType = type,
-    nextYear = year,
-    preservePage = true,
-  }: {
-    nextQuery?: string;
-    nextType?: SearchMediaType;
-    nextYear?: string;
-    preservePage?: boolean;
-  } = {}) {
-    const params = new URLSearchParams();
-
-    const trimmedQuery = nextQuery.trim();
-
-    if (trimmedQuery) {
-      params.set('q', trimmedQuery);
-    }
-
-    if (nextType !== 'all') {
-      params.set('type', nextType);
-
-      if (supportsYear(nextType) && nextYear) {
-        params.set('year', nextYear);
-      }
-    }
-
-    if (preservePage) {
-      const existingPage = searchParams.get('page');
-
-      if (existingPage) {
-        params.set('page', existingPage);
-      }
-    }
-
-    return params.toString() ? `${pathname}?${params.toString()}` : pathname;
-  }
+  }, [debouncedYear, type, buildUrl, router]);
 
   function navigateWithFilters({
     nextType = type,

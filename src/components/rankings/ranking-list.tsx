@@ -1,6 +1,7 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { RankingItem } from '@/types';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type RankingListProps = {
@@ -38,12 +39,14 @@ const RankingList = ({ items, showType = false }: RankingListProps) => {
                 </span>
               </div>
 
-              <div className="relative h-[120px] w-[80px] shrink-0 overflow-hidden rounded-lg bg-surface sm:h-[150px] sm:w-[100px] sm:rounded-xl">
+              <div className="h-120px w-80px sm:h-150px sm:w-100px relative shrink-0 overflow-hidden rounded-lg bg-surface sm:rounded-xl">
                 {poster ? (
-                  <img
+                  <Image
                     src={poster}
                     alt={`${media.title} poster`}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    fill
+                    sizes="(max-width: 640px) 80px, 100px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center px-2 text-center text-xs text-muted-foreground">

@@ -3,6 +3,7 @@
 import type { TvScheduleItem } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
@@ -156,17 +157,18 @@ const TvScheduleCarousel = ({
               <Link
                 key={episode.id}
                 href={`/tv/${media.tmdbId}`}
-                className="group w-[290px] shrink-0 snap-start sm:w-[320px]"
+                className="group w-290px shrink-0 snap-start sm:w-[320px]"
               >
                 <article className="flex h-full flex-col">
                   <div className="overflow-hidden rounded-2xl border border-border/60 bg-surface">
-                    <div className="aspect-video overflow-hidden bg-surface-hover">
+                    <div className="relative aspect-video overflow-hidden bg-surface-hover">
                       {image ? (
-                        <img
+                        <Image
                           src={image}
                           alt=""
-                          loading="lazy"
-                          className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          fill
+                          sizes="(max-width: 640px) 290px, 320px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
@@ -175,7 +177,7 @@ const TvScheduleCarousel = ({
                       )}
                     </div>
 
-                    <div className="flex h-[148px] flex-col p-4 sm:h-[156px]">
+                    <div className="h-148px sm:h-156px flex flex-col p-4">
                       <p className="font-mono text-xs font-medium text-muted-foreground">
                         {formatEpisodeNumber(
                           episode.seasonNumber,

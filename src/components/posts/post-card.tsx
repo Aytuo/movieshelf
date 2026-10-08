@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { Post } from '@/types';
 import { MessageCircle, Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { PostReactionButton } from './post-reaction-button';
 
@@ -71,10 +72,12 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
         >
           <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-hover text-xs font-semibold">
             {author.avatarUrl ? (
-              <img
+              <Image
                 src={author.avatarUrl}
                 alt=""
-                className="h-full w-full object-cover"
+                width={36}
+                height={36}
+                className="size-9 object-cover"
               />
             ) : (
               author.username.slice(0, 1).toUpperCase()

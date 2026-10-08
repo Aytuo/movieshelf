@@ -2,6 +2,7 @@ import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { MediaInteraction, Post } from '@/types';
 import { MessageSquareText, Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import PostList from '../posts/post-list';
 import ReviewCard from '../reviews/review-card';
@@ -134,27 +135,34 @@ const MediaDetailsView = ({
       <section className="relative overflow-hidden border-b border-border/60">
         {backdrop && (
           <div className="absolute inset-0">
-            <img
+            <Image
               src={backdrop}
               alt=""
-              className="h-full w-full object-cover opacity-20"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover opacity-20"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/20" />
+            <div className="absolute inset-0 bg-linear-to-r from-background via-background/90 to-background/40" />
+            <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-background/20" />
           </div>
         )}
 
         <div className="relative container-content py-16 lg:py-24">
           <div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-14">
             {/* Poster */}
-            <div className="mx-auto w-full max-w-[280px]">
+            <div className="max-w-280px mx-auto w-full">
               <div className="poster-frame">
                 {poster && (
-                  <img
+                  <Image
                     src={poster}
                     alt={`${media.title} poster`}
-                    className="aspect-[2/3] w-full object-cover"
+                    width={500}
+                    height={750}
+                    priority
+                    sizes="(max-width: 1024px) 280px, 280px"
+                    className="aspect-2/3 w-full object-cover"
                   />
                 )}
               </div>

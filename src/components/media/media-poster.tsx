@@ -11,6 +11,7 @@ import {
   Tv,
   X,
 } from 'lucide-react';
+import Image from 'next/image';
 
 export type MediaPosterStatus =
   'watchlist' | 'watching' | 'watched' | 'dropped';
@@ -62,11 +63,12 @@ const MediaPoster = ({
       )}
     >
       {poster ? (
-        <img
+        <Image
           src={poster}
           alt={`${media.title} poster`}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          fill
+          sizes="(max-width: 640px) 50vw, 25vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
         />
       ) : (
         <div className="flex h-full items-center justify-center px-3 text-center text-sm text-muted-foreground">
@@ -74,7 +76,7 @@ const MediaPoster = ({
         </div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-80" />
 
       {showType && (
         <div

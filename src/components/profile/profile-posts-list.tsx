@@ -42,8 +42,6 @@ const ProfilePostsList = ({
       setPosts((current) => [...current, ...page.posts]);
 
       setNextCursor(page.nextCursor);
-
-      setNextCursor(page.nextCursor);
     } finally {
       setIsLoadingMore(false);
     }

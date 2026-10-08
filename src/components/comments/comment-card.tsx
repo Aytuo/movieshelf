@@ -3,6 +3,7 @@
 import { useComment } from '@/hooks/use-comment';
 import { cn } from '@/lib/utils';
 import type { Comment } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import { CommentActions } from './comment-actions';
 import { CommentDeleteConfirmation } from './comment-delete-confirmation';
@@ -90,9 +91,11 @@ const CommentCard = ({
             )}
           >
             {author.avatarUrl ? (
-              <img
+              <Image
                 src={author.avatarUrl}
                 alt=""
+                width={36}
+                height={36}
                 className="h-full w-full object-cover"
               />
             ) : (

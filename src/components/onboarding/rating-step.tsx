@@ -1,6 +1,7 @@
 import type { Media, MediaType } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type RatingStepProps = {
   media: Media[];
@@ -67,12 +68,14 @@ const RatingStep = ({
                   key={`${item.type}:${item.tmdbId}`}
                   className="flex items-center gap-4 rounded-xl p-3 surface sm:p-4"
                 >
-                  <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-surface-hover">
+                  <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-surface-hover">
                     {poster && (
-                      <img
+                      <Image
                         src={poster}
                         alt=""
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="56px"
+                        className="object-cover"
                       />
                     )}
                   </div>

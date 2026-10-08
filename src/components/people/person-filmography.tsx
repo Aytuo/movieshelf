@@ -1,6 +1,7 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { PersonCredit } from '@/types';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type PersonFilmographyProps = {
@@ -42,12 +43,14 @@ function FilmographyTable({ credits }: { credits: PersonCredit[] }) {
                 {year ?? '—'}
               </span>
 
-              <div className="h-[64px] w-11 overflow-hidden rounded-md bg-surface-hover sm:h-[72px] sm:w-12">
+              <div className="h-64px sm:h-72px relative w-11 overflow-hidden rounded-md bg-surface-hover sm:w-12">
                 {credit.posterPath ? (
-                  <img
-                    src={tmdbImage(credit.posterPath, 'w185') ?? undefined}
+                  <Image
+                    src={tmdbImage(credit.posterPath, 'w185')!}
                     alt=""
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="48px"
+                    className="object-cover"
                   />
                 ) : null}
               </div>

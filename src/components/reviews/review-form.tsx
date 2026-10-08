@@ -7,7 +7,7 @@ import { reviewSchema } from '@/lib/validations/review';
 import type { ReviewInput } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -38,6 +38,11 @@ const ReviewForm = ({
       rating: initialValues?.rating ?? 8,
       containsSpoilers: initialValues?.containsSpoilers ?? false,
     },
+  });
+
+  const rating = useWatch({
+    control: form.control,
+    name: 'rating',
   });
 
   useEffect(() => {
@@ -127,7 +132,7 @@ const ReviewForm = ({
               }
               className={cn(
                 'flex size-9 items-center justify-center rounded-lg border text-xs font-semibold transition-colors',
-                form.watch('rating') === value
+                rating === value
                   ? 'border-rating/40 bg-rating-muted text-rating'
                   : 'border-border bg-surface text-muted-foreground hover:bg-surface-hover'
               )}

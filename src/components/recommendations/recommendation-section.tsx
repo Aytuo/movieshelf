@@ -1,5 +1,6 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import { MediaRecommendation } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type RecommendationSectionProps = {
@@ -44,17 +45,18 @@ const RecommendationSection = ({
               className="group"
             >
               <article>
-                <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
+                <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-surface">
                   {poster && (
-                    <img
+                    <Image
                       src={poster}
                       alt={`${media.title} poster`}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      fill
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                     />
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
                 </div>
 
                 <h3 className="mt-3 line-clamp-1 text-sm font-semibold transition-colors group-hover:text-primary">

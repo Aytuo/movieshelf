@@ -1,4 +1,5 @@
 import { ChevronDown, EyeOff, Star } from 'lucide-react';
+import Image from 'next/image';
 
 type ReviewCardProps = {
   review: {
@@ -23,9 +24,11 @@ const ReviewCard = ({ review, profile }: ReviewCardProps) => {
         <div className="flex items-center gap-3">
           <div className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-surface-hover text-xs font-semibold">
             {profile.avatarUrl ? (
-              <img
+              <Image
                 src={profile.avatarUrl}
                 alt=""
+                width={36}
+                height={36}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -64,7 +67,7 @@ const ReviewCard = ({ review, profile }: ReviewCardProps) => {
               <span>Contains spoilers — click to reveal</span>
             </span>
 
-            <ChevronDown className="size-4 shrink-0 transition-transform duration-200 [[open]_&]:rotate-180" />
+            <ChevronDown className="size-4 shrink-0 transition-transform duration-200 in-[[open]]:rotate-180" />
           </summary>
 
           <p className="mt-4 border-t border-border/60 pt-4 text-sm leading-7 whitespace-pre-line text-muted-foreground">

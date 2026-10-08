@@ -1,6 +1,7 @@
 import type { MediaType } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { Check, Clock3, Film, Tv } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type HistoryCardProps = {
@@ -37,13 +38,15 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
     <Link href={href} className="group flex gap-4 rounded-2xl p-4 surface">
       <div className="relative w-20 shrink-0 overflow-hidden rounded-xl bg-surface-hover">
         {poster ? (
-          <img
+          <Image
             src={poster}
             alt={`${media.title} poster`}
-            className="aspect-[2/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            fill
+            sizes="80px"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex aspect-[2/3] items-center justify-center px-2 text-center text-[10px] text-muted-foreground">
+          <div className="flex aspect-2/3 items-center justify-center px-2 text-center text-[10px] text-muted-foreground">
             No poster
           </div>
         )}

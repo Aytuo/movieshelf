@@ -3,6 +3,7 @@
 import type { Media } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type OnboardingMediaCardProps = {
   media: Media;
@@ -29,20 +30,22 @@ const OnboardingMediaCard = ({
           : 'hover:ring-border-strong ring-1 ring-border'
       )}
     >
-      <div className="aspect-[2/3] bg-surface">
+      <div className="relative aspect-2/3 bg-surface">
         {poster && (
-          <img
+          <Image
             src={poster}
             alt={`${media.title} poster`}
+            fill
+            sizes="(max-width: 640px) 50vw, 220px"
             className={cn(
-              'h-full w-full object-cover transition-all duration-300',
+              'object-cover transition-all duration-300',
               selected ? 'scale-[1.02]' : 'group-hover:scale-[1.03]'
             )}
           />
         )}
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-transparent to-transparent" />
 
       {selected && (
         <div className="absolute top-3 right-3 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground">

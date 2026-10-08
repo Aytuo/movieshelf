@@ -1,5 +1,6 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { PersonSearchItem } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type PeopleSearchResultsProps = {
@@ -18,12 +19,14 @@ const PeopleSearchResults = ({ people }: PeopleSearchResultsProps) => {
             href={`/person/${person.id}`}
             className="group flex items-center gap-4 rounded-2xl p-4 transition-transform duration-200 surface hover:-translate-y-0.5"
           >
-            <div className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-hover">
+            <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-surface-hover">
               {portrait ? (
-                <img
+                <Image
                   src={portrait}
                   alt={`${person.name} portrait`}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  fill
+                  sizes="64px"
+                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                 />
               ) : null}
             </div>

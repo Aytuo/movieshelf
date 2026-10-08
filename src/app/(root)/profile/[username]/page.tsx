@@ -5,6 +5,7 @@ import { requireSession } from '@/lib/auth/require-session';
 import { getPublicProfile } from '@/lib/services/profile-service';
 import { Film, Heart, History, Star, Tv } from 'lucide-react';
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -42,9 +43,11 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
           <div className="flex min-w-0 items-end gap-5">
             <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-2xl font-bold">
               {profile.avatarUrl ? (
-                <img
+                <Image
                   src={profile.avatarUrl}
                   alt=""
+                  width={96}
+                  height={96}
                   className="h-full w-full object-cover"
                 />
               ) : (

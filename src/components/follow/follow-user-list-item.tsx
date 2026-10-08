@@ -1,6 +1,7 @@
 'use client';
 
 import type { FollowUser } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import { FollowButton } from './follow-button';
 
@@ -23,10 +24,12 @@ export function FollowUserListItem({
       >
         <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-hover text-sm font-semibold">
           {user.avatarUrl ? (
-            <img
+            <Image
               src={user.avatarUrl}
               alt=""
-              className="h-full w-full object-cover"
+              width={40}
+              height={40}
+              className="size-10 object-cover"
             />
           ) : (
             user.username.slice(0, 1).toUpperCase()

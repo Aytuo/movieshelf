@@ -1,4 +1,5 @@
 import { ArrowRight, Bookmark, Check, Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const featuredMovies = [
@@ -108,10 +109,12 @@ const Hero = () => {
                 className={`absolute w-45 poster-frame transition-transform duration-500 hover:z-40 hover:scale-[1.03] sm:w-52.5 lg:w-57.5 ${movie.className}`}
               >
                 <div className="relative aspect-2/3">
-                  <img
+                  <Image
                     src={movie.image}
                     alt={`${movie.title} poster`}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 640px) 80vw, 230px"
+                    className="object-cover"
                   />
 
                   <div className="poster-overlay" />
@@ -153,10 +156,12 @@ const Hero = () => {
 
                 <div className="flex -space-x-2">
                   {featuredMovies.map((movie) => (
-                    <img
+                    <Image
                       key={movie.title}
                       src={movie.image}
                       alt=""
+                      width={28}
+                      height={28}
                       className="size-7 rounded-full border-2 border-background object-cover"
                     />
                   ))}

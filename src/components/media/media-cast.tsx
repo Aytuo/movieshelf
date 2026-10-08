@@ -1,5 +1,6 @@
 import type { MediaCastMember } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type MediaCastProps = {
@@ -33,12 +34,14 @@ const MediaCast = ({ cast }: MediaCastProps) => {
                 className="group"
               >
                 <article>
-                  <div className="aspect-[2/3] overflow-hidden rounded-xl bg-surface">
+                  <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-surface">
                     {image ? (
-                      <img
+                      <Image
                         src={image}
                         alt={person.name}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        fill
+                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 16vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center px-4 text-center text-xs text-muted-foreground">

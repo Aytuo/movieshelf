@@ -9,7 +9,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -83,6 +83,21 @@ const PasswordSettings = () => {
       newPassword: '',
       confirmPassword: '',
     },
+  });
+
+  const currentPassword = useWatch({
+    control: form.control,
+    name: 'currentPassword',
+  });
+
+  const newPassword = useWatch({
+    control: form.control,
+    name: 'newPassword',
+  });
+
+  const confirmPassword = useWatch({
+    control: form.control,
+    name: 'confirmPassword',
   });
 
   useEffect(() => {
@@ -184,7 +199,7 @@ const PasswordSettings = () => {
           id="currentPassword"
           label="Current password"
           type="currentPassword"
-          value={form.watch('currentPassword')}
+          value={currentPassword}
           onChange={(value) => {
             form.setValue('currentPassword', value, {
               shouldValidate: true,
@@ -199,7 +214,7 @@ const PasswordSettings = () => {
         id="newPassword"
         label={hasCredential ? 'New password' : 'Password'}
         type="newPassword"
-        value={form.watch('newPassword')}
+        value={newPassword}
         onChange={(value) => {
           form.setValue('newPassword', value, {
             shouldValidate: true,
@@ -213,7 +228,7 @@ const PasswordSettings = () => {
         id="confirmPassword"
         label="Confirm password"
         type="confirmPassword"
-        value={form.watch('confirmPassword')}
+        value={confirmPassword}
         onChange={(value) => {
           form.setValue('confirmPassword', value, {
             shouldValidate: true,

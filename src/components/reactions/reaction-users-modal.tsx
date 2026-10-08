@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import type { ReactionUser } from '@/types';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type ReactionUsersModalProps = {
@@ -72,9 +73,11 @@ export function ReactionUsersModal({
                   >
                     <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-hover text-xs font-semibold">
                       {user.avatarUrl ? (
-                        <img
+                        <Image
                           src={user.avatarUrl}
                           alt=""
+                          width={40}
+                          height={40}
                           className="h-full w-full object-cover"
                         />
                       ) : (

@@ -1,5 +1,6 @@
 import { tmdbImage } from '@/lib/tmdb/images';
 import type { PersonCredit } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import PersonFilmography from './person-filmography';
 
@@ -42,12 +43,14 @@ function CreditGrid({ credits }: { credits: PersonCredit[] }) {
             href={`/${credit.type === 'movie' ? 'movie' : 'tv'}/${credit.tmdbId}`}
             className="group overflow-hidden rounded-2xl transition-transform duration-200 surface hover:-translate-y-0.5"
           >
-            <div className="aspect-[2/3] overflow-hidden bg-surface-hover">
+            <div className="relative aspect-2/3 overflow-hidden bg-surface-hover">
               {poster ? (
-                <img
+                <Image
                   src={poster}
                   alt={`${credit.title} poster`}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  fill
+                  sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                 />
               ) : null}
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Bookmark, Heart, Search, Star } from 'lucide-react';
+import Image from 'next/image';
 
 const movies = [
   {
@@ -35,7 +36,7 @@ const ShelfPreview = () => {
     <section id="shelf" className="overflow-hidden border-b border-border/60">
       <div className="container-content py-24 lg:py-32">
         <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="overflow-hidden rounded-2xl border border-border bg-[#090a0d] shadow-[0_30px_100px_rgb(0_0_0_/_35%)]">
+          <div className="overflow-hidden rounded-2xl border border-border bg-[#090a0d] shadow-[0_30px_100px_rgb(0_0_0/35%)]">
             {/* Fake application chrome */}
             <div className="flex h-12 items-center justify-between border-b border-border/70 px-4">
               <div className="flex items-center gap-2">
@@ -80,11 +81,13 @@ const ShelfPreview = () => {
                 <div className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-5">
                   {movies.map((movie) => (
                     <div key={movie.title}>
-                      <div className="aspect-[2/3] overflow-hidden rounded-lg">
-                        <img
+                      <div className="relative aspect-2/3 overflow-hidden rounded-lg">
+                        <Image
                           src={movie.image}
                           alt=""
-                          className="h-full w-full object-cover"
+                          fill
+                          sizes="(max-width: 640px) 30vw, 150px"
+                          className="object-cover"
                         />
                       </div>
 
