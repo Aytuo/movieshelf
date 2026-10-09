@@ -34,7 +34,7 @@ const MediaCast = ({ cast }: MediaCastProps) => {
                 className="group"
               >
                 <article>
-                  <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-surface">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
                     {image ? (
                       <Image
                         src={image}

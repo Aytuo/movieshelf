@@ -104,7 +104,7 @@ const ActivityTimeline = ({ activities }: MediaActivityTimelineProps) => {
 
               {/* Activity card */}
               <div className="flex min-w-0 flex-1 gap-4 rounded-2xl p-4 surface">
-                <div className="relative aspect-2/3 w-20 shrink-0 self-start overflow-hidden rounded-lg">
+                <div className="relative aspect-[2/3] w-20 shrink-0 self-start overflow-hidden rounded-lg">
                   <Link href={href} className="block">
                     {poster ? (
                       <Image

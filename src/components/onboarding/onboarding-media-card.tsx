@@ -30,7 +30,7 @@ const OnboardingMediaCard = ({
           : 'hover:ring-border-strong ring-1 ring-border'
       )}
     >
-      <div className="relative aspect-2/3 bg-surface">
+      <div className="relative aspect-[2/3] bg-surface">
         {poster && (
           <Image
             src={poster}

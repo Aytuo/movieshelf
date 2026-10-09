@@ -34,7 +34,7 @@ const Hero = () => {
     <section className="relative isolate overflow-hidden border-b border-border/40">
       {/* Background atmosphere */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-[-25%] left-1/2 h-162.5 w-162.5 -translate-x-1/2 rounded-full bg-primary/10 blur-[140px]" />
+        <div className="absolute top-[-25%] left-1/2 h-[650px] w-[650px] -translate-x-1/2 rounded-full bg-primary/10 blur-[140px]" />
 
         <div className="absolute bottom-[-30%] left-[-10%] h-125 w-125 rounded-full bg-primary/5 blur-[120px]" />
 
@@ -106,9 +106,9 @@ const Hero = () => {
             {featuredMovies.map((movie) => (
               <div
                 key={movie.title}
-                className={`absolute w-45 poster-frame transition-transform duration-500 hover:z-40 hover:scale-[1.03] sm:w-52.5 lg:w-57.5 ${movie.className}`}
+                className={`absolute w-45 poster-frame transition-transform duration-500 hover:z-40 hover:scale-[1.03] sm:w-[210px] lg:w-[230px] ${movie.className}`}
               >
-                <div className="relative aspect-2/3">
+                <div className="relative aspect-[2/3]">
                   <Image
                     src={movie.image}
                     alt={`${movie.title} poster`}

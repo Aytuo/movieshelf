@@ -157,7 +157,7 @@ const TvScheduleCarousel = ({
               <Link
                 key={episode.id}
                 href={`/tv/${media.tmdbId}`}
-                className="group w-290px shrink-0 snap-start sm:w-[320px]"
+                className="group w-[290px] shrink-0 snap-start sm:w-[320px]"
               >
                 <article className="flex h-full flex-col">
                   <div className="overflow-hidden rounded-2xl border border-border/60 bg-surface">
@@ -177,7 +177,7 @@ const TvScheduleCarousel = ({
                       )}
                     </div>
 
-                    <div className="h-148px sm:h-156px flex flex-col p-4">
+                    <div className="flex h-[148px] flex-col p-4 sm:h-[156px]">
                       <p className="font-mono text-xs font-medium text-muted-foreground">
                         {formatEpisodeNumber(
                           episode.seasonNumber,

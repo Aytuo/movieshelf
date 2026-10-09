@@ -48,7 +48,7 @@ const TasteSection = () => {
                       <span className="text-muted-foreground">{value}%</span>
                     </div>
 
-                    <div className="h-1.5 overflow-hidden rounded-full bg-surface-hover">
+                    <div className="h-[6px] overflow-hidden rounded-full bg-surface-hover">
                       <div
                         className="h-full rounded-full bg-primary"
                         style={{ width: `${value}%` }}

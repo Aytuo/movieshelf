@@ -14,7 +14,7 @@ const AuthVisual = () => {
 
       <div className="absolute inset-0 bg-black/25" />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/5 to-black/20" />
+      <div className="absolute inset-0 bg-linear-to-t from-black via-black/5 to-black/20" />
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_38%,rgba(239,68,68,0.12),transparent_45%)]" />
 
@@ -24,7 +24,7 @@ const AuthVisual = () => {
       </div>
 
       {/* Editorial frame */}
-      <div className="absolute inset-8 rounded-[1.75rem] border border-white/[0.08]" />
+      <div className="absolute inset-8 rounded-[1.75rem] border border-white/8" />
 
       {/* Bottom metadata */}
       <div className="absolute inset-x-0 bottom-0 p-10 xl:p-14">

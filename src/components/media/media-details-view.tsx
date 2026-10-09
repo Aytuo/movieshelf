@@ -152,7 +152,7 @@ const MediaDetailsView = ({
         <div className="relative container-content py-16 lg:py-24">
           <div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-14">
             {/* Poster */}
-            <div className="max-w-280px mx-auto w-full">
+            <div className="mx-auto w-full max-w-70">
               <div className="poster-frame">
                 {poster && (
                   <Image
@@ -162,7 +162,7 @@ const MediaDetailsView = ({
                     height={750}
                     priority
                     sizes="(max-width: 1024px) 280px, 280px"
-                    className="aspect-2/3 w-full object-cover"
+                    className="aspect-[2/3] w-full object-cover"
                   />
                 )}
               </div>

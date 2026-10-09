@@ -57,7 +57,7 @@ const SelectionStep = ({
           </p>
 
           <div className="mt-6 flex items-center gap-3">
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-hover">
+            <div className="h-[6px] flex-1 overflow-hidden rounded-full bg-surface-hover">
               <div
                 className="h-full rounded-full bg-primary transition-[width] duration-300"
                 style={{

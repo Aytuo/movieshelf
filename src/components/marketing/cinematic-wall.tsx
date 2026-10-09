@@ -18,9 +18,9 @@ const CinematicWall = () => {
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_45%,rgba(239,68,68,0.16),transparent_48%)]" />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/35 to-background/10" />
+      <div className="absolute inset-0 bg-linear-to-r from-background via-background/35 to-background/10" />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/20" />
+      <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-background/20" />
 
       {/* Film grain */}
       <div className="absolute inset-0 opacity-[0.055] mix-blend-soft-light">
@@ -28,7 +28,7 @@ const CinematicWall = () => {
       </div>
 
       {/* Cinematic frame */}
-      <div className="cinematic-wall-frame absolute inset-6 rounded-[2rem] border border-white/[0.08] opacity-0 sm:inset-8 lg:inset-12" />
+      <div className="cinematic-wall-frame absolute inset-6 rounded-[2rem] border border-white/8 opacity-0 sm:inset-8 lg:inset-12" />
     </div>
   );
 };

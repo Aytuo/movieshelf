@@ -81,7 +81,7 @@ const ShelfPreview = () => {
                 <div className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-5">
                   {movies.map((movie) => (
                     <div key={movie.title}>
-                      <div className="relative aspect-2/3 overflow-hidden rounded-lg">
+                      <div className="relative aspect-[2/3] overflow-hidden rounded-lg">
                         <Image
                           src={movie.image}
                           alt=""

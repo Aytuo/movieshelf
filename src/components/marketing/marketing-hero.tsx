@@ -235,9 +235,9 @@ const MarketingHero = () => {
       <CinematicWall />
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="size-720px absolute top-[-20%] left-[45%] rounded-full bg-primary/10 blur-[150px]" />
+        <div className="absolute top-[-20%] left-[45%] size-[720px] rounded-full bg-primary/10 blur-[150px]" />
 
-        <div className="size-450px absolute top-[25%] right-[-10%] rounded-full bg-primary/8 blur-[130px]" />
+        <div className="absolute top-[25%] right-[-10%] size-[450px] rounded-full bg-primary/8 blur-[130px]" />
 
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,var(--background)_76%)]" />
       </div>
@@ -291,7 +291,7 @@ const MarketingHero = () => {
               <div
                 key={poster.title}
                 data-initial-rotation={rotations[index]}
-                className="marketing-poster w-190px sm:w-215px absolute top-1/2 left-1/2 overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_rgb(0_0_0/55%)]"
+                className="marketing-poster absolute top-1/2 left-1/2 w-[190px] overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_rgb(0_0_0/55%)] sm:w-[215px]"
                 style={{
                   transform: `
                     translate(-50%, -50%)
@@ -303,7 +303,7 @@ const MarketingHero = () => {
                   `,
                 }}
               >
-                <div className="relative aspect-2/3">
+                <div className="relative aspect-[2/3]">
                   <Image
                     src={poster.image}
                     alt=""

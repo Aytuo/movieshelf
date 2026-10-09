@@ -45,7 +45,7 @@ const RecommendationSection = ({
               className="group"
             >
               <article>
-                <div className="relative aspect-2/3 overflow-hidden rounded-xl bg-surface">
+                <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-surface">
                   {poster && (
                     <Image
                       src={poster}

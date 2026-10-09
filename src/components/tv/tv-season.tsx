@@ -82,7 +82,7 @@ const TvSeason = ({ tvId, season }: TvSeasonProps) => {
               className="object-cover"
             />
           ) : (
-            <div className="aspect-2/3 w-full" />
+            <div className="aspect-[2/3] w-full" />
           )}
         </div>
 

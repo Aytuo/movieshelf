@@ -39,7 +39,7 @@ const RankingList = ({ items, showType = false }: RankingListProps) => {
                 </span>
               </div>
 
-              <div className="h-120px w-80px sm:h-150px sm:w-100px relative shrink-0 overflow-hidden rounded-lg bg-surface sm:rounded-xl">
+              <div className="relative h-30 w-20 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-[150px] sm:w-[100px] sm:rounded-xl">
                 {poster ? (
                   <Image
                     src={poster}

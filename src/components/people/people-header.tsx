@@ -35,7 +35,7 @@ const PersonHeader = ({ person }: PersonHeaderProps) => {
     <section className="border-b border-border/60">
       <div className="container-content py-12 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
-          <div className="max-w-220px mx-auto w-full">
+          <div className="mx-auto w-full max-w-55">
             <div className="overflow-hidden rounded-2xl bg-surface shadow-sm">
               {portrait ? (
                 <Image
@@ -44,10 +44,10 @@ const PersonHeader = ({ person }: PersonHeaderProps) => {
                   width={500}
                   height={750}
                   sizes="(max-width: 1024px) 220px, 220px"
-                  className="aspect-2/3 w-full object-cover"
+                  className="aspect-[2/3] w-full object-cover"
                 />
               ) : (
-                <div className="aspect-2/3 bg-surface-hover" />
+                <div className="aspect-[2/3] bg-surface-hover" />
               )}
             </div>
           </div>

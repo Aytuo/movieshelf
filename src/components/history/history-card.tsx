@@ -46,7 +46,7 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
             className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex aspect-2/3 items-center justify-center px-2 text-center text-[10px] text-muted-foreground">
+          <div className="flex aspect-[2/3] items-center justify-center px-2 text-center text-[10px] text-muted-foreground">
             No poster
           </div>
         )}

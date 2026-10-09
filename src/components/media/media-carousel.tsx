@@ -142,7 +142,7 @@ const MediaCarousel = ({
             <Link
               key={`${item.type}:${item.tmdbId}`}
               href={href}
-              className="group w-[155px] shrink-0 snap-start sm:w-[180px] lg:w-[200px]"
+              className="group w-[155px] shrink-0 snap-start sm:w-45 lg:w-50"
             >
               <article>
                 <MediaPoster

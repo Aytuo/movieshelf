@@ -76,7 +76,7 @@ const GlobalSearchResults = ({
               media={media}
               compact
               showType
-              className="h-72px w-12 shrink-0 rounded-lg"
+              className="h-18 w-12 shrink-0 rounded-lg"
             />
 
             <div className="min-w-0 flex-1">

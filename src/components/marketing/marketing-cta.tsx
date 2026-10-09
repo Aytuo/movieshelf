@@ -10,7 +10,7 @@ const MarketingCta = () => {
         <div className="mx-auto max-w-3xl text-center">
           <p className="eyebrow">Start your collection</p>
 
-          <h2 className="mt-5 font-heading text-5xl font-bold tracking-[-0.05em] sm:text-6xl">
+          <h2 className="mt-5 font-heading text-5xl font-bold tracking-tighter sm:text-6xl">
             Start building
             <br />
             <span className="text-gradient-primary">your shelf.</span>

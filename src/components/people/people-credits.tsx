@@ -43,7 +43,7 @@ function CreditGrid({ credits }: { credits: PersonCredit[] }) {
             href={`/${credit.type === 'movie' ? 'movie' : 'tv'}/${credit.tmdbId}`}
             className="group overflow-hidden rounded-2xl transition-transform duration-200 surface hover:-translate-y-0.5"
           >
-            <div className="relative aspect-2/3 overflow-hidden bg-surface-hover">
+            <div className="relative aspect-[2/3] overflow-hidden bg-surface-hover">
               {poster ? (
                 <Image
                   src={poster}

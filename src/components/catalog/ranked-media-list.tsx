@@ -62,7 +62,7 @@ const RankedMediaList = ({
                 href={href}
                 className="group"
               >
-                <article className="min-h-240px relative isolate overflow-hidden rounded-2xl border border-border/60 bg-surface">
+                <article className="relative isolate min-h-60 overflow-hidden rounded-2xl border border-border/60 bg-surface">
                   {/* Giant ranking number */}
                   <span
                     aria-hidden="true"
@@ -71,9 +71,9 @@ const RankedMediaList = ({
                     {rank}
                   </span>
 
-                  <div className="min-h-240px relative z-10 flex items-center gap-5 p-5 sm:p-6">
+                  <div className="relative z-10 flex min-h-60 items-center gap-5 p-5 sm:p-6">
                     {/* Poster */}
-                    <div className="h-190px w-128px relative shrink-0 overflow-hidden rounded-xl shadow-2xl">
+                    <div className="relative h-[190px] w-32 shrink-0 overflow-hidden rounded-xl shadow-2xl">
                       {posterUrl ? (
                         <Image
                           src={posterUrl}
