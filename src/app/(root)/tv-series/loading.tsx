@@ -1,9 +1,9 @@
 import {
   MediaCarouselSkeleton,
   PageHeaderSkeleton,
-  RankingListSkeleton,
+  RankedMediaGridSkeleton,
+  TvScheduleCarouselSkeleton,
 } from '@/components/ui/page-skeletons';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Loading() {
   return (
@@ -11,21 +11,22 @@ export default function Loading() {
       <PageHeaderSkeleton />
 
       <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
-        <MediaCarouselSkeleton />
+        {/* Most popular */}
         <MediaCarouselSkeleton />
 
-        <section>
-          <div className="mb-7">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="mt-3 h-8 w-56" />
-            <Skeleton className="mt-2 h-4 w-80 max-w-full" />
-          </div>
-
-          <RankingListSkeleton count={6} />
-        </section>
-
+        {/* Trending */}
         <MediaCarouselSkeleton />
-        <MediaCarouselSkeleton />
+
+        {/* Weekly top 10 */}
+        <RankedMediaGridSkeleton count={10} />
+
+        {/* Airing today */}
+        <TvScheduleCarouselSkeleton />
+
+        {/* Currently airing */}
+        <TvScheduleCarouselSkeleton />
+
+        {/* Top rated */}
         <MediaCarouselSkeleton />
       </div>
     </main>

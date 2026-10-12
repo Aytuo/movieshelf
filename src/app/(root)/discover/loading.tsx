@@ -16,8 +16,8 @@ export default function Loading() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[250px_1fr]">
-          <aside className="hidden lg:block">
-            <Skeleton className="h-130 w-full rounded-2xl" />
+          <aside>
+            <Skeleton className="h-150 w-full rounded-2xl" />
           </aside>
 
           <div className="min-w-0">
