@@ -34,7 +34,7 @@ export const auth = betterAuth({
     requireEmailVerification: true,
 
     sendResetPassword: async ({ user, url }) => {
-      void sendEmail({
+      await sendEmail({
         to: user.email,
         subject: passwordResetEmailSubject,
         react: PasswordResetEmail({
@@ -55,7 +55,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      void sendEmail({
+      await sendEmail({
         to: user.email,
         subject: verificationEmailSubject,
         react: VerificationEmail({
@@ -74,7 +74,7 @@ export const auth = betterAuth({
     afterEmailVerification: async (user) => {
       const url = new URL('/home', process.env.BETTER_AUTH_URL).toString();
 
-      void sendEmail({
+      await sendEmail({
         to: user.email,
         subject: welcomeEmailSubject,
         react: WelcomeEmail({
