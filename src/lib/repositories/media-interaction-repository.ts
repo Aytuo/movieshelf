@@ -399,70 +399,62 @@ export async function toggleMediaFavorite({
   userId: string;
   mediaId: string;
 }) {
-  const existing = await db
-    .select({
-      favorite: mediaInteraction.favorite,
-    })
-    .from(mediaInteraction)
-    .where(
-      and(
-        eq(mediaInteraction.userId, userId),
-        eq(mediaInteraction.mediaId, mediaId)
-      )
-    )
-    .limit(1);
-
   const now = new Date();
 
-  if (!existing[0]) {
-    await db.batch([
-      db.insert(mediaInteraction).values({
-        userId,
-        mediaId,
-        status: 'watchlist',
-        favorite: true,
-        rating: null,
-        watchedAt: null,
-        createdAt: now,
-        updatedAt: now,
-      }),
+  const result = await db.execute(sql<{ type: string }>`
+    WITH toggled AS (
+      INSERT INTO media_interaction (
+        user_id,
+        media_id,
+        status,
+        favorite,
+        rating,
+        watched_at,
+        created_at,
+        updated_at
+      )
+      VALUES (
+        ${userId},
+        ${mediaId},
+        'watchlist',
+        true,
+        NULL,
+        NULL,
+        ${now},
+        ${now}
+      )
+      ON CONFLICT (user_id, media_id)
+      DO UPDATE SET
+        favorite = NOT media_interaction.favorite,
+        updated_at = EXCLUDED.updated_at
+      RETURNING favorite
+    )
+    INSERT INTO media_activity (
+      user_id,
+      media_id,
+      type,
+      created_at
+    )
+    SELECT
+      ${userId},
+      ${mediaId},
+      CASE
+        WHEN toggled.favorite
+          THEN 'favorite_added'::media_activity_type
+        ELSE 'favorite_removed'::media_activity_type
+      END,
+      ${now}
+    FROM toggled
+    RETURNING type::text AS type
+  `);
 
-      db.insert(mediaActivity).values({
-        userId,
-        mediaId,
-        type: 'favorite_added',
-        createdAt: now,
-      }),
-    ]);
+  const activity = result.rows[0];
 
-    return true;
+  if (!activity) {
+    throw new Error('Unable to update favorite state.');
   }
 
-  const favorite = !existing[0].favorite;
-
-  await db.batch([
-    db
-      .update(mediaInteraction)
-      .set({
-        favorite,
-        updatedAt: now,
-      })
-      .where(
-        and(
-          eq(mediaInteraction.userId, userId),
-          eq(mediaInteraction.mediaId, mediaId)
-        )
-      ),
-
-    db.insert(mediaActivity).values({
-      userId,
-      mediaId,
-      type: favorite ? 'favorite_added' : 'favorite_removed',
-      createdAt: now,
-    }),
-  ]);
-
-  return favorite;
+  return activity.type === 'favorite_added';
 }
 
 export async function removeMediaFromShelf({
