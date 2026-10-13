@@ -1,6 +1,10 @@
+import 'server-only';
+
 import { del, put } from '@vercel/blob';
 
 export const MAX_AVATAR_SIZE = 3 * 1024 * 1024;
+
+const FETCH_TIMEOUT_MS = 10_000;
 
 const ALLOWED_CONTENT_TYPES = new Set([
   'image/jpeg',
@@ -14,27 +18,177 @@ const EXTENSIONS: Record<string, string> = {
   'image/webp': 'webp',
 };
 
-function validateImage(contentType: string, size: number) {
+const ALLOWED_PROVIDER_AVATAR_HOSTS = new Set([
+  'lh3.googleusercontent.com',
+  'cdn.discordapp.com',
+]);
+
+function normalizeContentType(value: string | null | undefined) {
+  return (value ?? '').split(';', 1)[0].trim().toLowerCase();
+}
+
+function validateContentType(contentType: string) {
   if (!ALLOWED_CONTENT_TYPES.has(contentType)) {
     throw new Error('Unsupported image format.');
   }
+}
 
-  if (size > MAX_AVATAR_SIZE) {
+function detectImageContentType(bytes: Uint8Array): string | null {
+  // JPEG
+  if (
+    bytes.length >= 3 &&
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes[2] === 0xff
+  ) {
+    return 'image/jpeg';
+  }
+
+  // PNG
+  if (
+    bytes.length >= 8 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a
+  ) {
+    return 'image/png';
+  }
+
+  // WebP
+  if (
+    bytes.length >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  ) {
+    return 'image/webp';
+  }
+
+  return null;
+}
+
+function validateImageBytes(bytes: Uint8Array, contentType: string) {
+  validateContentType(contentType);
+
+  if (bytes.byteLength > MAX_AVATAR_SIZE) {
     throw new Error('Avatar image cannot exceed 3 MB.');
+  }
+
+  if (detectImageContentType(bytes) !== contentType) {
+    throw new Error('Image content does not match its declared format.');
   }
 }
 
-export async function storeAvatarFile(userId: string, file: File) {
-  validateImage(file.type, file.size);
+function parseProviderAvatarUrl(value: string): URL {
+  let url: URL;
 
-  const extension = EXTENSIONS[file.type];
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error('Invalid provider avatar URL.');
+  }
+
+  if (
+    url.protocol !== 'https:' ||
+    url.username !== '' ||
+    url.password !== '' ||
+    url.port !== '' ||
+    !ALLOWED_PROVIDER_AVATAR_HOSTS.has(url.hostname.toLowerCase())
+  ) {
+    throw new Error('Avatar URL is not from a supported provider.');
+  }
+
+  return url;
+}
+
+async function readLimitedResponseBody(
+  response: Response
+): Promise<ArrayBuffer> {
+  const contentLength = response.headers.get('content-length');
+
+  if (contentLength !== null) {
+    const declaredSize = Number(contentLength);
+
+    if (!Number.isSafeInteger(declaredSize) || declaredSize < 0) {
+      throw new Error('Invalid avatar image size.');
+    }
+
+    if (declaredSize > MAX_AVATAR_SIZE) {
+      throw new Error('Avatar image cannot exceed 3 MB.');
+    }
+  }
+
+  if (!response.body) {
+    throw new Error('Provider avatar has no image data.');
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalSize = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      totalSize += value.byteLength;
+
+      if (totalSize > MAX_AVATAR_SIZE) {
+        await reader.cancel().catch(() => undefined);
+        throw new Error('Avatar image cannot exceed 3 MB.');
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const buffer = new ArrayBuffer(totalSize);
+  const result = new Uint8Array(buffer);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return buffer;
+}
+
+export async function storeAvatarFile(userId: string, file: File) {
+  const contentType = normalizeContentType(file.type);
+  validateContentType(contentType);
+
+  if (file.size > MAX_AVATAR_SIZE) {
+    throw new Error('Avatar image cannot exceed 3 MB.');
+  }
+
+  const bytes = await file.arrayBuffer();
+  validateImageBytes(new Uint8Array(bytes), contentType);
+
+  const extension = EXTENSIONS[contentType];
+  const image = new Blob([bytes], { type: contentType });
 
   const blob = await put(
     `avatars/${userId}/${crypto.randomUUID()}.${extension}`,
-    file,
+    image,
     {
       access: 'public',
-      contentType: file.type,
+      contentType,
       addRandomSuffix: false,
     }
   );
@@ -42,32 +196,46 @@ export async function storeAvatarFile(userId: string, file: File) {
   return blob.url;
 }
 
-export async function storeAvatarFromUrl(userId: string, url: string) {
-  const parsed = new URL(url);
+export async function storeAvatarFromUrl(userId: string, value: string) {
+  const url = parseProviderAvatarUrl(value);
 
-  if (parsed.protocol !== 'https:') {
-    throw new Error('Avatar URL must use HTTPS.');
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      cache: 'no-store',
+      redirect: 'error',
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+  } catch {
+    throw new Error('Unable to securely download the provider avatar.');
   }
 
-  const response = await fetch(parsed, {
-    cache: 'no-store',
-  });
-
   if (!response.ok) {
+    await response.body?.cancel().catch(() => undefined);
     throw new Error('Unable to download the provider avatar.');
   }
 
-  const contentType = response.headers.get('content-type')?.split(';')[0] ?? '';
+  const contentType = normalizeContentType(
+    response.headers.get('content-type')
+  );
 
-  const blob = await response.blob();
+  try {
+    validateContentType(contentType);
+  } catch (error) {
+    await response.body?.cancel().catch(() => undefined);
+    throw error;
+  }
 
-  validateImage(contentType, blob.size);
+  const bytes = await readLimitedResponseBody(response);
+  validateImageBytes(new Uint8Array(bytes), contentType);
 
   const extension = EXTENSIONS[contentType];
+  const image = new Blob([bytes], { type: contentType });
 
   const stored = await put(
     `avatars/${userId}/${crypto.randomUUID()}.${extension}`,
-    blob,
+    image,
     {
       access: 'public',
       contentType,
