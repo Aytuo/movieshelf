@@ -219,16 +219,18 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
             </div>
 
             {result.media.length > 0 ? (
-              <>
-                <MediaGrid media={result.media} />
-
-                <DiscoverPagination
-                  page={result.page}
-                  totalPages={result.totalPages}
-                />
-              </>
+              <MediaGrid media={result.media} />
             ) : (
               <EmptyDiscoverState />
+            )}
+
+            {(result.media.length > 0 || filters.hideOnShelf) && (
+              <DiscoverPagination
+                page={result.page}
+                totalPages={result.totalPages}
+                totalPagesKnown={result.totalPagesKnown ?? true}
+                canGoNext={result.canGoNext}
+              />
             )}
           </>
         </DiscoverLayout>

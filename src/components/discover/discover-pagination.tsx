@@ -7,15 +7,25 @@ import { useSearchParams } from 'next/navigation';
 type DiscoverPaginationProps = {
   page: number;
   totalPages: number;
+  totalPagesKnown?: boolean;
+  canGoNext?: boolean;
 };
 
-const DiscoverPagination = ({ page, totalPages }: DiscoverPaginationProps) => {
+const DiscoverPagination = ({
+  page,
+  totalPages,
+  totalPagesKnown = true,
+  canGoNext,
+}: DiscoverPaginationProps) => {
   const searchParams = useSearchParams();
 
   const previous = page > 1 ? buildDiscoverUrl(searchParams, page - 1) : null;
 
-  const next =
-    page < totalPages ? buildDiscoverUrl(searchParams, page + 1) : null;
+  const canNavigateNext = canGoNext ?? page < totalPages;
+
+  const next = canNavigateNext
+    ? buildDiscoverUrl(searchParams, page + 1)
+    : null;
 
   return (
     <div className="mt-10 flex items-center justify-between border-t border-border/60 pt-6">
@@ -31,7 +41,7 @@ const DiscoverPagination = ({ page, totalPages }: DiscoverPaginationProps) => {
       )}
 
       <span className="text-xs text-muted-foreground">
-        Page {page} of {totalPages}
+        {totalPagesKnown ? `Page ${page} of ${totalPages}` : `Page ${page}`}
       </span>
 
       {next ? (

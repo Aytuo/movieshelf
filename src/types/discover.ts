@@ -48,6 +48,8 @@ export interface DiscoverResult {
   page: number;
   totalPages: number;
   totalResults: number;
+  totalPagesKnown?: boolean;
+  canGoNext?: boolean;
 }
 
 export interface DiscoverOptions {
