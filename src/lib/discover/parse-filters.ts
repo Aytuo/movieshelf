@@ -4,6 +4,7 @@ import type {
   MovieDiscoverSort,
   TvDiscoverSort,
 } from '@/types';
+import { TMDB_DISCOVER_MAX_PAGES } from './pagination';
 
 const MOVIE_DISCOVER_SORTS = [
   'popularity.desc',
@@ -86,7 +87,10 @@ export function parseDiscoverFilters(params: URLSearchParams): DiscoverFilters {
     minRuntime: undefined,
     maxRuntime: parsePositiveInteger(params.get('runtime')),
     language: params.get('language')?.trim() || undefined,
-    page: parsePositiveInteger(params.get('page')) ?? 1,
+    page: Math.min(
+      parsePositiveInteger(params.get('page')) ?? 1,
+      TMDB_DISCOVER_MAX_PAGES
+    ),
     minVoteCount: undefined,
     hideOnShelf: parseBoolean(params.get('hideOnShelf')),
   };

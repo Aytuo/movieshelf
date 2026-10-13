@@ -1,4 +1,9 @@
-import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
+import {
+  DISCOVER_PAGE_SIZE,
+  getDiscoverSlice,
+  getRequiredMediaCount,
+  TMDB_DISCOVER_MAX_PAGES,
+} from '@/lib/discover/pagination';
 import type { Media } from '@/lib/media';
 import {
   getUserMediaKeys,
@@ -11,17 +16,15 @@ function getMediaKey(media: Pick<Media, 'tmdbId' | 'type'>) {
   return `${media.type}:${media.tmdbId}`;
 }
 
-async function discoverMedia(filters: DiscoverFilters, maxResults: number) {
+async function discoverMedia(filters: DiscoverFilters, maxResults?: number) {
+  const options = maxResults === undefined ? undefined : { maxResults };
+
   switch (filters.type) {
     case 'movie':
-      return tmdbMovieRepository.discover(filters, {
-        maxResults,
-      });
+      return tmdbMovieRepository.discover(filters, options);
 
     case 'tv':
-      return tmdbTvRepository.discover(filters, {
-        maxResults,
-      });
+      return tmdbTvRepository.discover(filters, options);
   }
 }
 
@@ -29,49 +32,54 @@ export async function discoverForUser(
   userId: string,
   filters: DiscoverFilters
 ) {
-  const page = filters.page ?? 1;
+  // Standard mode does not require downloading previous pages.
+  if (!filters.hideOnShelf) {
+    return discoverMedia(filters);
+  }
 
-  // We request enough candidates to build the requested application page after removing media already present on the user's shelf.
+  const requestedPage = filters.page ?? 1;
 
-  const requiredCount = page * DISCOVER_PAGE_SIZE;
-
-  // Known media.
-
-  const knownMedia = filters.hideOnShelf ? await getUserMediaKeys(userId) : [];
+  const knownMedia = await getUserMediaKeys(userId);
 
   const knownMediaKeys = new Set(knownMedia.map(getMediaKey));
 
-  // Fetch candidates.
+  // Any item from the pool of a given type may potentially require replacement by an additional candidate.
+  const knownMediaCount = knownMedia.filter(
+    (item) => item.type === filters.type
+  ).length;
 
-  let result = await discoverMedia(filters, requiredCount);
+  const maxCandidates = TMDB_DISCOVER_MAX_PAGES * DISCOVER_PAGE_SIZE;
 
-  const filterKnownMedia = (items: Media[]) =>
-    items.filter((item) => !knownMediaKeys.has(getMediaKey(item)));
+  const requestedCount = Math.min(
+    maxCandidates,
+    getRequiredMediaCount(requestedPage) + knownMediaCount
+  );
 
-  let filtered = filterKnownMedia(result.media);
+  const result = await discoverMedia(filters, requestedCount);
 
-  // Fetch additional candidates.
+  const filtered = result.media.filter(
+    (item) => !knownMediaKeys.has(getMediaKey(item))
+  );
 
-  while (
-    filters.hideOnShelf &&
-    filtered.length < requiredCount &&
-    result.media.length < 200 &&
-    result.media.length < result.totalResults
-  ) {
-    const nextCandidateCount = result.media.length + DISCOVER_PAGE_SIZE;
+  // We know that the entire reachable set has been retrieved if:
+  // - the number of elements has reached the number of candidates, or
+  // - the API did not provide as many candidates as we requested.
+  const allCandidatesLoaded =
+    result.media.length < requestedCount ||
+    result.media.length >= result.totalResults;
 
-    result = await discoverMedia(filters, nextCandidateCount);
+  const totalPages = allCandidatesLoaded
+    ? Math.max(1, Math.ceil(filtered.length / DISCOVER_PAGE_SIZE))
+    : result.totalPages;
 
-    filtered = filterKnownMedia(result.media);
-  }
+  const page = Math.min(requestedPage, totalPages);
 
-  // Application pagination.
-
-  const start = (page - 1) * DISCOVER_PAGE_SIZE;
-  const end = start + DISCOVER_PAGE_SIZE;
+  const { start } = getDiscoverSlice(page);
 
   return {
     ...result,
-    media: filtered.slice(start, end),
+    page,
+    totalPages,
+    media: filtered.slice(start, start + DISCOVER_PAGE_SIZE),
   };
 }

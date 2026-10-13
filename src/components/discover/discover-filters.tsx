@@ -417,21 +417,17 @@ const DiscoverFilters = () => {
 
             <span>
               <span className="block text-sm font-medium">
-                Hide media on my shelf
+                Hide titles already on my shelf
               </span>
 
               <span className="mt-1 block text-xs leading-5 text-muted-foreground">
                 Only show {type === 'movie' ? 'movies' : 'TV series'} you
-                haven&apos;t already added to your collection.
+                haven&apos;t added to your shelf yet.
               </span>
             </span>
           </label>
         </div>
       </div>
-
-      {/* <p className="mt-5 text-[11px] leading-5 text-muted-foreground">
-        Changes are applied automatically when you stop editing.
-      </p> */}
     </aside>
   );
 };

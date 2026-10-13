@@ -87,7 +87,7 @@ function isPersonSearchResult(
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const params = await searchParams;
 
-  const query = params.q?.trim() ?? '';
+  const query = normalizeSearchQuery(params.q ?? '');
   const type = parseSearchType(params.type);
   const year = parseYear(params.year);
   const page = parsePage(params.page);

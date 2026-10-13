@@ -1,4 +1,8 @@
-import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
+import {
+  DISCOVER_PAGE_SIZE,
+  getReachableDiscoverPageCount,
+  getReachableDiscoverResultCount,
+} from '@/lib/discover/pagination';
 import type {
   TvEpisode,
   TvScheduleItem,
@@ -162,45 +166,79 @@ export const tmdbTvRepository: TvRepository = {
   },
 
   async discover(filters, options) {
-    const appPage = filters.page ?? 1;
+    const fetchPage = (page: number) =>
+      discover(toTmdbDiscoverParams(filters, page));
 
-    const requestedCount = options?.maxResults ?? appPage * DISCOVER_PAGE_SIZE;
+    const firstResult = await fetchPage(1);
+
+    const totalResults = getReachableDiscoverResultCount(
+      firstResult.total_results,
+      firstResult.total_pages
+    );
+
+    const totalPages = getReachableDiscoverPageCount(
+      firstResult.total_results,
+      firstResult.total_pages
+    );
+
+    const requestedPage = Math.max(
+      1,
+      Number.isInteger(filters.page) ? (filters.page ?? 1) : 1
+    );
+
+    const page = Math.min(requestedPage, totalPages);
+
+    if (options?.maxResults !== undefined) {
+      const requestedCount = Math.min(
+        totalResults,
+        Math.max(0, Math.floor(options.maxResults))
+      );
+
+      const uniqueShows = new Map<number, TvShow>();
+
+      for (
+        let tmdbPage = 1;
+        tmdbPage <= totalPages && uniqueShows.size < requestedCount;
+        tmdbPage += 1
+      ) {
+        const result = tmdbPage === 1 ? firstResult : await fetchPage(tmdbPage);
+
+        for (const item of result.results) {
+          const show = mapTmdbTv(item);
+
+          uniqueShows.set(show.tmdbId, show);
+
+          if (uniqueShows.size >= requestedCount) {
+            break;
+          }
+        }
+      }
+
+      return {
+        media: Array.from(uniqueShows.values()).slice(0, requestedCount),
+        page,
+        totalResults,
+        totalPages,
+      };
+    }
+
+    const result = page === 1 ? firstResult : await fetchPage(page);
 
     const uniqueShows = new Map<number, TvShow>();
 
-    let tmdbPage = 1;
-    let totalResults = 0;
-    let totalPages = 1;
+    for (const item of result.results) {
+      const show = mapTmdbTv(item);
 
-    while (
-      uniqueShows.size < requestedCount &&
-      tmdbPage <= 500 &&
-      tmdbPage <= totalPages
-    ) {
-      const result = await discover(toTmdbDiscoverParams(filters, tmdbPage));
-
-      totalResults = result.total_results;
-
-      totalPages = result.total_pages;
-
-      for (const item of result.results) {
-        const show = mapTmdbTv(item);
-
+      if (!uniqueShows.has(show.tmdbId)) {
         uniqueShows.set(show.tmdbId, show);
       }
-
-      if (tmdbPage >= totalPages) {
-        break;
-      }
-
-      tmdbPage += 1;
     }
 
     return {
-      media: Array.from(uniqueShows.values()),
-      page: appPage,
+      media: Array.from(uniqueShows.values()).slice(0, DISCOVER_PAGE_SIZE),
+      page,
       totalResults,
-      totalPages: Math.max(1, Math.ceil(totalResults / DISCOVER_PAGE_SIZE)),
+      totalPages,
     };
   },
 };

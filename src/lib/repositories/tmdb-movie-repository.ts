@@ -1,4 +1,8 @@
-import { DISCOVER_PAGE_SIZE } from '@/lib/discover/pagination';
+import {
+  DISCOVER_PAGE_SIZE,
+  getReachableDiscoverPageCount,
+  getReachableDiscoverResultCount,
+} from '@/lib/discover/pagination';
 import type { Movie } from '@/lib/media';
 import {
   discover,
@@ -128,45 +132,82 @@ export const tmdbMovieRepository: MovieRepository = {
   },
 
   async discover(filters, options) {
-    const appPage = filters.page ?? 1;
+    const fetchPage = (page: number) =>
+      discover(toTmdbDiscoverParams(filters, page));
 
-    const requestedCount = options?.maxResults ?? appPage * DISCOVER_PAGE_SIZE;
+    // The first response establishes stable pagination metadata.
+    const firstResult = await fetchPage(1);
+
+    const totalResults = getReachableDiscoverResultCount(
+      firstResult.total_results,
+      firstResult.total_pages
+    );
+
+    const totalPages = getReachableDiscoverPageCount(
+      firstResult.total_results,
+      firstResult.total_pages
+    );
+
+    const requestedPage = Math.max(
+      1,
+      Number.isInteger(filters.page) ? (filters.page ?? 1) : 1
+    );
+
+    const page = Math.min(requestedPage, totalPages);
+
+    // Special candidate retrieval mode for "Hide media on my shelf".
+    if (options?.maxResults !== undefined) {
+      const requestedCount = Math.min(
+        totalResults,
+        Math.max(0, Math.floor(options.maxResults))
+      );
+
+      const uniqueMovies = new Map<number, Movie>();
+
+      for (
+        let tmdbPage = 1;
+        tmdbPage <= totalPages && uniqueMovies.size < requestedCount;
+        tmdbPage += 1
+      ) {
+        const result = tmdbPage === 1 ? firstResult : await fetchPage(tmdbPage);
+
+        for (const item of result.results) {
+          const movie = mapTmdbMovie(item);
+
+          uniqueMovies.set(movie.tmdbId, movie);
+
+          if (uniqueMovies.size >= requestedCount) {
+            break;
+          }
+        }
+      }
+
+      return {
+        media: Array.from(uniqueMovies.values()).slice(0, requestedCount),
+        page,
+        totalResults,
+        totalPages,
+      };
+    }
+
+    // Standard Discover only fetches the current TMDB page.
+    const result = page === 1 ? firstResult : await fetchPage(page);
 
     const uniqueMovies = new Map<number, Movie>();
 
-    let tmdbPage = 1;
-    let totalResults = 0;
-    let totalPages = 1;
+    for (const item of result.results) {
+      const movie = mapTmdbMovie(item);
 
-    while (
-      uniqueMovies.size < requestedCount &&
-      tmdbPage <= 50 &&
-      tmdbPage <= totalPages
-    ) {
-      const result = await discover(toTmdbDiscoverParams(filters, tmdbPage));
-
-      totalResults = result.total_results;
-
-      totalPages = result.total_pages;
-
-      for (const item of result.results) {
-        const movie = mapTmdbMovie(item);
-
+      if (!uniqueMovies.has(movie.tmdbId)) {
         uniqueMovies.set(movie.tmdbId, movie);
       }
-
-      if (tmdbPage >= totalPages) {
-        break;
-      }
-
-      tmdbPage += 1;
     }
 
     return {
-      media: Array.from(uniqueMovies.values()),
-      page: appPage,
+      media: Array.from(uniqueMovies.values()).slice(0, DISCOVER_PAGE_SIZE),
+      page,
       totalResults,
-      totalPages: Math.max(1, Math.ceil(totalResults / DISCOVER_PAGE_SIZE)),
+      totalPages,
     };
   },
 };

@@ -1,4 +1,4 @@
-import DiscoverFilters from '@/components/discover/discover-filters';
+import DiscoverLayout from '@/components/discover/discover-layout';
 import DiscoverPagination from '@/components/discover/discover-pagination';
 import MediaGrid from '@/components/media/media-grid';
 import EmptyState from '@/components/ui/empty-state';
@@ -10,6 +10,7 @@ import type { DiscoverFilters as DiscoverFiltersType } from '@/types';
 import { SearchX } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 function FilterChip({ label }: { label: string }) {
   return (
@@ -97,6 +98,20 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
 
   const result = await discoverForUser(session.user.id, filters);
 
+  if (params.page !== undefined && Number(params.page) !== result.page) {
+    const canonicalParams = toURLSearchParams(params);
+
+    if (result.page === 1) {
+      canonicalParams.delete('page');
+    } else {
+      canonicalParams.set('page', String(result.page));
+    }
+
+    const query = canonicalParams.toString();
+
+    redirect(query ? `/discover?${query}` : '/discover');
+  }
+
   const isMovie = filters.type === 'movie';
 
   const mediaLabel = isMovie ? 'movies' : 'TV series';
@@ -150,10 +165,8 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
         </div>
 
         {/* Filters + results */}
-        <div className="grid gap-8 lg:grid-cols-[250px_1fr]">
-          <DiscoverFilters />
-
-          <div className="min-w-0">
+        <DiscoverLayout>
+          <>
             <div className="mb-6">
               {hasFilters && (
                 <div className="flex flex-wrap items-center gap-2">
@@ -196,10 +209,12 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
               )}
 
               <p className="mt-4 text-xs text-muted-foreground">
-                {result.totalResults.toLocaleString()}{' '}
-                {result.totalResults === 1
-                  ? mediaLabel.slice(0, -1)
-                  : mediaLabel}
+                Up to {result.totalResults.toLocaleString()}{' '}
+                {filters.type === 'movie' ? 'movies' : 'TV series'} accessible
+                through TMDB
+                {filters.hideOnShelf
+                  ? ' before excluding titles on your shelf'
+                  : ''}
               </p>
             </div>
 
@@ -215,8 +230,8 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
             ) : (
               <EmptyDiscoverState />
             )}
-          </div>
-        </div>
+          </>
+        </DiscoverLayout>
       </section>
     </main>
   );
