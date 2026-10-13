@@ -26,9 +26,20 @@ function MediaCardSkeleton() {
   );
 }
 
-function MediaGridSkeleton({ count = 12 }: { count?: number }) {
+function MediaGridSkeleton({
+  count = 12,
+  xlColumns = 6,
+}: {
+  count?: number;
+  xlColumns?: 5 | 6;
+}) {
+  const gridClassName =
+    xlColumns === 5
+      ? 'grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+      : 'grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6';
+
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className={gridClassName}>
       {Array.from({ length: count }, (_, index) => (
         <MediaCardSkeleton key={index} />
       ))}
@@ -88,19 +99,13 @@ function RankingListSkeleton({ count = 8 }: { count?: number }) {
 
 function SearchResultsSkeleton() {
   return (
-    <div className="mt-10 space-y-3">
-      {Array.from({ length: 7 }, (_, index) => (
-        <div
-          key={index}
-          className="flex items-center gap-3 rounded-xl p-3 surface"
-        >
-          <Skeleton className="size-14 shrink-0 rounded-lg" />
-
-          <div className="min-w-0 flex-1">
-            <Skeleton className="h-4 w-2/3 max-w-sm" />
-            <Skeleton className="mt-2 h-3 w-1/3 max-w-xs" />
-          </div>
-        </div>
+    <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {Array.from({ length: 10 }, (_, index) => (
+        <article key={index}>
+          <Skeleton className="aspect-[2/3] w-full rounded-xl" />
+          <Skeleton className="mt-3 h-4 w-4/5" />
+          <Skeleton className="mt-2 h-3 w-1/2" />
+        </article>
       ))}
     </div>
   );

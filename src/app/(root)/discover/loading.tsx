@@ -15,6 +15,10 @@ export default function Loading() {
           <Skeleton className="h-10 w-28 rounded-lg" />
         </div>
 
+        <div className="mb-4 flex justify-end">
+          <Skeleton className="h-10 w-32 rounded-lg" />
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-[250px_1fr]">
           <aside>
             <Skeleton className="h-150 w-full rounded-2xl" />
@@ -22,7 +26,7 @@ export default function Loading() {
 
           <div className="min-w-0">
             <Skeleton className="mb-6 h-4 w-40" />
-            <MediaGridSkeleton count={12} />
+            <MediaGridSkeleton count={10} xlColumns={5} />
           </div>
         </div>
       </section>
