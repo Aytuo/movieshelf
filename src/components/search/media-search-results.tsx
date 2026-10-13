@@ -12,7 +12,7 @@ type MediaSearchResultsProps = {
 const MediaSearchResults = ({ media, type }: MediaSearchResultsProps) => {
   return (
     <>
-      <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {media.map((item) => {
           const href =
             item.type === 'movie'

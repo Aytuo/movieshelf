@@ -9,7 +9,7 @@ type PeopleSearchResultsProps = {
 
 const PeopleSearchResults = ({ people }: PeopleSearchResultsProps) => {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {people.map((person) => {
         const portrait = tmdbImage(person.profilePath, 'w185');
 
@@ -17,7 +17,7 @@ const PeopleSearchResults = ({ people }: PeopleSearchResultsProps) => {
           <Link
             key={person.id}
             href={`/person/${person.id}`}
-            className="group flex items-center gap-4 rounded-2xl p-4 transition-transform duration-200 surface hover:-translate-y-0.5"
+            className="group flex h-24 items-center gap-4 rounded-2xl p-4 transition-transform duration-200 surface hover:-translate-y-0.5"
           >
             <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-surface-hover">
               {portrait ? (
@@ -37,7 +37,10 @@ const PeopleSearchResults = ({ people }: PeopleSearchResultsProps) => {
               </h3>
 
               {person.knownForDepartment && (
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p
+                  title={person.knownForDepartment}
+                  className="mt-1 truncate text-xs text-muted-foreground"
+                >
                   {person.knownForDepartment}
                 </p>
               )}

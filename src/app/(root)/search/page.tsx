@@ -15,6 +15,7 @@ import type {
 import { ArrowRight, Search, SearchX } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 type SearchPageProps = {
   searchParams: Promise<{
@@ -103,6 +104,31 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
       })
     : null;
 
+  if (
+    query &&
+    results &&
+    params.page !== undefined &&
+    Number(params.page) !== results.page
+  ) {
+    const canonicalParams = new URLSearchParams();
+
+    canonicalParams.set('q', query);
+
+    if (type !== 'all') {
+      canonicalParams.set('type', type);
+    }
+
+    if ((type === 'movie' || type === 'tv') && year !== undefined) {
+      canonicalParams.set('year', String(year));
+    }
+
+    if (results.page > 1) {
+      canonicalParams.set('page', String(results.page));
+    }
+
+    redirect(`/search?${canonicalParams.toString()}`);
+  }
+
   const mediaLabel =
     type === 'movie'
       ? 'movies'
@@ -160,8 +186,9 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">
-                  {results?.totalResults.toLocaleString() ?? 0}{' '}
-                  {(results?.totalResults ?? 0) === 1 ? 'result' : 'results'}
+                  Up to {results?.totalResults.toLocaleString() ?? 0}{' '}
+                  {(results?.totalResults ?? 0) === 1 ? 'result' : 'results'}{' '}
+                  available through TMDB
                 </p>
 
                 <h2 className="mt-1 font-heading text-2xl font-bold tracking-tight">

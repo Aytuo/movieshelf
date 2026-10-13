@@ -3,14 +3,10 @@ import {
   tmdbSearchRepository,
   tmdbTvRepository,
 } from '@/lib/repositories';
-import {
-  getSearchPagesNeeded,
-  getSearchSlice,
-  getSearchTotalPages,
-} from '@/lib/search/pagination';
 import type { SearchFilters, SearchResult } from '@/types';
-import { searchPeople } from './people-service';
+import { getSearchPagination, SEARCH_PAGE_SIZE } from '../search/pagination';
 import { normalizeSearchQuery } from '../search/query';
+import { searchPeople } from './people-service';
 
 export async function search({
   query,
@@ -56,49 +52,29 @@ export async function search({
       page: 1,
     });
 
-    const totalResults = firstResponse.totalResults;
-    const totalPages = getSearchTotalPages(totalResults);
+    const pagination = getSearchPagination(
+      firstResponse.totalResults,
+      firstResponse.totalPages,
+      page
+    );
 
-    if (totalResults === 0 || page > totalPages) {
+    if (pagination.totalResults === 0) {
       return {
         results: [],
-        page,
-        totalResults,
-        totalPages,
+        ...pagination,
       };
     }
 
-    const pagesNeeded = Math.min(
-      getSearchPagesNeeded(page),
-      firstResponse.totalPages
-    );
-
-    const responses = [
-      firstResponse,
-      ...(pagesNeeded > 1
-        ? await Promise.all(
-            Array.from(
-              {
-                length: pagesNeeded - 1,
-              },
-              (_, index) =>
-                tmdbSearchRepository.search(normalized, {
-                  page: index + 2,
-                })
-            )
-          )
-        : []),
-    ];
-
-    const candidates = responses.flatMap((response) => response.results);
-
-    const { start, end } = getSearchSlice(page);
+    const response =
+      pagination.page === 1
+        ? firstResponse
+        : await tmdbSearchRepository.search(normalized, {
+            page: pagination.page,
+          });
 
     return {
-      results: candidates.slice(start, end),
-      page,
-      totalResults,
-      totalPages,
+      results: response.results.slice(0, SEARCH_PAGE_SIZE),
+      ...pagination,
     };
   }
 

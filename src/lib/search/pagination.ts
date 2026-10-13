@@ -1,67 +1,75 @@
 import type { TmdbPagedResponse } from '@/lib/tmdb/types';
 
-const SEARCH_PAGE_SIZE = 24;
-const TMDB_PAGE_SIZE = 20;
+export const SEARCH_PAGE_SIZE = 20;
+export const TMDB_SEARCH_MAX_PAGES = 500;
 
-export function getSearchTotalPages(totalResults: number) {
-  return Math.max(1, Math.ceil(totalResults / SEARCH_PAGE_SIZE));
-}
+export function getSearchPagination(
+  totalResults: number,
+  tmdbTotalPages: number,
+  requestedPage: number
+) {
+  const safeTotalResults = Number.isFinite(totalResults)
+    ? Math.max(0, Math.floor(totalResults))
+    : 0;
 
-export function getSearchPagesNeeded(appPage: number) {
-  return Math.ceil((appPage * SEARCH_PAGE_SIZE) / TMDB_PAGE_SIZE);
-}
+  const safeTmdbTotalPages = Number.isFinite(tmdbTotalPages)
+    ? Math.max(0, Math.floor(tmdbTotalPages))
+    : 0;
 
-export function getSearchSlice(appPage: number) {
-  const start = (appPage - 1) * SEARCH_PAGE_SIZE;
+  const calculatedPages = Math.ceil(safeTotalResults / SEARCH_PAGE_SIZE);
+
+  const reachablePages =
+    safeTotalResults === 0
+      ? 0
+      : Math.min(
+          TMDB_SEARCH_MAX_PAGES,
+          calculatedPages,
+          safeTmdbTotalPages || calculatedPages
+        );
+
+  const totalPages = Math.max(1, reachablePages);
+
+  const reachableResults = Math.min(
+    safeTotalResults,
+    reachablePages * SEARCH_PAGE_SIZE
+  );
+
+  const safeRequestedPage =
+    Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 
   return {
-    start,
-    end: start + SEARCH_PAGE_SIZE,
+    page: Math.min(safeRequestedPage, totalPages),
+    totalPages,
+    totalResults: reachableResults,
   };
 }
 
 export async function paginateSearchItems<TResult>(
-  appPage: number,
+  requestedPage: number,
   fetchPage: (tmdbPage: number) => Promise<TmdbPagedResponse<TResult>>
 ) {
+  // The first response establishes stable pagination metadata.
   const firstResponse = await fetchPage(1);
 
-  const totalResults = firstResponse.total_results;
-  const totalPages = getSearchTotalPages(totalResults);
+  const pagination = getSearchPagination(
+    firstResponse.total_results,
+    firstResponse.total_pages,
+    requestedPage
+  );
 
-  if (totalResults === 0 || appPage > totalPages) {
+  if (pagination.totalResults === 0) {
     return {
       items: [],
-      page: appPage,
-      totalResults,
-      totalPages,
+      ...pagination,
     };
   }
 
-  const pagesNeeded = getSearchPagesNeeded(appPage);
-
-  const responses = [
-    firstResponse,
-    ...(pagesNeeded > 1
-      ? await Promise.all(
-          Array.from(
-            {
-              length: pagesNeeded - 1,
-            },
-            (_, index) => fetchPage(index + 2)
-          )
-        )
-      : []),
-  ];
-
-  const candidates = responses.flatMap((response) => response.results);
-
-  const { start, end } = getSearchSlice(appPage);
+  // We retrieve only the current page, without merging previous pages.
+  const response =
+    pagination.page === 1 ? firstResponse : await fetchPage(pagination.page);
 
   return {
-    items: candidates.slice(start, end),
-    page: appPage,
-    totalResults,
-    totalPages,
+    items: response.results.slice(0, SEARCH_PAGE_SIZE),
+    ...pagination,
   };
 }
