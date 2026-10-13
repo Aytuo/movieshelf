@@ -10,6 +10,7 @@ import {
 } from '@/lib/search/pagination';
 import type { SearchFilters, SearchResult } from '@/types';
 import { searchPeople } from './people-service';
+import { normalizeSearchQuery } from '../search/query';
 
 export async function search({
   query,
@@ -18,7 +19,7 @@ export async function search({
   query: string;
   filters: SearchFilters;
 }): Promise<SearchResult> {
-  const normalized = query.trim();
+  const normalized = normalizeSearchQuery(query);
   const page = filters.page ?? 1;
 
   if (!normalized) {

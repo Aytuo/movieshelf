@@ -1,6 +1,7 @@
 'use client';
 
 import { useDebounce } from '@/hooks/use-debounce';
+import { MAX_SEARCH_QUERY_LENGTH } from '@/lib/search/query';
 import { cn } from '@/lib/utils';
 import type { SearchMediaType } from '@/types';
 import { Search, X } from 'lucide-react';
@@ -204,6 +205,7 @@ const SearchControls = ({
           name="q"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          maxLength={MAX_SEARCH_QUERY_LENGTH}
           placeholder="Search titles..."
           className="h-12 pr-10 pl-10"
         />

@@ -4,6 +4,7 @@ import SearchAllResults from '@/components/search/search-all-results';
 import SearchControls from '@/components/search/search-controls';
 import SearchPagination from '@/components/search/search-pagination';
 import EmptyState from '@/components/ui/empty-state';
+import { normalizeSearchQuery } from '@/lib/search/query';
 import { search } from '@/lib/services/search-service';
 import type {
   PersonSearchResult,
@@ -28,7 +29,7 @@ export async function generateMetadata({
   searchParams,
 }: SearchPageProps): Promise<Metadata> {
   const params = await searchParams;
-  const query = params.q?.trim() ?? '';
+  const query = normalizeSearchQuery(params.q ?? '');
   const type = parseSearchType(params.type);
 
   if (!query) {
