@@ -13,6 +13,6 @@ export const reviewSchema: z.ZodType<ReviewInput, ReviewInput> = z.object({
     .trim()
     .min(20, 'Review must contain at least 20 characters.')
     .max(5000, 'Review cannot exceed 5000 characters.'),
-  rating: z.number().min(1).max(10),
+  rating: z.number().int().min(1).max(10),
   containsSpoilers: z.boolean(),
 });

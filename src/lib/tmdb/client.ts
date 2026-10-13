@@ -1,3 +1,5 @@
+import 'server-only';
+
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 const token = process.env.TMDB_API_READ_ACCESS_TOKEN;

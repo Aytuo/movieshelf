@@ -1,3 +1,5 @@
+import 'server-only';
+
 import * as schema from '@/lib/db/schema';
 import { neon } from '@neondatabase/serverless';
 import { config } from 'dotenv';

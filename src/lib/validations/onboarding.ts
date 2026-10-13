@@ -25,7 +25,7 @@ export const onboardingRatingsSchema = z.object({
       z.object({
         tmdbId: z.number().int().positive(),
         type: z.enum(['movie', 'tv']),
-        rating: z.number().min(1).max(10),
+        rating: z.number().int().min(1).max(10),
       })
     )
     .min(5, 'Please rate at least 5 titles.')

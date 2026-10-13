@@ -1,3 +1,5 @@
+import 'server-only';
+
 import {
   getPasswordResetEmailText,
   PasswordResetEmail,
@@ -108,7 +110,7 @@ export const auth = betterAuth({
   account: {
     accountLinking: {
       enabled: true,
-      disableImplicitLinking: false,
+      disableImplicitLinking: true,
       trustedProviders: ['google', 'discord'],
       updateUserInfoOnLink: false,
       allowDifferentEmails: false,

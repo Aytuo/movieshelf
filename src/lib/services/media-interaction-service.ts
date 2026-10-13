@@ -67,8 +67,8 @@ export async function setRating(
   mediaId: string,
   rating: number
 ) {
-  if (rating < 1 || rating > 10) {
-    throw new Error('Rating must be between 1 and 10.');
+  if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+    throw new Error('Rating must be an integer between 1 and 10.');
   }
 
   return setMediaRating({

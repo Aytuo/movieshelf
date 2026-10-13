@@ -111,8 +111,8 @@ export async function rateMedia(
 ) {
   const { userId, media } = await getContext(type, tmdbId);
 
-  if (!Number.isFinite(rating) || rating < 1 || rating > 10) {
-    throw new Error('Rating must be between 1 and 10.');
+  if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+    throw new Error('Rating must be an integer between 1 and 10.');
   }
 
   const details = await getMediaDetails(type, tmdbId);
