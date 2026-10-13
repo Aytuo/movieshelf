@@ -25,7 +25,12 @@ export async function discoverForUser(
   filters: DiscoverFilters
 ) {
   if (!filters.hideOnShelf) {
-    return discoverMedia(filters);
+    const result = await discoverMedia(filters);
+
+    return {
+      ...result,
+      emptyAfterShelfFilter: false,
+    };
   }
 
   // We retrieve only the results for the current page and the shelf keys.
@@ -44,6 +49,7 @@ export async function discoverForUser(
   return {
     ...result,
     media,
+    emptyAfterShelfFilter: result.media.length > 0 && media.length === 0,
     // Excluding the shelf, the exact number of pages is unknown.
     totalPagesKnown: false,
     // The next TMDB page may contain further results.

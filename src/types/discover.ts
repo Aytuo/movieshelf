@@ -50,6 +50,7 @@ export interface DiscoverResult {
   totalResults: number;
   totalPagesKnown?: boolean;
   canGoNext?: boolean;
+  emptyAfterShelfFilter?: boolean;
 }
 
 export interface DiscoverOptions {

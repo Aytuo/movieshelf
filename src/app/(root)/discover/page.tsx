@@ -20,13 +20,29 @@ function FilterChip({ label }: { label: string }) {
   );
 }
 
-function EmptyDiscoverState() {
+function EmptyDiscoverState({
+  emptyAfterShelfFilter,
+  canGoNext,
+}: {
+  emptyAfterShelfFilter: boolean;
+  canGoNext: boolean;
+}) {
+  const title = emptyAfterShelfFilter
+    ? 'No new titles on this page'
+    : 'Nothing matched those filters';
+
+  const description = emptyAfterShelfFilter
+    ? canGoNext
+      ? 'All titles on this page are already on your shelf. Try the next page to find more.'
+      : 'All titles on this page are already on your shelf. There are no more pages to browse with these filters.'
+    : 'Try relaxing one or two filters and explore again.';
+
   return (
     <div className="rounded-2xl p-12 surface">
       <EmptyState
         icon={SearchX}
-        title="Nothing matched those filters"
-        description="Try relaxing one or two filters and explore again."
+        title={title}
+        description={description}
         action={
           <Link
             href="/discover"
@@ -221,7 +237,10 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
             {result.media.length > 0 ? (
               <MediaGrid media={result.media} />
             ) : (
-              <EmptyDiscoverState />
+              <EmptyDiscoverState
+                emptyAfterShelfFilter={result.emptyAfterShelfFilter ?? false}
+                canGoNext={result.canGoNext ?? result.page < result.totalPages}
+              />
             )}
 
             {(result.media.length > 0 || filters.hideOnShelf) && (
