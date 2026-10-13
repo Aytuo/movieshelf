@@ -5,7 +5,7 @@ import {
   MediaActivityType,
   review,
 } from '@/lib/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 
 type DbMedia = typeof media.$inferSelect;
 type DbMediaActivity = typeof mediaActivity.$inferSelect;
@@ -23,6 +23,7 @@ export type MediaActivityRow = {
   activity: DbMediaActivity;
   media: DbMedia;
   review: DbReview | null;
+  watchNumber: number;
 };
 
 export async function createMediaActivity({
@@ -56,11 +57,20 @@ export async function getUserMediaActivity(
       activity: mediaActivity,
       media,
       review,
+      watchNumber: sql<number>`(
+        count(*) filter (
+          where ${mediaActivity.type} = 'watched'
+        ) over (
+          partition by ${mediaActivity.userId}, ${mediaActivity.mediaId}
+          order by ${mediaActivity.createdAt} asc, ${mediaActivity.id} asc
+          rows between unbounded preceding and current row
+        )
+      )::int`,
     })
     .from(mediaActivity)
     .innerJoin(media, eq(media.id, mediaActivity.mediaId))
     .leftJoin(review, eq(review.id, mediaActivity.reviewId))
     .where(eq(mediaActivity.userId, userId))
-    .orderBy(desc(mediaActivity.createdAt))
+    .orderBy(desc(mediaActivity.createdAt), desc(mediaActivity.id))
     .limit(100);
 }
