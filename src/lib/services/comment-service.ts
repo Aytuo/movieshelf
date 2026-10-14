@@ -21,7 +21,11 @@ async function enrichComments(
   }
 
   const authorIds = [
-    ...new Set(comments.map((current) => current.author.userId)),
+    ...new Set(
+      comments.flatMap((current) =>
+        current.author ? [current.author.userId] : []
+      )
+    ),
   ];
 
   const [reactionStats, mediaId] = await Promise.all([
@@ -32,9 +36,10 @@ async function enrichComments(
     getPostMediaId(postId),
   ]);
 
-  const authorRatings = mediaId
-    ? await getMediaAuthorRatings(mediaId, authorIds)
-    : [];
+  const authorRatings =
+    mediaId && authorIds.length > 0
+      ? await getMediaAuthorRatings(mediaId, authorIds)
+      : [];
 
   const reactionStatsMap = new Map(
     reactionStats.map((stats) => [stats.commentId, stats])
@@ -46,14 +51,17 @@ async function enrichComments(
 
   return comments.map((current) => {
     const stats = reactionStatsMap.get(current.id);
+    const author = current.author;
 
     return {
       ...current,
 
-      author: {
-        ...current.author,
-        rating: authorRatingsMap.get(current.author.userId) ?? null,
-      },
+      author: author
+        ? {
+            ...author,
+            rating: authorRatingsMap.get(author.userId) ?? null,
+          }
+        : null,
 
       reactionCount: stats?.count ?? 0,
       viewerHasReacted: stats?.reacted ?? false,

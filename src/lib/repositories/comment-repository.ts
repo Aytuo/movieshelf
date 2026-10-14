@@ -8,7 +8,7 @@ type DbProfile = typeof profile.$inferSelect;
 
 type CommentRow = {
   comment: DbComment;
-  profile: DbProfile;
+  profile: DbProfile | null;
 };
 
 type CommentCursor = {
@@ -44,13 +44,15 @@ function mapComment(row: CommentRow, replyCount = 0): Comment {
     updatedAt: row.comment.updatedAt,
     deletedAt: row.comment.deletedAt,
 
-    author: {
-      userId: row.profile.userId,
-      username: row.profile.username,
-      displayName: row.profile.displayName,
-      avatarUrl: row.profile.avatarUrl,
-      rating: null,
-    },
+    author: row.profile
+      ? {
+          userId: row.profile.userId,
+          username: row.profile.username,
+          displayName: row.profile.displayName,
+          avatarUrl: row.profile.avatarUrl,
+          rating: null,
+        }
+      : null,
 
     postId: row.comment.postId,
     parentId: row.comment.parentId,
@@ -150,7 +152,7 @@ export async function getPostComments(
       replyCount: replyCountExpression,
     })
     .from(comment)
-    .innerJoin(profile, eq(profile.userId, comment.authorId))
+    .leftJoin(profile, eq(profile.userId, comment.authorId))
     .where(
       and(
         eq(comment.postId, postId),
@@ -211,14 +213,8 @@ export async function getCommentReplies(
       profile,
     })
     .from(comment)
-    .innerJoin(profile, eq(profile.userId, comment.authorId))
-    .where(
-      and(
-        eq(comment.parentId, parentId),
-        eq(comment.postId, postId),
-        isNull(comment.deletedAt)
-      )
-    )
+    .leftJoin(profile, eq(profile.userId, comment.authorId))
+    .where(and(eq(comment.parentId, parentId), eq(comment.postId, postId)))
     .orderBy(asc(comment.createdAt), asc(comment.id));
 
   return rows.map((row) => mapComment(row));
@@ -303,7 +299,7 @@ export async function getCommentAuthorId(
 }
 
 export async function getCommentContext(commentId: string): Promise<{
-  authorId: string;
+  authorId: string | null;
   postId: string;
 } | null> {
   const [row] = await db

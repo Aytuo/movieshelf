@@ -20,6 +20,7 @@ import * as schema from '@/lib/db/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
+import { eq } from 'drizzle-orm';
 import { sendEmail } from '../email/send-email';
 import { ensureProfile } from '../services/profile-service';
 
@@ -136,6 +137,18 @@ export const auth = betterAuth({
   user: {
     deleteUser: {
       enabled: true,
+      beforeDelete: async (deletedUser) => {
+        const deletedAt = new Date();
+
+        await db
+          .update(schema.comment)
+          .set({
+            content: '',
+            deletedAt,
+            updatedAt: deletedAt,
+          })
+          .where(eq(schema.comment.authorId, deletedUser.id));
+      },
     },
   },
   plugins: [nextCookies()],

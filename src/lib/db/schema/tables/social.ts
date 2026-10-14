@@ -103,9 +103,9 @@ export const comment = pgTable(
   'comment',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    authorId: text('author_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
+    authorId: text('author_id').references(() => user.id, {
+      onDelete: 'set null',
+    }),
     postId: uuid('post_id')
       .notNull()
       .references(() => post.id, { onDelete: 'cascade' }),

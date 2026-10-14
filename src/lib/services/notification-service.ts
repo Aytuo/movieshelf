@@ -81,7 +81,7 @@ export async function notifyCommentLiked(data: {
 }) {
   const context = await getCommentContext(data.commentId);
 
-  if (!context || context.authorId === data.actorId) {
+  if (!context || !context.authorId || context.authorId === data.actorId) {
     return null;
   }
 

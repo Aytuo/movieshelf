@@ -3,6 +3,7 @@
 import { useComment } from '@/hooks/use-comment';
 import { cn } from '@/lib/utils';
 import type { Comment } from '@/types';
+import { UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CommentActions } from './comment-actions';
@@ -33,7 +34,7 @@ const CommentCard = ({
   const { author } = comment;
 
   const isReply = depth > 0;
-  const isOwner = viewerUserId === author.userId;
+  const isOwner = author !== null && viewerUserId === author.userId;
 
   const {
     displayContent,
@@ -80,29 +81,41 @@ const CommentCard = ({
       }
     >
       <div className="flex items-start gap-3">
-        <Link
-          href={`/profile/${author.username}`}
-          className="group flex shrink-0"
-        >
+        {author ? (
+          <Link
+            href={`/profile/${author.username}`}
+            className="group flex shrink-0"
+          >
+            <div
+              className={cn(
+                'flex items-center justify-center overflow-hidden rounded-full bg-surface-hover text-xs font-semibold',
+                isReply ? 'size-8' : 'size-9'
+              )}
+            >
+              {author.avatarUrl ? (
+                <Image
+                  src={author.avatarUrl}
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                author.username.slice(0, 1).toUpperCase()
+              )}
+            </div>
+          </Link>
+        ) : (
           <div
+            aria-hidden="true"
             className={cn(
-              'flex items-center justify-center overflow-hidden rounded-full bg-surface-hover text-xs font-semibold',
+              'flex shrink-0 items-center justify-center rounded-full bg-surface-hover text-muted-foreground',
               isReply ? 'size-8' : 'size-9'
             )}
           >
-            {author.avatarUrl ? (
-              <Image
-                src={author.avatarUrl}
-                alt=""
-                width={36}
-                height={36}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              author.username.slice(0, 1).toUpperCase()
-            )}
+            <UserRound className="size-4" />
           </div>
-        </Link>
+        )}
 
         <div className="min-w-0 flex-1">
           <CommentHeader

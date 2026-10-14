@@ -23,7 +23,7 @@ export type Comment = {
   updatedAt: Date;
   deletedAt: Date | null;
 
-  author: CommentAuthor;
+  author: CommentAuthor | null;
 
   postId: string;
   parentId: string | null;

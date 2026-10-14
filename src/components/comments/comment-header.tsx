@@ -8,7 +8,7 @@ type CommentHeaderProps = {
     displayName: string | null;
     avatarUrl: string | null;
     rating: number | null;
-  };
+  } | null;
   mediaType: 'movie' | 'tv';
   updatedAt: Date;
   createdAt: Date;
@@ -50,38 +50,47 @@ export function CommentHeader({
   updatedAt,
   createdAt,
 }: CommentHeaderProps) {
-  const authorLabel = author.displayName || `@${author.username}`;
-
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <Link
-          href={`/profile/${author.username}`}
-          className="text-sm font-semibold transition-colors hover:text-primary"
-        >
-          {authorLabel}
-        </Link>
+        {author ? (
+          <>
+            <Link
+              href={`/profile/${author.username}`}
+              className="text-sm font-semibold transition-colors hover:text-primary"
+            >
+              {author.displayName || `@${author.username}`}
+            </Link>
 
-        <p className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
-          <span className="truncate">@{author.username}</span>
+            <p className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+              <span className="truncate">@{author.username}</span>
 
-          {author.rating !== null && (
-            <>
-              <span aria-hidden="true">·</span>
+              {author.rating !== null && (
+                <>
+                  <span aria-hidden="true">·</span>
 
-              <span className="inline-flex min-w-0 items-center gap-1">
-                <span className="truncate">
-                  rated this {mediaType === 'movie' ? 'movie' : 'TV series'}
-                </span>
+                  <span className="inline-flex min-w-0 items-center gap-1">
+                    <span className="truncate">
+                      rated this {mediaType === 'movie' ? 'movie' : 'TV series'}
+                    </span>
 
-                <span className="inline-flex shrink-0 items-center gap-0.5 font-semibold text-foreground">
-                  {author.rating}/10
-                  <Star className="size-3 fill-current" aria-hidden="true" />
-                </span>
-              </span>
-            </>
-          )}
-        </p>
+                    <span className="inline-flex shrink-0 items-center gap-0.5 font-semibold text-foreground">
+                      {author.rating}/10
+                      <Star
+                        className="size-3 fill-current"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </span>
+                </>
+              )}
+            </p>
+          </>
+        ) : (
+          <span className="text-sm font-semibold text-muted-foreground">
+            Deleted user
+          </span>
+        )}
       </div>
 
       <div className="flex shrink-0 items-center gap-1.5">
