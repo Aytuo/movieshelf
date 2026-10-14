@@ -93,8 +93,8 @@ const DeleteAccountSettings = () => {
           <DialogDescription>
             <div className="space-y-4 text-sm leading-6 text-muted-foreground">
               <p>
-                This permanently deletes your MovieShelf profile and all
-                associated content.
+                This permanently deletes your MovieShelf account and personal
+                profile data.
               </p>
 
               <ul className="mx-auto max-w-xs space-y-2 text-left">
@@ -102,23 +102,31 @@ const DeleteAccountSettings = () => {
                   <span className="w-3 shrink-0 text-center font-semibold text-muted-foreground">
                     -
                   </span>
-                  <span>Reviews, posts, and activity history</span>
+                  <span>Reviews, ratings, and activity history</span>
                 </li>
 
                 <li className="flex gap-2.5">
                   <span className="w-3 shrink-0 text-center font-semibold text-muted-foreground">
                     -
                   </span>
-                  <span>Follows and notifications</span>
+                  <span>
+                    Posts you&apos;ve created and discussions attached to them
+                  </span>
                 </li>
 
                 <li className="flex gap-2.5">
                   <span className="w-3 shrink-0 text-center font-semibold text-muted-foreground">
                     -
                   </span>
-                  <span>Your account and profile data</span>
+                  <span>Follows, notifications, and your profile data</span>
                 </li>
               </ul>
+
+              <p>
+                Comments you&apos;ve written on other people&apos;s posts will
+                remain as deleted comments with their content removed, so
+                replies can retain their context.
+              </p>
 
               <p className="font-semibold text-foreground">
                 This action cannot be undone.

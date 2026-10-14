@@ -123,6 +123,7 @@ const CommentCard = ({
             mediaType={mediaType}
             updatedAt={updatedAt}
             createdAt={comment.createdAt}
+            deletedAt={comment.deletedAt}
           />
 
           {isDeleted ? (

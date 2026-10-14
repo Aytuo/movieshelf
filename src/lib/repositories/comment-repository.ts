@@ -141,7 +141,6 @@ export async function getPostComments(
       select count(*)
       from ${comment} as reply
       where reply.parent_id = comment.id
-        and reply.deleted_at is null
     )
   `.mapWith(Number);
 
