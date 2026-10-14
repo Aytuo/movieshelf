@@ -28,6 +28,7 @@ export type Comment = {
   postId: string;
   parentId: string | null;
 
+  hasReplies: boolean;
   replyCount: number;
   replies?: Comment[];
 

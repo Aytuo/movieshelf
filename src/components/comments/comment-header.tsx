@@ -12,7 +12,7 @@ type CommentHeaderProps = {
   mediaType: 'movie' | 'tv';
   updatedAt: Date;
   createdAt: Date;
-  deletedAt: Date | null;
+  isDeleted: boolean;
 };
 
 function formatCommentDate(date: Date) {
@@ -50,7 +50,7 @@ export function CommentHeader({
   mediaType,
   updatedAt,
   createdAt,
-  deletedAt,
+  isDeleted,
 }: CommentHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4">
@@ -104,8 +104,12 @@ export function CommentHeader({
           {formatCommentDate(updatedAt)}
         </time>
 
-        {!deletedAt && updatedAt.getTime() > createdAt.getTime() && (
-          <span className="text-xs text-muted-foreground">· edited</span>
+        {isDeleted ? (
+          <span className="text-xs text-muted-foreground">· deleted</span>
+        ) : (
+          updatedAt.getTime() > createdAt.getTime() && (
+            <span className="text-xs text-muted-foreground">· edited</span>
+          )
         )}
       </div>
     </div>

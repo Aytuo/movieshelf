@@ -4,6 +4,7 @@ import { CommentReactionButton } from './comment-reaction-button';
 type CommentActionsProps = {
   commentId: string;
   isReply: boolean;
+  hasReplies: boolean;
   replyCount: number;
   isRepliesOpen: boolean;
   isLoadingReplies: boolean;
@@ -19,6 +20,7 @@ type CommentActionsProps = {
 export function CommentActions({
   commentId,
   isReply,
+  hasReplies,
   replyCount,
   isRepliesOpen,
   isLoadingReplies,
@@ -44,7 +46,7 @@ export function CommentActions({
           </button>
         )}
 
-        {replyCount > 0 && (
+        {hasReplies && (
           <button
             type="button"
             onClick={onToggleReplies}
@@ -57,7 +59,9 @@ export function CommentActions({
               ? 'Loading…'
               : isRepliesOpen
                 ? 'Hide replies'
-                : `${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`}
+                : replyCount > 0
+                  ? `${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`
+                  : 'View replies'}
           </button>
         )}
 

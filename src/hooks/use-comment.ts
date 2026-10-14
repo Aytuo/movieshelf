@@ -136,10 +136,11 @@ export function useComment({
     setIsDeleting(true);
 
     try {
-      await deleteCommentAction({
+      const deleted = await deleteCommentAction({
         commentId: comment.id,
       });
 
+      setUpdatedAt(deleted.deletedAt);
       setIsDeleted(true);
       setShowDeleteConfirmation(false);
 
@@ -161,9 +162,7 @@ export function useComment({
     }
   }
 
-  function handleReplyDeleted(replyId: string) {
-    setReplies((current) => current?.filter((reply) => reply.id !== replyId));
-
+  function handleReplyDeleted() {
     setReplyCount((current) => Math.max(0, current - 1));
   }
 

@@ -3,7 +3,7 @@
 import { useComment } from '@/hooks/use-comment';
 import { cn } from '@/lib/utils';
 import type { Comment } from '@/types';
-import { UserRound } from 'lucide-react';
+import { MessagesSquare, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CommentActions } from './comment-actions';
@@ -72,6 +72,9 @@ const CommentCard = ({
     onDeleted,
   });
 
+  const hasReplies =
+    comment.hasReplies || replyCount > 0 || (replies?.length ?? 0) > 0;
+
   return (
     <article
       className={
@@ -123,7 +126,7 @@ const CommentCard = ({
             mediaType={mediaType}
             updatedAt={updatedAt}
             createdAt={comment.createdAt}
-            deletedAt={comment.deletedAt}
+            isDeleted={isDeleted}
           />
 
           {isDeleted ? (
@@ -158,10 +161,11 @@ const CommentCard = ({
               onToggleReplies={handleToggleReplies}
               onEdit={startEditing}
               onDelete={() => setShowDeleteConfirmation(true)}
+              hasReplies={hasReplies}
             />
           )}
 
-          {isDeleted && replyCount > 0 && (
+          {isDeleted && hasReplies && (
             <div className="mt-4">
               <button
                 type="button"
@@ -169,11 +173,15 @@ const CommentCard = ({
                 disabled={isLoadingReplies}
                 className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
               >
+                <MessagesSquare className="size-3.5" />
+
                 {isLoadingReplies
                   ? 'Loading…'
                   : isRepliesOpen
                     ? 'Hide replies'
-                    : `${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`}
+                    : replyCount > 0
+                      ? `${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`
+                      : 'View replies'}
               </button>
             </div>
           )}
@@ -223,7 +231,7 @@ const CommentCard = ({
                 depth={1}
                 viewerUserId={viewerUserId}
                 onCommentCountChange={onCommentCountChange}
-                onDeleted={() => handleReplyDeleted(reply.id)}
+                onDeleted={handleReplyDeleted}
               />
             </div>
           ))}

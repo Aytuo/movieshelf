@@ -36,7 +36,11 @@ function decodeCursor(cursor: string): CommentCursor | null {
   }
 }
 
-function mapComment(row: CommentRow, replyCount = 0): Comment {
+function mapComment(
+  row: CommentRow,
+  replyCount = 0,
+  hasReplies = replyCount > 0
+): Comment {
   return {
     id: row.comment.id,
     content: row.comment.content,
@@ -57,6 +61,7 @@ function mapComment(row: CommentRow, replyCount = 0): Comment {
     postId: row.comment.postId,
     parentId: row.comment.parentId,
 
+    hasReplies,
     replyCount,
     replies: undefined,
 
@@ -141,14 +146,24 @@ export async function getPostComments(
       select count(*)
       from ${comment} as reply
       where reply.parent_id = comment.id
+        and reply.deleted_at is null
     )
   `.mapWith(Number);
+
+  const hasRepliesExpression = sql<boolean>`
+    exists (
+      select 1
+      from ${comment} as reply
+      where reply.parent_id = comment.id
+    )
+  `.mapWith(Boolean);
 
   const commentsQuery = db
     .select({
       comment,
       profile,
       replyCount: replyCountExpression,
+      hasReplies: hasRepliesExpression,
     })
     .from(comment)
     .leftJoin(profile, eq(profile.userId, comment.authorId))
@@ -195,7 +210,9 @@ export async function getPostComments(
       : null;
 
   return {
-    comments: pageRows.map((row) => mapComment(row, row.replyCount)),
+    comments: pageRows.map((row) =>
+      mapComment(row, row.replyCount, row.hasReplies)
+    ),
     nextCursor,
     hasMore,
     totalCount: Number(totalCount),
