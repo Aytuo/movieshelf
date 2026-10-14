@@ -5,6 +5,7 @@ import {
   Bookmark,
   Check,
   Clock3,
+  Eye,
   Film,
   Heart,
   Star,
@@ -26,6 +27,7 @@ type MediaPosterProps = {
   compact?: boolean;
   showTmdbRating?: boolean;
   showType?: boolean;
+  showWatchedIndicator?: boolean;
   favorite?: boolean;
   status?: MediaPosterStatus | null;
   userRating?: number | null;
@@ -47,6 +49,7 @@ const MediaPoster = ({
   compact = false,
   showTmdbRating = false,
   showType = false,
+  showWatchedIndicator = false,
   favorite = false,
   status = null,
   userRating = null,
@@ -94,6 +97,20 @@ const MediaPoster = ({
           ) : (
             <Tv className={compact ? 'size-3' : 'size-3.5'} />
           )}
+        </div>
+      )}
+
+      {showWatchedIndicator && (
+        <div
+          role="img"
+          aria-label="Previously watched or rated"
+          title="Previously watched or rated"
+          className={cn(
+            'absolute z-10 flex items-center justify-center rounded-md bg-black/80 text-white shadow-sm backdrop-blur-sm',
+            compact ? 'top-1.5 left-1.5 size-6' : 'top-3 left-3 size-7'
+          )}
+        >
+          <Eye className={compact ? 'size-3' : 'size-3.5'} aria-hidden="true" />
         </div>
       )}
 

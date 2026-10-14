@@ -7,12 +7,14 @@ type MediaCardProps = {
   media: Media;
   showType?: boolean;
   showGenres?: boolean;
+  showWatchedIndicator?: boolean;
 };
 
 const MediaCard = ({
   media,
   showType = false,
   showGenres = true,
+  showWatchedIndicator = false,
 }: MediaCardProps) => {
   const href =
     media.type === 'movie' ? `/movie/${media.tmdbId}` : `/tv/${media.tmdbId}`;
@@ -24,6 +26,7 @@ const MediaCard = ({
           media={media}
           showTmdbRating
           showType={showType}
+          showWatchedIndicator={showWatchedIndicator}
           className="aspect-[2/3]"
         />
 

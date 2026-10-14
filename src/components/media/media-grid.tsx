@@ -1,8 +1,8 @@
-import type { Media } from '@/lib/media';
+import type { DiscoverMedia } from '@/types';
 import MediaCard from './media-card';
 
 type MediaGridProps = {
-  media: Media[];
+  media: DiscoverMedia[];
 };
 
 const MediaGrid = ({ media }: MediaGridProps) => {
@@ -17,7 +17,11 @@ const MediaGrid = ({ media }: MediaGridProps) => {
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {media.map((item) => (
-        <MediaCard key={`${item.type}:${item.tmdbId}`} media={item} />
+        <MediaCard
+          key={`${item.type}:${item.tmdbId}`}
+          media={item}
+          showWatchedIndicator={item.userHasWatchedOrRated}
+        />
       ))}
     </div>
   );

@@ -187,7 +187,7 @@ const DeleteAccountSettings = () => {
         <DialogFooter className="mt-7 gap-3 sm:gap-3">
           <DialogClose
             disabled={isPending}
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-10 rounded-lg border border-border px-4 text-sm font-semibold transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </DialogClose>
@@ -195,6 +195,7 @@ const DeleteAccountSettings = () => {
           <Button
             type="button"
             variant="destructive"
+            className="h-10 px-4"
             disabled={!canDelete}
             onClick={() => void deleteAccount()}
           >

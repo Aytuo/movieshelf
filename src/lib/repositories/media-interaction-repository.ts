@@ -6,7 +6,7 @@ import {
   watchHistory,
 } from '@/lib/db/schema';
 import type { MediaType } from '@/lib/media';
-import { and, count, desc, eq, isNotNull, sql } from 'drizzle-orm';
+import { and, count, desc, eq, isNotNull, or, sql } from 'drizzle-orm';
 
 type DbMedia = typeof media.$inferSelect;
 type DbMediaInteraction = typeof mediaInteraction.$inferSelect;
@@ -49,6 +49,22 @@ export async function getUserMediaKeys(userId: string) {
     .from(mediaInteraction)
     .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
     .where(eq(mediaInteraction.userId, userId));
+}
+
+export async function getUserWatchedOrRatedMediaKeys(userId: string) {
+  return db
+    .selectDistinct({
+      tmdbId: media.tmdbId,
+      type: media.type,
+    })
+    .from(mediaActivity)
+    .innerJoin(media, eq(media.id, mediaActivity.mediaId))
+    .where(
+      and(
+        eq(mediaActivity.userId, userId),
+        or(eq(mediaActivity.type, 'watched'), eq(mediaActivity.type, 'rated'))
+      )
+    );
 }
 
 export async function getUserShelf(userId: string): Promise<UserShelfRow[]> {

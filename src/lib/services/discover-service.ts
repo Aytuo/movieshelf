@@ -1,10 +1,11 @@
 import type { Media } from '@/lib/media';
 import {
   getUserMediaKeys,
+  getUserWatchedOrRatedMediaKeys,
   tmdbMovieRepository,
   tmdbTvRepository,
 } from '@/lib/repositories';
-import type { DiscoverFilters } from '@/types';
+import type { DiscoverFilters, DiscoverMedia } from '@/types';
 
 function getMediaKey(media: Pick<Media, 'tmdbId' | 'type'>) {
   return `${media.type}:${media.tmdbId}`;
@@ -24,35 +25,39 @@ export async function discoverForUser(
   userId: string,
   filters: DiscoverFilters
 ) {
-  if (!filters.hideOnShelf) {
-    const result = await discoverMedia(filters);
+  const [result, watchedOrRatedMedia, knownMedia] = await Promise.all([
+    discoverMedia(filters),
+    getUserWatchedOrRatedMediaKeys(userId),
+    filters.hideOnShelf ? getUserMediaKeys(userId) : Promise.resolve([]),
+  ]);
 
+  const watchedOrRatedKeys = new Set(watchedOrRatedMedia.map(getMediaKey));
+
+  const media: DiscoverMedia[] = result.media.map((item) => ({
+    ...item,
+    userHasWatchedOrRated: watchedOrRatedKeys.has(getMediaKey(item)),
+  }));
+
+  if (!filters.hideOnShelf) {
     return {
       ...result,
+      media,
       emptyAfterShelfFilter: false,
     };
   }
 
-  // We retrieve only the results for the current page and the shelf keys.
-  const [result, knownMedia] = await Promise.all([
-    discoverMedia(filters),
-    getUserMediaKeys(userId),
-  ]);
-
   const knownMediaKeys = new Set(knownMedia.map(getMediaKey));
 
-  // We filter only the current TMDB page.
-  const media = result.media.filter(
+  const filteredMedia = media.filter(
     (item) => !knownMediaKeys.has(getMediaKey(item))
   );
 
   return {
     ...result,
-    media,
-    emptyAfterShelfFilter: result.media.length > 0 && media.length === 0,
-    // Excluding the shelf, the exact number of pages is unknown.
+    media: filteredMedia,
+    emptyAfterShelfFilter:
+      result.media.length > 0 && filteredMedia.length === 0,
     totalPagesKnown: false,
-    // The next TMDB page may contain further results.
     canGoNext: result.page < result.totalPages,
   };
 }

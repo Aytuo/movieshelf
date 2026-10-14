@@ -4,6 +4,10 @@
 
 import type { Media } from '@/lib/media';
 
+export type DiscoverMedia = Media & {
+  userHasWatchedOrRated: boolean;
+};
+
 export type MovieDiscoverSort =
   | 'popularity.desc'
   | 'vote_average.desc'
