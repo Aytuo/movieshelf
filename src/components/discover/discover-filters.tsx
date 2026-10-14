@@ -7,6 +7,7 @@ import {
   TV_GENRES,
 } from '@/constants';
 import { useDebounce } from '@/hooks/use-debounce';
+import { getDiscoverYearRangeError } from '@/lib/validations/year-validation';
 import { RotateCcw, SlidersHorizontal } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -112,6 +113,14 @@ const DiscoverFilters = () => {
     readFilters(new URLSearchParams(urlString))
   );
 
+  const currentYear = new Date().getFullYear();
+
+  const yearRangeError = getDiscoverYearRangeError(
+    draft.yearFrom,
+    draft.yearTo,
+    currentYear
+  );
+
   const debouncedDraft = useDebounce(draft, 500);
 
   const dirtyRef = useRef(false);
@@ -131,6 +140,16 @@ const DiscoverFilters = () => {
 
   useEffect(() => {
     if (!dirtyRef.current) {
+      return;
+    }
+
+    if (
+      getDiscoverYearRangeError(
+        debouncedDraft.yearFrom,
+        debouncedDraft.yearTo,
+        currentYear
+      )
+    ) {
       return;
     }
 
@@ -191,7 +210,7 @@ const DiscoverFilters = () => {
     router.replace(query ? `/discover?${query}` : '/discover', {
       scroll: false,
     });
-  }, [debouncedDraft, router, type, urlString]);
+  }, [currentYear, debouncedDraft, router, type, urlString]);
 
   function update(key: keyof FilterState, value: string) {
     setDraft((current) => ({
@@ -283,10 +302,10 @@ const DiscoverFilters = () => {
             <Input
               type="number"
               min="1888"
-              max={new Date().getFullYear()}
+              max={currentYear}
               value={draft.yearFrom}
               onChange={(event) => update('yearFrom', event.target.value)}
-              placeholder="2010"
+              placeholder="2000"
             />
           </div>
 
@@ -296,13 +315,19 @@ const DiscoverFilters = () => {
             <Input
               type="number"
               min="1888"
-              max={new Date().getFullYear()}
+              max={currentYear}
               value={draft.yearTo}
               onChange={(event) => update('yearTo', event.target.value)}
-              placeholder="2025"
+              placeholder={currentYear.toString()}
             />
           </div>
         </div>
+
+        {yearRangeError && (
+          <p role="alert" className="mt-2 text-xs text-destructive">
+            {yearRangeError}
+          </p>
+        )}
 
         <div>
           <label className="label">Minimum rating</label>

@@ -4,6 +4,7 @@ import type {
   MovieDiscoverSort,
   TvDiscoverSort,
 } from '@/types';
+import { parseDiscoverYear } from '../validations/year-validation';
 import { TMDB_DISCOVER_MAX_PAGES } from './pagination';
 
 const MOVIE_DISCOVER_SORTS = [
@@ -79,10 +80,24 @@ function parseTvSort(value: string | null): TvDiscoverSort | undefined {
 export function parseDiscoverFilters(params: URLSearchParams): DiscoverFilters {
   const type = parseMediaType(params.get('type'));
 
+  const currentYear = new Date().getFullYear();
+
+  const parsedYearFrom = parseDiscoverYear(params.get('yearFrom'), currentYear);
+
+  const parsedYearTo = parseDiscoverYear(params.get('yearTo'), currentYear);
+
+  const hasInvalidYearRange =
+    parsedYearFrom !== undefined &&
+    parsedYearTo !== undefined &&
+    parsedYearFrom > parsedYearTo;
+
+  const yearFrom = hasInvalidYearRange ? undefined : parsedYearFrom;
+  const yearTo = hasInvalidYearRange ? undefined : parsedYearTo;
+
   const base = {
     genre: parsePositiveInteger(params.get('genre')),
-    yearFrom: parsePositiveInteger(params.get('yearFrom')),
-    yearTo: parsePositiveInteger(params.get('yearTo')),
+    yearFrom,
+    yearTo,
     minRating: parseNumber(params.get('rating')),
     minRuntime: undefined,
     maxRuntime: parsePositiveInteger(params.get('runtime')),

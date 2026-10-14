@@ -110,7 +110,32 @@ const DiscoverPage = async ({ searchParams }: DiscoverPageProps) => {
 
   const params = await searchParams;
 
-  const filters = parseDiscoverFilters(toURLSearchParams(params));
+  const filterParams = toURLSearchParams(params);
+  const filters = parseDiscoverFilters(filterParams);
+
+  const originalQuery = filterParams.toString();
+  const canonicalParams = new URLSearchParams(originalQuery);
+
+  if (filters.yearFrom !== undefined) {
+    canonicalParams.set('yearFrom', String(filters.yearFrom));
+  } else {
+    canonicalParams.delete('yearFrom');
+  }
+
+  if (filters.yearTo !== undefined) {
+    canonicalParams.set('yearTo', String(filters.yearTo));
+  } else {
+    canonicalParams.delete('yearTo');
+  }
+
+  if (canonicalParams.toString() !== originalQuery) {
+    // Invalid filter values change the effective query, so restart at page 1.
+    canonicalParams.delete('page');
+
+    const query = canonicalParams.toString();
+
+    redirect(query ? `/discover?${query}` : '/discover');
+  }
 
   const result = await discoverForUser(session.user.id, filters);
 
