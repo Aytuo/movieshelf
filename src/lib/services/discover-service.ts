@@ -25,11 +25,15 @@ export async function discoverForUser(
   userId: string,
   filters: DiscoverFilters
 ) {
-  const [result, watchedOrRatedMedia, knownMedia] = await Promise.all([
+  const [result, knownMedia] = await Promise.all([
     discoverMedia(filters),
-    getUserWatchedOrRatedMediaKeys(userId),
     filters.hideOnShelf ? getUserMediaKeys(userId) : Promise.resolve([]),
   ]);
+
+  const watchedOrRatedMedia = await getUserWatchedOrRatedMediaKeys(
+    userId,
+    result.media
+  );
 
   const watchedOrRatedKeys = new Set(watchedOrRatedMedia.map(getMediaKey));
 

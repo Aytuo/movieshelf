@@ -1,0 +1,1 @@
+CREATE INDEX "media_activity_user_media_type_idx" ON "media_activity" USING btree ("user_id","media_id","type");

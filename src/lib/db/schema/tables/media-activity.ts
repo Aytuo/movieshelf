@@ -1,4 +1,5 @@
 import {
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -32,25 +33,35 @@ export type MediaActivityType = (typeof mediaActivityType.enumValues)[number];
 /*                              MEDIA ACTIVITY                                */
 /* ========================================================================== */
 
-export const mediaActivity = pgTable('media_activity', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  mediaId: uuid('media_id')
-    .notNull()
-    .references(() => media.id, { onDelete: 'cascade' }),
-  type: mediaActivityType('type').notNull(),
+export const mediaActivity = pgTable(
+  'media_activity',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    mediaId: uuid('media_id')
+      .notNull()
+      .references(() => media.id, { onDelete: 'cascade' }),
+    type: mediaActivityType('type').notNull(),
 
-  // Optional event-specific data; currently used by: rated → rating, reviewed → reviewId
+    // Optional event-specific data; currently used by: rated → rating, reviewed → reviewId
 
-  rating: integer('rating'),
-  reviewId: uuid('review_id').references(() => review.id, {
-    onDelete: 'set null',
-  }),
-  createdAt: timestamp('created_at', {
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
-});
+    rating: integer('rating'),
+    reviewId: uuid('review_id').references(() => review.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', {
+      withTimezone: true,
+    })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index('media_activity_user_media_type_idx').on(
+      table.userId,
+      table.mediaId,
+      table.type
+    ),
+  ]
+);
