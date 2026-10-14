@@ -50,7 +50,7 @@ const MarketingNavbar = ({ authenticated = false }: MarketingNavbarProps) => {
             {authenticated ? (
               <Link
                 href="/home"
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
               >
                 Open MovieShelf
                 <ArrowRight className="size-4" />
@@ -66,7 +66,7 @@ const MarketingNavbar = ({ authenticated = false }: MarketingNavbarProps) => {
 
                 <Link
                   href="/register"
-                  className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
                 >
                   Join MovieShelf
                   <ArrowRight className="size-4" />

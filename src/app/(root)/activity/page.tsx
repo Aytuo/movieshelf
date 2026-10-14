@@ -36,7 +36,7 @@ const ActivityPage = async () => {
           className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Watch history
-          <ArrowRight className="size-3.5" />
+          <ArrowRight className="size-4" />
         </Link>
       </div>
 

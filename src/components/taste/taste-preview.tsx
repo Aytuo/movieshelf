@@ -39,7 +39,7 @@ const TastePreview = ({ taste, username }: TastePreviewProps) => {
               className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
             >
               Explore more
-              <ArrowRight className="size-3.5" />
+              <ArrowRight className="size-4" />
             </Link>
           </div>
 

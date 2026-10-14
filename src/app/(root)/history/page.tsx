@@ -45,7 +45,7 @@ const HistoryPage = async ({ searchParams }: HistoryPageProps) => {
           className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Activity
-          <ArrowRight className="size-3.5" />
+          <ArrowRight className="size-4" />
         </Link>
       </div>
 

@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 type HistoryPaginationProps = {
@@ -15,9 +16,10 @@ const HistoryPagination = ({ page, totalPages }: HistoryPaginationProps) => {
       {page > 1 ? (
         <Link
           href={`/history?page=${page - 1}`}
-          className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
         >
-          ← Previous
+          <ArrowLeft className="size-4" />
+          Previous
         </Link>
       ) : (
         <span />
@@ -30,9 +32,10 @@ const HistoryPagination = ({ page, totalPages }: HistoryPaginationProps) => {
       {page < totalPages ? (
         <Link
           href={`/history?page=${page + 1}`}
-          className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
         >
-          Next →
+          Next
+          <ArrowRight className="size-4" />
         </Link>
       ) : (
         <span />

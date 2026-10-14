@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import type { Post } from '@/types';
-import { MessageCircle, Star } from 'lucide-react';
+import { ArrowRight, MessageCircle, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PostReactionButton } from './post-reaction-button';
@@ -126,8 +126,9 @@ const PostCard = ({ post, variant = 'preview' }: PostCardProps) => {
             {getPreviewContent(post.content)}
           </p>
 
-          <span className="mt-4 inline-block text-sm font-semibold text-primary">
-            Read more →
+          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+            Read more
+            <ArrowRight className="size-4" />
           </span>
         </Link>
       ) : (

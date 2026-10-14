@@ -1,6 +1,7 @@
 import type { Media, MediaType } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
 import { cn } from '@/lib/utils';
+import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 
 type RatingStepProps = {
@@ -33,9 +34,10 @@ const RatingStep = ({
           <button
             type="button"
             onClick={onBack}
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            ← Back
+            <ArrowLeft className="size-4" />
+            Back
           </button>
 
           <span className="text-xs text-muted-foreground">

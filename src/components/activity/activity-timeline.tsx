@@ -2,6 +2,7 @@ import type { MediaActivityItem } from '@/lib/services/media-activity-service';
 import { tmdbImage } from '@/lib/tmdb/images';
 import {
   Activity,
+  ArrowRight,
   Bookmark,
   Check,
   Clock3,
@@ -210,9 +211,10 @@ const ActivityTimeline = ({ activities }: MediaActivityTimelineProps) => {
                       <div className="mt-2 flex justify-end">
                         <Link
                           href={`${href}#reviews`}
-                          className="text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
                         >
-                          Read full review →
+                          Read full review
+                          <ArrowRight className="size-4" />
                         </Link>
                       </div>
                     </>

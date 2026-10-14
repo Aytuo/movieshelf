@@ -161,7 +161,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
           className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Discover
-          <ArrowRight className="size-3.5" />
+          <ArrowRight className="size-4" />
         </Link>
       </div>
 
@@ -201,7 +201,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
                 className="hidden items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary-hover sm:inline-flex"
               >
                 Looking to explore?
-                <ArrowRight className="size-3.5" />
+                <ArrowRight className="size-4" />
               </Link>
             </div>
 

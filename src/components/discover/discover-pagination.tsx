@@ -1,6 +1,7 @@
 'use client';
 
 import { buildDiscoverUrl } from '@/lib/discover/build-url';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -32,9 +33,10 @@ const DiscoverPagination = ({
       {previous ? (
         <Link
           href={previous}
-          className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
         >
-          ← Previous
+          <ArrowLeft className="size-4" />
+          Previous
         </Link>
       ) : (
         <span />
@@ -47,9 +49,10 @@ const DiscoverPagination = ({
       {next ? (
         <Link
           href={next}
-          className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover"
         >
-          Next →
+          Next
+          <ArrowRight className="size-4" />
         </Link>
       ) : (
         <span />
