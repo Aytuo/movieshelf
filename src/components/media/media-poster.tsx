@@ -100,6 +100,34 @@ const MediaPoster = ({
         </div>
       )}
 
+      {showTmdbRating && (media.rating ?? 0) > 0 && (
+        <div className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-md bg-black/80 px-2 py-1 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
+          <Star className="size-3 fill-current text-rating" />
+          {(media.rating ?? 0).toFixed(1)}
+        </div>
+      )}
+
+      {(userRating !== null || favorite) && (
+        <div className="absolute bottom-3 left-3 z-10 flex h-7 items-center gap-1.5">
+          {userRating !== null && (
+            <div className="inline-flex h-7 items-center gap-1 rounded-md bg-black/70 px-2 text-xs font-semibold text-rating shadow-sm backdrop-blur-sm">
+              <Star className="size-3 fill-current" />
+              {userRating}
+            </div>
+          )}
+
+          {favorite && (
+            <div
+              title="Favorite"
+              aria-label="Favorite"
+              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-black/70 text-primary shadow-sm backdrop-blur-sm"
+            >
+              <Heart className="size-3.5" fill="currentColor" />
+            </div>
+          )}
+        </div>
+      )}
+
       {showWatchedIndicator && (
         <div
           role="img"
@@ -111,26 +139,6 @@ const MediaPoster = ({
           )}
         >
           <Eye className={compact ? 'size-3' : 'size-3.5'} aria-hidden="true" />
-        </div>
-      )}
-
-      {favorite && (
-        <div className="absolute top-3 right-3 flex size-7 items-center justify-center rounded-full bg-black/70 text-primary backdrop-blur-sm">
-          <Heart className="size-3.5" fill="currentColor" />
-        </div>
-      )}
-
-      {showTmdbRating && (media.rating ?? 0) > 0 && (
-        <div className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-md bg-black/80 px-2 py-1 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
-          <Star className="size-3 fill-current text-rating" />
-          {(media.rating ?? 0).toFixed(1)}
-        </div>
-      )}
-
-      {userRating !== null && (
-        <div className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-xs font-semibold text-rating">
-          <Star className="size-3 fill-current" />
-          {userRating}
         </div>
       )}
 
