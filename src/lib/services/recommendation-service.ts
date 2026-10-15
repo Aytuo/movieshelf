@@ -14,6 +14,7 @@ import {
 } from '@/lib/recommendations/scorer';
 import { getUserShelfForType } from '@/lib/repositories';
 import type { MediaRecommendation } from '@/types';
+import { withStoredMediaRatings } from './media-rating-service';
 
 type RecommendationShelfItem = Awaited<
   ReturnType<typeof getUserShelfForType>
@@ -100,7 +101,16 @@ export async function getRecommendationsForUser(
 
   // Diversification.
 
-  return diversifyRecommendations(filtered, 12);
+  const recommendations = diversifyRecommendations(filtered, 12);
+
+  const mediaWithStoredRatings = await withStoredMediaRatings(
+    recommendations.map((item) => item.media)
+  );
+
+  return recommendations.map((item, index) => ({
+    ...item,
+    media: mediaWithStoredRatings[index] ?? item.media,
+  }));
 }
 
 function toRecommendationMedia(media: RecommendationShelfItem['media']): Media {

@@ -6,6 +6,7 @@ import {
 import type { SearchFilters, SearchResult } from '@/types';
 import { getSearchPagination, SEARCH_PAGE_SIZE } from '../search/pagination';
 import { normalizeSearchQuery } from '../search/query';
+import { getMediaKey, withStoredMediaRatings } from './media-rating-service';
 import { searchPeople } from './people-service';
 
 export async function search({
@@ -72,8 +73,29 @@ export async function search({
             page: pagination.page,
           });
 
+    const visibleResults = response.results.slice(0, SEARCH_PAGE_SIZE);
+
+    const visibleMedia = visibleResults.flatMap((item) =>
+      item.type === 'media' ? [item.media] : []
+    );
+
+    const ratedMedia = await withStoredMediaRatings(visibleMedia);
+
+    const ratedMediaByKey = new Map(
+      ratedMedia.map((media) => [getMediaKey(media), media] as const)
+    );
+
     return {
-      results: response.results.slice(0, SEARCH_PAGE_SIZE),
+      results: visibleResults.map((item) => {
+        if (item.type !== 'media') {
+          return item;
+        }
+
+        return {
+          ...item,
+          media: ratedMediaByKey.get(getMediaKey(item.media)) ?? item.media,
+        };
+      }),
       ...pagination,
     };
   }
@@ -92,5 +114,8 @@ export async function search({
     year: filters.year,
   });
 
-  return response;
+  return {
+    ...response,
+    media: await withStoredMediaRatings(response.media),
+  };
 }

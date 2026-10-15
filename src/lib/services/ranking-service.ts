@@ -1,5 +1,6 @@
 import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
 import type { Ranking, RankingItem, RankingType } from '@/types';
+import { withStoredMediaRatings } from './media-rating-service';
 
 const RANKING_LIMIT = 100;
 const MIN_VOTE_COUNT = 10_000;
@@ -63,14 +64,28 @@ function buildRanking(
   };
 }
 
+async function applyStoredRatingsToRanking(ranking: Ranking): Promise<Ranking> {
+  const ratedMedia = await withStoredMediaRatings(
+    ranking.items.map((item) => item.media)
+  );
+
+  return {
+    ...ranking,
+    items: ranking.items.map((item, index) => ({
+      ...item,
+      media: ratedMedia[index] ?? item.media,
+    })),
+  };
+}
+
 export async function getMovieRanking() {
   const candidates = await tmdbMovieRepository.getRankingCandidates();
 
-  return buildRanking('movie', candidates);
+  return applyStoredRatingsToRanking(buildRanking('movie', candidates));
 }
 
 export async function getTvRanking() {
   const candidates = await tmdbTvRepository.getRankingCandidates();
 
-  return buildRanking('tv', candidates);
+  return applyStoredRatingsToRanking(buildRanking('tv', candidates));
 }

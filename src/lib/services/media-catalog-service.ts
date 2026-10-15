@@ -1,5 +1,11 @@
 import type { Media, TvScheduleItem } from '@/lib/media';
 import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
+import type { StoredMediaRatingMap } from './media-rating-service';
+import {
+  applyStoredMediaRatings,
+  getMediaKey,
+  getStoredMediaRatings,
+} from './media-rating-service';
 
 export type MovieCatalogSections = {
   popular: Media[];
@@ -19,6 +25,28 @@ export type TvCatalogSections = {
   topRated: Media[];
 };
 
+function applyRatingsToSchedule(
+  items: TvScheduleItem[],
+  storedRatings: StoredMediaRatingMap
+): TvScheduleItem[] {
+  return items.map((item) => {
+    const storedRating = storedRatings.get(getMediaKey(item.media));
+
+    if (!storedRating) {
+      return item;
+    }
+
+    return {
+      ...item,
+      media: {
+        ...item.media,
+        rating: storedRating.rating,
+        voteCount: storedRating.voteCount,
+      },
+    };
+  });
+}
+
 export async function getMovieCatalogSections(): Promise<MovieCatalogSections> {
   const [popular, trending, topPicks, nowPlaying, upcoming, topRated] =
     await Promise.all([
@@ -30,13 +58,22 @@ export async function getMovieCatalogSections(): Promise<MovieCatalogSections> {
       tmdbMovieRepository.getTopRated(),
     ]);
 
+  const storedRatings = await getStoredMediaRatings([
+    ...popular,
+    ...trending,
+    ...topPicks,
+    ...nowPlaying,
+    ...upcoming,
+    ...topRated,
+  ]);
+
   return {
-    popular,
-    trending,
-    topPicks,
-    nowPlaying,
-    upcoming,
-    topRated,
+    popular: applyStoredMediaRatings(popular, storedRatings),
+    trending: applyStoredMediaRatings(trending, storedRatings),
+    topPicks: applyStoredMediaRatings(topPicks, storedRatings),
+    nowPlaying: applyStoredMediaRatings(nowPlaying, storedRatings),
+    upcoming: applyStoredMediaRatings(upcoming, storedRatings),
+    topRated: applyStoredMediaRatings(topRated, storedRatings),
   };
 }
 
@@ -51,12 +88,21 @@ export async function getTvCatalogSections(): Promise<TvCatalogSections> {
       tmdbTvRepository.getTopRated(),
     ]);
 
+  const storedRatings = await getStoredMediaRatings([
+    ...popular,
+    ...trending,
+    ...topPicks,
+    ...airingToday.map((item) => item.media),
+    ...onTheAir.map((item) => item.media),
+    ...topRated,
+  ]);
+
   return {
-    popular,
-    trending,
-    topPicks,
-    airingToday,
-    onTheAir,
-    topRated,
+    popular: applyStoredMediaRatings(popular, storedRatings),
+    trending: applyStoredMediaRatings(trending, storedRatings),
+    topPicks: applyStoredMediaRatings(topPicks, storedRatings),
+    airingToday: applyRatingsToSchedule(airingToday, storedRatings),
+    onTheAir: applyRatingsToSchedule(onTheAir, storedRatings),
+    topRated: applyStoredMediaRatings(topRated, storedRatings),
   };
 }

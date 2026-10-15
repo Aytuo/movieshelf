@@ -1,16 +1,11 @@
-import type { Media } from '@/lib/media';
 import {
-  getMediaRatingsByTmdbKeys,
   getUserMediaKeys,
   getUserWatchedOrRatedMediaKeys,
   tmdbMovieRepository,
   tmdbTvRepository,
 } from '@/lib/repositories';
 import type { DiscoverFilters, DiscoverMedia } from '@/types';
-
-function getMediaKey(media: Pick<Media, 'tmdbId' | 'type'>) {
-  return `${media.type}:${media.tmdbId}`;
-}
+import { getMediaKey, withStoredMediaRatings } from './media-rating-service';
 
 async function discoverMedia(filters: DiscoverFilters) {
   switch (filters.type) {
@@ -31,39 +26,17 @@ export async function discoverForUser(
     filters.hideOnShelf ? getUserMediaKeys(userId) : Promise.resolve([]),
   ]);
 
-  const [watchedOrRatedMedia, storedMediaRatings] = await Promise.all([
+  const [watchedOrRatedMedia, ratedMedia] = await Promise.all([
     getUserWatchedOrRatedMediaKeys(userId, result.media),
-    getMediaRatingsByTmdbKeys(result.media),
+    withStoredMediaRatings(result.media),
   ]);
 
   const watchedOrRatedKeys = new Set(watchedOrRatedMedia.map(getMediaKey));
 
-  const storedRatingsByKey = new Map<
-    string,
-    { rating: number; voteCount: number }
-  >();
-
-  for (const item of storedMediaRatings) {
-    storedRatingsByKey.set(getMediaKey(item), {
-      rating: Number(item.rating ?? 0),
-      voteCount: item.voteCount,
-    });
-  }
-
-  const media: DiscoverMedia[] = result.media.map((item) => {
-    const storedRating = storedRatingsByKey.get(getMediaKey(item));
-
-    return {
-      ...item,
-      ...(storedRating
-        ? {
-            rating: storedRating.rating,
-            voteCount: storedRating.voteCount,
-          }
-        : {}),
-      userHasWatchedOrRated: watchedOrRatedKeys.has(getMediaKey(item)),
-    };
-  });
+  const media: DiscoverMedia[] = ratedMedia.map((item) => ({
+    ...item,
+    userHasWatchedOrRated: watchedOrRatedKeys.has(getMediaKey(item)),
+  }));
 
   if (!filters.hideOnShelf) {
     return {

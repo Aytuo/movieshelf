@@ -9,6 +9,7 @@ import {
   upsertMedia,
 } from '@/lib/repositories';
 import type { MediaRecord } from '@/types';
+import { withStoredMediaRatings } from './media-rating-service';
 import { getMediaPosts } from './post-service';
 import { getMediaWatchCountForUser } from './watch-history-service';
 
@@ -38,6 +39,19 @@ export async function getMediaDetailsPageData(
 ) {
   const mediaDetails = await getMediaDetails(type, tmdbId);
 
+  const similarCount = mediaDetails.similar.length;
+
+  const ratedRelatedMedia = await withStoredMediaRatings([
+    ...mediaDetails.similar,
+    ...mediaDetails.recommendations,
+  ]);
+
+  const mediaWithRatedRelatedItems: MediaDetails = {
+    ...mediaDetails,
+    similar: ratedRelatedMedia.slice(0, similarCount),
+    recommendations: ratedRelatedMedia.slice(similarCount),
+  };
+
   const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, mediaDetails);
 
   const postsPagePromise = getMediaPosts(mediaRecord.id, userId, {
@@ -58,7 +72,7 @@ export async function getMediaDetailsPageData(
       : null;
 
   return {
-    media: mediaDetails,
+    media: mediaWithRatedRelatedItems,
     mediaInteraction,
     watchNumber,
     existingReview,
