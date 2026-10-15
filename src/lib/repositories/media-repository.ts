@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { media } from '@/lib/db/schema';
-import type { Media, MediaType } from '@/lib/media';
-import { and, eq } from 'drizzle-orm';
+import type { Media, MediaKey, MediaType } from '@/lib/media';
+import { and, eq, or } from 'drizzle-orm';
 
 type DbMedia = typeof media.$inferSelect;
 type DbMediaInsert = typeof media.$inferInsert;
@@ -48,6 +48,32 @@ export async function getMediaRecordByTmdbId(
     .limit(1);
 
   return result[0] ?? null;
+}
+
+export async function getMediaRatingsByTmdbKeys(mediaKeys: MediaKey[]) {
+  if (mediaKeys.length === 0) {
+    return [];
+  }
+
+  const matchingMedia = or(
+    ...mediaKeys.map(({ tmdbId, type }) =>
+      and(eq(media.tmdbId, tmdbId), eq(media.type, type))
+    )
+  );
+
+  if (!matchingMedia) {
+    return [];
+  }
+
+  return db
+    .select({
+      tmdbId: media.tmdbId,
+      type: media.type,
+      rating: media.tmdbRating,
+      voteCount: media.tmdbVoteCount,
+    })
+    .from(media)
+    .where(matchingMedia);
 }
 
 export async function createMedia(data: DbMediaCreate) {

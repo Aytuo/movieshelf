@@ -77,14 +77,16 @@ export async function getOrCreateMediaRecord(
   tmdbId: number,
   details?: MediaDetails
 ): Promise<MediaRecord> {
-  const existing = await getMediaRecordByTmdbId(tmdbId, type);
+  if (!details) {
+    const existing = await getMediaRecordByTmdbId(tmdbId, type);
 
-  if (
-    existing &&
-    Array.isArray(existing.genres) &&
-    existing.genres.length > 0
-  ) {
-    return existing;
+    if (
+      existing &&
+      Array.isArray(existing.genres) &&
+      existing.genres.length > 0
+    ) {
+      return existing;
+    }
   }
 
   const source = details ?? (await getMediaDetails(type, tmdbId));
