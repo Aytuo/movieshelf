@@ -64,28 +64,16 @@ function buildRanking(
   };
 }
 
-async function applyStoredRatingsToRanking(ranking: Ranking): Promise<Ranking> {
-  const ratedMedia = await withStoredMediaRatings(
-    ranking.items.map((item) => item.media)
-  );
-
-  return {
-    ...ranking,
-    items: ranking.items.map((item, index) => ({
-      ...item,
-      media: ratedMedia[index] ?? item.media,
-    })),
-  };
-}
-
 export async function getMovieRanking() {
   const candidates = await tmdbMovieRepository.getRankingCandidates();
+  const ratedCandidates = await withStoredMediaRatings(candidates);
 
-  return applyStoredRatingsToRanking(buildRanking('movie', candidates));
+  return buildRanking('movie', ratedCandidates);
 }
 
 export async function getTvRanking() {
   const candidates = await tmdbTvRepository.getRankingCandidates();
+  const ratedCandidates = await withStoredMediaRatings(candidates);
 
-  return applyStoredRatingsToRanking(buildRanking('tv', candidates));
+  return buildRanking('tv', ratedCandidates);
 }
