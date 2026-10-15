@@ -354,8 +354,13 @@ const ShelfPage = async ({ searchParams }: ShelfPageProps) => {
                       posterPath: media.posterPath,
                       title: media.title,
                       type: media.type,
+                      rating:
+                        media.tmdbRating === null
+                          ? null
+                          : Number(media.tmdbRating),
                     }}
-                    showType
+                    showTmdbRating
+                    showType={type === 'all'}
                     favorite={interaction.favorite}
                     status={interaction.status}
                     userRating={interaction.rating}

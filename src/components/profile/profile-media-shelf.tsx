@@ -18,6 +18,10 @@ type ProfileMediaItem = {
     originalLanguage: string;
     genres: Media['genres'];
   };
+  interaction: {
+    favorite: boolean;
+    rating: number | null;
+  };
 };
 
 type ProfileMediaShelfProps = {
@@ -27,6 +31,7 @@ type ProfileMediaShelfProps = {
   emptyTitle: string;
   emptyDescription: string;
   emptyIcon: LucideIcon;
+  badge: 'favorite' | 'user-rating';
 };
 
 function toMedia(record: ProfileMediaItem['media']): Media {
@@ -53,6 +58,7 @@ export function ProfileMediaShelf({
   emptyTitle,
   emptyDescription,
   emptyIcon: EmptyIcon,
+  badge,
 }: ProfileMediaShelfProps) {
   return (
     <section className="py-10 lg:py-14">
@@ -64,7 +70,7 @@ export function ProfileMediaShelf({
 
       {items.length > 0 ? (
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
-          {items.map(({ media: record }) => {
+          {items.map(({ media: record, interaction }) => {
             const media = toMedia(record);
 
             return (
@@ -72,6 +78,9 @@ export function ProfileMediaShelf({
                 key={`${media.type}:${media.tmdbId}`}
                 media={media}
                 showGenres={false}
+                showType
+                favorite={badge === 'favorite' && interaction.favorite}
+                userRating={badge === 'user-rating' ? interaction.rating : null}
               />
             );
           })}

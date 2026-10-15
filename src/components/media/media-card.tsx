@@ -7,6 +7,8 @@ type MediaCardProps = {
   media: Media;
   showType?: boolean;
   showGenres?: boolean;
+  favorite?: boolean;
+  userRating?: number | null;
   showWatchedIndicator?: boolean;
 };
 
@@ -14,6 +16,8 @@ const MediaCard = ({
   media,
   showType = false,
   showGenres = true,
+  favorite = false,
+  userRating = null,
   showWatchedIndicator = false,
 }: MediaCardProps) => {
   const href =
@@ -26,6 +30,8 @@ const MediaCard = ({
           media={media}
           showTmdbRating
           showType={showType}
+          favorite={favorite}
+          userRating={userRating}
           showWatchedIndicator={showWatchedIndicator}
           className="aspect-[2/3]"
         />

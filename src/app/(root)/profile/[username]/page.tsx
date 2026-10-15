@@ -219,6 +219,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
         emptyTitle="No favorites yet"
         emptyDescription="Favorite movies and TV series will appear here."
         emptyIcon={Heart}
+        badge="favorite"
       />
 
       <ProfileMediaShelf
@@ -228,6 +229,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
         emptyTitle="No ratings yet"
         emptyDescription="Movies and TV series you rate will appear here."
         emptyIcon={History}
+        badge="user-rating"
       />
     </main>
   );
