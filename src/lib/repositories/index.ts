@@ -1,3 +1,4 @@
+export * from './account-repository';
 export * from './comment-reaction-repository';
 export * from './comment-repository';
 export * from './follow-repository';

@@ -1,6 +1,7 @@
 import ActiveSessions from './active-sessions';
 import DeleteAccountSettings from './delete-account-settings';
 import PasswordSettings from './password-settings';
+import SessionReauthentication from './session-reauthentication';
 
 type SecuritySettingsProps = {
   initialSessions: {
@@ -12,11 +13,21 @@ type SecuritySettingsProps = {
   }[];
 
   currentSessionToken: string;
+
+  sessionsRequireReauthentication: boolean;
+
+  userEmail: string;
+  hasPassword: boolean;
+  oauthProviders: ('google' | 'discord')[];
 };
 
 const SecuritySettings = ({
   initialSessions,
   currentSessionToken,
+  sessionsRequireReauthentication,
+  userEmail,
+  hasPassword,
+  oauthProviders,
 }: SecuritySettingsProps) => {
   return (
     <div className="space-y-8">
@@ -54,10 +65,18 @@ const SecuritySettings = ({
           </p>
         </div>
 
-        <ActiveSessions
-          initialSessions={initialSessions}
-          currentSessionToken={currentSessionToken}
-        />
+        {sessionsRequireReauthentication ? (
+          <SessionReauthentication
+            userEmail={userEmail}
+            hasPassword={hasPassword}
+            oauthProviders={oauthProviders}
+          />
+        ) : (
+          <ActiveSessions
+            initialSessions={initialSessions}
+            currentSessionToken={currentSessionToken}
+          />
+        )}
       </section>
 
       <section className="rounded-2xl border border-destructive/30 p-5 sm:p-7">
