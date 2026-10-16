@@ -18,10 +18,14 @@ const EXTENSIONS: Record<string, string> = {
   'image/webp': 'webp',
 };
 
-const ALLOWED_PROVIDER_AVATAR_HOSTS = new Set([
-  'lh3.googleusercontent.com',
-  'cdn.discordapp.com',
-]);
+const AVATAR_PROVIDER_BY_HOST: Record<string, 'google' | 'discord'> = {
+  'lh3.googleusercontent.com': 'google',
+  'cdn.discordapp.com': 'discord',
+};
+
+const ALLOWED_PROVIDER_AVATAR_HOSTS = new Set(
+  Object.keys(AVATAR_PROVIDER_BY_HOST)
+);
 
 function normalizeContentType(value: string | null | undefined) {
   return (value ?? '').split(';', 1)[0].trim().toLowerCase();
@@ -109,6 +113,18 @@ function parseProviderAvatarUrl(value: string): URL {
   }
 
   return url;
+}
+
+export function getAvatarProviderFromUrl(
+  value: string
+): 'google' | 'discord' | null {
+  try {
+    const url = parseProviderAvatarUrl(value);
+
+    return AVATAR_PROVIDER_BY_HOST[url.hostname.toLowerCase()] ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function readLimitedResponseBody(

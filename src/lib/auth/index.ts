@@ -22,7 +22,13 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { eq } from 'drizzle-orm';
 import { sendEmail } from '../email/send-email';
-import { deleteStoredAvatarsForUser } from '../services/profile-avatar-service';
+import { updateProfileAvatar } from '../repositories';
+import {
+  deleteStoredAvatar,
+  deleteStoredAvatarsForUser,
+  getAvatarProviderFromUrl,
+  storeAvatarFromUrl,
+} from '../services/profile-avatar-service';
 import { ensureProfile } from '../services/profile-service';
 
 export const auth = betterAuth({
@@ -122,11 +128,49 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
-          await ensureProfile({
+          const profile = await ensureProfile({
             userId: user.id,
             name: user.name,
             email: user.email,
           });
+
+          const providerAvatarUrl = user.image;
+
+          if (!providerAvatarUrl) {
+            return;
+          }
+
+          const provider = getAvatarProviderFromUrl(providerAvatarUrl);
+
+          if (!provider || profile.avatarPreferenceSet || profile.avatarUrl) {
+            return;
+          }
+
+          let storedAvatarUrl: string | null = null;
+
+          try {
+            storedAvatarUrl = await storeAvatarFromUrl(
+              user.id,
+              providerAvatarUrl
+            );
+
+            await updateProfileAvatar(user.id, {
+              avatarUrl: storedAvatarUrl,
+              avatarSource: 'oauth',
+              avatarProvider: provider,
+              avatarPreferenceSet: false,
+            });
+          } catch (error) {
+            if (storedAvatarUrl) {
+              await deleteStoredAvatar(storedAvatarUrl, 'oauth');
+            }
+
+            console.error('Failed to initialize OAuth avatar for new user:', {
+              userId: user.id,
+              provider,
+              error,
+            });
+          }
         },
       },
     },
