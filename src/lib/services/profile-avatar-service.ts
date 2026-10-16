@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { del, put } from '@vercel/blob';
+import { del, list, put } from '@vercel/blob';
 
 export const MAX_AVATAR_SIZE = 3 * 1024 * 1024;
 
@@ -262,5 +262,28 @@ export async function deleteStoredAvatar(
     }
   } catch {
     // Old/external avatar URLs are intentionally left untouched.
+  }
+}
+
+export async function deleteStoredAvatarsForUser(userId: string) {
+  const prefix = `avatars/${userId}/`;
+  let cursor: string | undefined;
+
+  while (true) {
+    const result = await list({ prefix, cursor });
+
+    if (result.blobs.length > 0) {
+      await del(result.blobs.map((blob) => blob.url));
+    }
+
+    if (!result.hasMore) {
+      break;
+    }
+
+    if (!result.cursor) {
+      throw new Error('Could not continue listing avatar blobs.');
+    }
+
+    cursor = result.cursor;
   }
 }

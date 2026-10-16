@@ -22,6 +22,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { eq } from 'drizzle-orm';
 import { sendEmail } from '../email/send-email';
+import { deleteStoredAvatarsForUser } from '../services/profile-avatar-service';
 import { ensureProfile } from '../services/profile-service';
 
 export const auth = betterAuth({
@@ -148,6 +149,20 @@ export const auth = betterAuth({
             updatedAt: deletedAt,
           })
           .where(eq(schema.comment.authorId, deletedUser.id));
+      },
+
+      afterDelete: async (deletedUser) => {
+        try {
+          await deleteStoredAvatarsForUser(deletedUser.id);
+        } catch (error) {
+          console.error(
+            'Failed to delete stored avatars after account deletion:',
+            {
+              userId: deletedUser.id,
+              error,
+            }
+          );
+        }
       },
     },
   },
