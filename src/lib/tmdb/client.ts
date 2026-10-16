@@ -1,5 +1,9 @@
 import 'server-only';
 
+type TmdbFetchOptions = {
+  revalidate?: number | false;
+};
+
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 const token = process.env.TMDB_API_READ_ACCESS_TOKEN;
@@ -10,7 +14,8 @@ if (!token) {
 
 export async function tmdbFetch<T>(
   path: string,
-  searchParams?: Record<string, string>
+  searchParams?: Record<string, string>,
+  options: TmdbFetchOptions = {}
 ): Promise<T> {
   const url = new URL(`${TMDB_BASE_URL}${path}`);
 
@@ -22,14 +27,17 @@ export async function tmdbFetch<T>(
     }
   }
 
+  const cacheOptions =
+    options.revalidate === false
+      ? { cache: 'no-store' as const }
+      : { next: { revalidate: options.revalidate ?? 300 } };
+
   const response = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
       accept: 'application/json',
     },
-    next: {
-      revalidate: 300,
-    },
+    ...cacheOptions,
   });
 
   if (!response.ok) {

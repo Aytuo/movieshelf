@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { media } from '@/lib/db/schema';
 import type { Media, MediaKey, MediaType } from '@/lib/media';
-import { and, eq, or } from 'drizzle-orm';
+import { and, asc, eq, or, sql } from 'drizzle-orm';
 
 type DbMedia = typeof media.$inferSelect;
 type DbMediaInsert = typeof media.$inferInsert;
@@ -74,6 +74,51 @@ export async function getMediaRatingsByTmdbKeys(mediaKeys: MediaKey[]) {
     })
     .from(media)
     .where(matchingMedia);
+}
+
+export async function getMediaForRatingRefresh(limit: number) {
+  return db
+    .select({
+      id: media.id,
+      tmdbId: media.tmdbId,
+      type: media.type,
+    })
+    .from(media)
+    .orderBy(
+      sql`${media.tmdbRatingCheckedAt} ASC NULLS FIRST`,
+      asc(media.createdAt)
+    )
+    .limit(limit);
+}
+
+export async function updateMediaTmdbRating(
+  mediaId: string,
+  rating: number,
+  voteCount: number
+) {
+  const checkedAt = new Date();
+
+  await db
+    .update(media)
+    .set({
+      tmdbRating: String(rating),
+      tmdbVoteCount: voteCount,
+      tmdbRatingCheckedAt: checkedAt,
+      updatedAt: checkedAt,
+    })
+    .where(eq(media.id, mediaId));
+}
+
+export async function markMediaRatingChecked(mediaId: string) {
+  const checkedAt = new Date();
+
+  await db
+    .update(media)
+    .set({
+      tmdbRatingCheckedAt: checkedAt,
+      updatedAt: checkedAt,
+    })
+    .where(eq(media.id, mediaId));
 }
 
 export async function createMedia(data: DbMediaCreate) {

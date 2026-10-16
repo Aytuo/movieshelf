@@ -45,6 +45,7 @@ export const media = pgTable(
       scale: 1,
     }), // TMDB rating.
     tmdbVoteCount: integer('tmdb_vote_count').notNull().default(0), // Number of TMDB votes.
+    tmdbRatingCheckedAt: timestamp('tmdb_rating_checked_at'),
     tagline: text('tagline'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')

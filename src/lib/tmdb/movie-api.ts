@@ -1,6 +1,7 @@
 import { tmdbFetch } from './client';
 import type {
   TmdbMovieBundle,
+  TmdbMovieDetails,
   TmdbMovieResult,
   TmdbPagedResponse,
   TmdbTrendingResponse,
@@ -148,4 +149,17 @@ export async function discover(params: TmdbMovieDiscoverParams) {
     '/discover/movie',
     toQueryParams(params)
   );
+}
+
+export async function getMovieRating(id: number) {
+  const result = await tmdbFetch<TmdbMovieDetails>(
+    `/movie/${id}`,
+    { language: 'en-US' },
+    { revalidate: false }
+  );
+
+  return {
+    rating: result.vote_average,
+    voteCount: result.vote_count,
+  };
 }

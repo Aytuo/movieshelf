@@ -2,6 +2,7 @@ import { tmdbFetch } from './client';
 import type {
   TmdbPagedResponse,
   TmdbTvBundle,
+  TmdbTvDetails,
   TmdbTvEpisode,
   TmdbTvResult,
   TmdbTvSeasonDetails,
@@ -194,4 +195,17 @@ export async function discover(params: TmdbTvDiscoverParams) {
     '/discover/tv',
     toQueryParams(params)
   );
+}
+
+export async function getTvRating(id: number) {
+  const result = await tmdbFetch<TmdbTvDetails>(
+    `/tv/${id}`,
+    { language: 'en-US' },
+    { revalidate: false }
+  );
+
+  return {
+    rating: result.vote_average,
+    voteCount: result.vote_count,
+  };
 }
