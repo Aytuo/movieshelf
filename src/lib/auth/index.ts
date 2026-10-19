@@ -22,9 +22,11 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { eq } from 'drizzle-orm';
 import { sendEmail } from '../email/send-email';
-import { initializeOAuthAvatarForNewUser } from '../services/profile-avatar-management-service';
 import { deleteStoredAvatarsForUser } from '../services/profile-avatar-service';
-import { ensureProfile } from '../services/profile-service';
+import {
+  ensureProfile,
+  initializeOAuthAvatarForNewUser,
+} from '../services/profile-service';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {

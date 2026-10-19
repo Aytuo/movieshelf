@@ -6,6 +6,7 @@ import {
   getUserLatestRated,
   getUserMediaStats,
   getUserReviews,
+  updateProfileAvatar,
   type UserMediaStatsRow,
   usernameExists,
 } from '@/lib/repositories';
@@ -14,6 +15,11 @@ import { PostPaginationOptions } from '@/types';
 import { getUserFollowStats } from './follow-service';
 import { getUserMediaActivity } from './media-activity-service';
 import { getUserPosts } from './post-service';
+import {
+  deleteStoredAvatar,
+  getAvatarProviderFromUrl,
+  storeAvatarFromUrl,
+} from './profile-avatar-service';
 
 const USERNAME_MAX_LENGTH = 14;
 const RANDOM_SUFFIX_LENGTH = 4;
@@ -257,4 +263,46 @@ export async function getPublicActivity(username: string) {
     profile,
     activities,
   };
+}
+
+export async function initializeOAuthAvatarForNewUser(
+  userId: string,
+  providerAvatarUrl: string | null | undefined,
+  profile: {
+    avatarUrl: string | null;
+    avatarPreferenceSet: boolean;
+  }
+) {
+  if (!providerAvatarUrl) {
+    return;
+  }
+
+  const provider = getAvatarProviderFromUrl(providerAvatarUrl);
+
+  if (!provider || profile.avatarPreferenceSet || profile.avatarUrl) {
+    return;
+  }
+
+  let storedAvatarUrl: string | null = null;
+
+  try {
+    storedAvatarUrl = await storeAvatarFromUrl(userId, providerAvatarUrl);
+
+    await updateProfileAvatar(userId, {
+      avatarUrl: storedAvatarUrl,
+      avatarSource: 'oauth',
+      avatarProvider: provider,
+      avatarPreferenceSet: false,
+    });
+  } catch (error) {
+    if (storedAvatarUrl) {
+      await deleteStoredAvatar(storedAvatarUrl, 'oauth');
+    }
+
+    console.error('Failed to initialize OAuth avatar for new user:', {
+      userId,
+      provider,
+      error,
+    });
+  }
 }

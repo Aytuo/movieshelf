@@ -4,7 +4,6 @@ import { getProfileByUserId, updateProfileAvatar } from '@/lib/repositories';
 import { getOAuthAvatarForProvider } from '@/lib/services/oauth-avatar-service';
 import {
   deleteStoredAvatar,
-  getAvatarProviderFromUrl,
   storeAvatarFile,
   storeAvatarFromUrl,
 } from '@/lib/services/profile-avatar-service';
@@ -115,46 +114,4 @@ export async function uploadProfileAvatar(userId: string, file: File) {
     url: storedUrl,
     username: profile.username,
   };
-}
-
-export async function initializeOAuthAvatarForNewUser(
-  userId: string,
-  providerAvatarUrl: string | null | undefined,
-  profile: {
-    avatarUrl: string | null;
-    avatarPreferenceSet: boolean;
-  }
-) {
-  if (!providerAvatarUrl) {
-    return;
-  }
-
-  const provider = getAvatarProviderFromUrl(providerAvatarUrl);
-
-  if (!provider || profile.avatarPreferenceSet || profile.avatarUrl) {
-    return;
-  }
-
-  let storedAvatarUrl: string | null = null;
-
-  try {
-    storedAvatarUrl = await storeAvatarFromUrl(userId, providerAvatarUrl);
-
-    await updateProfileAvatar(userId, {
-      avatarUrl: storedAvatarUrl,
-      avatarSource: 'oauth',
-      avatarProvider: provider,
-      avatarPreferenceSet: false,
-    });
-  } catch (error) {
-    if (storedAvatarUrl) {
-      await deleteStoredAvatar(storedAvatarUrl, 'oauth');
-    }
-
-    console.error('Failed to initialize OAuth avatar for new user:', {
-      userId,
-      provider,
-      error,
-    });
-  }
 }
