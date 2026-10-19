@@ -1,6 +1,6 @@
 import SecuritySettings from '@/components/settings/security-settings';
 import { auth } from '@/lib/auth';
-import { getSessionReauthenticationOptions } from '@/lib/services/session-security-sevice';
+import { getSessionReauthenticationOptions } from '@/lib/services/session-security-service';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 

@@ -1,5 +1,9 @@
 import type { Media, MediaType } from '@/lib/media';
-import { tmdbMovieRepository, tmdbTvRepository } from '@/lib/repositories';
+import {
+  completeOnboarding as completeOnboardingRecord,
+  tmdbMovieRepository,
+  tmdbTvRepository,
+} from '@/lib/repositories';
 
 export async function getOnboardingCandidates(
   type: MediaType
@@ -26,4 +30,16 @@ export async function getOnboardingCandidates(
   }
 
   return Array.from(uniqueMedia.values()).slice(0, 24);
+}
+
+export async function completeTasteOnboarding(userId: string) {
+  const profile = await completeOnboardingRecord(userId);
+
+  if (!profile) {
+    throw new Error(
+      'Cannot complete onboarding because the profile does not exist.'
+    );
+  }
+
+  return profile;
 }

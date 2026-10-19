@@ -125,9 +125,8 @@ const SessionReauthentication = ({
 
           <Button
             type="submit"
-            size="lg"
+            size="xl"
             disabled={!password.trim() || pending}
-            className="h-10"
           >
             {passwordPending ? 'Verifying...' : 'Verify identity'}
           </Button>

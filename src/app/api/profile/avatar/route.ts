@@ -1,9 +1,5 @@
 import { auth } from '@/lib/auth';
-import { getProfileByUserId, updateProfileAvatar } from '@/lib/repositories';
-import {
-  deleteStoredAvatar,
-  storeAvatarFile,
-} from '@/lib/services/profile-avatar-service';
+import { uploadProfileAvatar } from '@/lib/services/profile-avatar-management-service';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -28,33 +24,22 @@ export async function POST(request: Request) {
   }
 
   try {
-    const profile = await getProfileByUserId(session.user.id);
+    const result = await uploadProfileAvatar(session.user.id, file);
 
-    if (!profile) {
+    if (!result) {
       return NextResponse.json(
         { message: 'Profile not found.' },
         { status: 404 }
       );
     }
 
-    const url = await storeAvatarFile(session.user.id, file);
-
-    await updateProfileAvatar(session.user.id, {
-      avatarUrl: url,
-      avatarSource: 'upload',
-      avatarProvider: null,
-      avatarPreferenceSet: true,
-    });
-
-    await deleteStoredAvatar(profile.avatarUrl, profile.avatarSource);
-
     revalidatePath('/settings/profile');
     revalidatePath('/profile');
-    revalidatePath(`/profile/${profile.username}`);
+    revalidatePath(`/profile/${result.username}`);
 
     return NextResponse.json({
       success: true,
-      url,
+      url: result.url,
     });
   } catch (error) {
     return NextResponse.json(

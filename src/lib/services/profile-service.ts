@@ -140,6 +140,37 @@ export async function ensureProfile({
   });
 }
 
+export async function getProfileOnboardingState(userId: string) {
+  const profile = await getProfileByUserId(userId);
+
+  if (!profile) {
+    return null;
+  }
+
+  return {
+    username: profile.username,
+    onboardingCompleted: profile.onboardingCompleted,
+  };
+}
+
+export async function getProfileSettings(userId: string) {
+  const profile = await getProfileByUserId(userId);
+
+  if (!profile) {
+    return null;
+  }
+
+  return {
+    username: profile.username,
+    displayName: profile.displayName,
+    bio: profile.bio,
+    avatarUrl: profile.avatarUrl,
+    avatarSource: profile.avatarSource,
+    avatarProvider: profile.avatarProvider,
+    avatarPreferenceSet: profile.avatarPreferenceSet,
+  };
+}
+
 export async function getPublicProfile(username: string, viewerUserId: string) {
   const profile = await getProfileByUsername(username);
 

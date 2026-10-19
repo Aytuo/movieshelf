@@ -1,7 +1,6 @@
 'use server';
 
 import { requireSession } from '@/lib/auth/require-session';
-import { completeOnboarding } from '@/lib/repositories';
 import { setRating } from '@/lib/services/media-interaction-service';
 import { getOrCreateMediaRecord } from '@/lib/services/media-service';
 import {
@@ -9,6 +8,7 @@ import {
   type OnboardingRatingsInput,
 } from '@/lib/validations/onboarding';
 import { revalidatePath } from 'next/cache';
+import { completeTasteOnboarding } from '../services/onboarding-service';
 
 export async function saveTasteRatings(input: OnboardingRatingsInput) {
   const session = await requireSession();
@@ -33,7 +33,7 @@ export async function saveTasteRatings(input: OnboardingRatingsInput) {
 export async function finishTasteOnboarding() {
   const session = await requireSession();
 
-  await completeOnboarding(session.user.id);
+  await completeTasteOnboarding(session.user.id);
 
   revalidatePath('/home');
   revalidatePath('/discover');

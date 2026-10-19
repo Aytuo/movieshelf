@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { getProfileByUserId } from '@/lib/repositories';
+import { getProfileOnboardingState } from '@/lib/services/profile-service';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -16,7 +16,7 @@ const OnboardingLayout = async ({
     redirect('/login');
   }
 
-  const profile = await getProfileByUserId(session.user.id);
+  const profile = await getProfileOnboardingState(session.user.id);
 
   if (!profile) {
     redirect('/home');

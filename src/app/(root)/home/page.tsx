@@ -3,14 +3,14 @@ import RecommendationSection from '@/components/recommendations/recommendation-s
 import TastePreview from '@/components/taste/taste-preview';
 import { requireSession } from '@/lib/auth/require-session';
 import { getColdStartRecommendations } from '@/lib/recommendations/cold-start';
-import { getProfileByUserId } from '@/lib/repositories';
+import { getProfileOnboardingState } from '@/lib/services/profile-service';
 import { getRecommendationsForUser } from '@/lib/services/recommendation-service';
 import { getTasteProfile } from '@/lib/services/taste-service';
 import Link from 'next/link';
 
 export default async function HomePage() {
   const session = await requireSession();
-  const profile = await getProfileByUserId(session.user.id);
+  const profile = await getProfileOnboardingState(session.user.id);
 
   const [personalizedMovies, personalizedTv, taste] = await Promise.all([
     getRecommendationsForUser(session.user.id, 'movie'),
