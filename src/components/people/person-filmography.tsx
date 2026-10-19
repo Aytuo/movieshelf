@@ -43,7 +43,7 @@ function FilmographyTable({ credits }: { credits: PersonCredit[] }) {
                 {year ?? '—'}
               </span>
 
-              <div className="h-16 w-11 overflow-hidden rounded-md bg-surface-hover sm:h-18 sm:w-12">
+              <div className="relative h-16 w-11 overflow-hidden rounded-md bg-surface-hover sm:h-18 sm:w-12">
                 {credit.posterPath ? (
                   <Image
                     src={tmdbImage(credit.posterPath, 'w185')!}
