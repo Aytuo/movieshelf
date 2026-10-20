@@ -16,6 +16,7 @@ const SocialButtons = () => {
       const { error } = await authClient.signIn.social({
         provider,
         callbackURL: '/home',
+        newUserCallbackURL: '/onboarding',
       });
 
       if (error) {

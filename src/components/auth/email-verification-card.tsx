@@ -74,7 +74,7 @@ export default function EmailVerificationCard({
           </p>
 
           <Link
-            href="/home"
+            href="/onboarding"
             className="mt-8 inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
           >
             Continue to MovieShelf
