@@ -41,6 +41,7 @@ export async function addMediaToWatchlist(type: MediaType, tmdbId: number) {
 
   await addToWatchlist(userId, media.id);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath(getMediaPath(type, tmdbId));
 }
@@ -55,6 +56,7 @@ export async function startMediaWatching(type: MediaType, tmdbId: number) {
 
   await startWatching(userId, media.id);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath(getMediaPath(type, tmdbId));
 }
@@ -69,6 +71,7 @@ export async function markMediaAsWatched(type: MediaType, tmdbId: number) {
 
   const watchNumber = await markAsWatched(userId, media.id);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath('/history');
   revalidatePath('/activity');
@@ -82,6 +85,7 @@ export async function markMediaAsDropped(type: MediaType, tmdbId: number) {
 
   await markAsDropped(userId, media.id);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath(getMediaPath(type, tmdbId));
 }
@@ -91,6 +95,7 @@ export async function removeMediaFromShelf(type: MediaType, tmdbId: number) {
 
   await removeFromShelf(userId, media.id);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath(getMediaPath(type, tmdbId));
 }
@@ -100,6 +105,7 @@ export async function toggleMediaFavorite(type: MediaType, tmdbId: number) {
 
   await toggleFavorite(userId, media.id);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath(getMediaPath(type, tmdbId));
 }
@@ -123,6 +129,7 @@ export async function rateMedia(
 
   await setRating(userId, media.id, rating);
 
+  revalidatePath('/home');
   revalidatePath('/shelf');
   revalidatePath('/activity');
   revalidatePath(getMediaPath(type, tmdbId));

@@ -1,6 +1,8 @@
 import {
   addMediaToWatchlist,
+  getUserLatestRated,
   getUserMediaInteraction,
+  getUserMediaStats,
   getUserShelf as getUserShelfRepository,
   markMediaAsDropped,
   markMediaAsWatched,
@@ -9,6 +11,23 @@ import {
   startMediaWatching,
   toggleMediaFavorite,
 } from '@/lib/repositories';
+import type { MediaType } from '../media';
+
+export type UserHomeSummary = {
+  shelfCount: number;
+  watchedCount: number;
+  ratedCount: number;
+  favoritesCount: number;
+  latestRated: {
+    tmdbId: number;
+    type: MediaType;
+    title: string;
+    posterPath: string | null;
+    releaseDate: string | null;
+    tmdbRating: number | null;
+    userRating: number | null;
+  }[];
+};
 
 /* ========================================================================== */
 /*                                GET USER SHELF                              */
@@ -16,6 +35,47 @@ import {
 
 export async function getUserShelf(userId: string) {
   return getUserShelfRepository(userId);
+}
+
+/* ========================================================================== */
+/*                             GET USER HOME SUMMARY                          */
+/* ========================================================================== */
+
+export async function getUserHomeSummary(
+  userId: string
+): Promise<UserHomeSummary> {
+  const [statsRows, latestRatedRows] = await Promise.all([
+    getUserMediaStats(userId),
+    getUserLatestRated(userId, 3),
+  ]);
+
+  const stats = statsRows.reduce(
+    (totals, row) => ({
+      shelfCount: totals.shelfCount + Number(row.total),
+      watchedCount: totals.watchedCount + Number(row.watched),
+      ratedCount: totals.ratedCount + Number(row.rated),
+      favoritesCount: totals.favoritesCount + Number(row.favorites),
+    }),
+    {
+      shelfCount: 0,
+      watchedCount: 0,
+      ratedCount: 0,
+      favoritesCount: 0,
+    }
+  );
+
+  return {
+    ...stats,
+    latestRated: latestRatedRows.map(({ media, interaction }) => ({
+      tmdbId: media.tmdbId,
+      type: media.type,
+      title: media.title,
+      posterPath: media.posterPath,
+      releaseDate: media.releaseDate,
+      tmdbRating: media.tmdbRating === null ? null : Number(media.tmdbRating),
+      userRating: interaction.rating,
+    })),
+  };
 }
 
 /* ========================================================================== */

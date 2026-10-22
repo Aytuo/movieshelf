@@ -3,6 +3,7 @@ import RecommendationSection from '@/components/recommendations/recommendation-s
 import TastePreview from '@/components/taste/taste-preview';
 import { requireSession } from '@/lib/auth/require-session';
 import { getColdStartRecommendations } from '@/lib/recommendations/cold-start';
+import { getUserHomeSummary } from '@/lib/services/media-interaction-service';
 import { getProfileOnboardingState } from '@/lib/services/profile-service';
 import { getRecommendationsForUser } from '@/lib/services/recommendation-service';
 import { getTasteProfile } from '@/lib/services/taste-service';
@@ -12,11 +13,13 @@ export default async function HomePage() {
   const session = await requireSession();
   const profile = await getProfileOnboardingState(session.user.id);
 
-  const [personalizedMovies, personalizedTv, taste] = await Promise.all([
-    getRecommendationsForUser(session.user.id, 'movie'),
-    getRecommendationsForUser(session.user.id, 'tv'),
-    getTasteProfile(session.user.id),
-  ]);
+  const [personalizedMovies, personalizedTv, taste, homeSummary] =
+    await Promise.all([
+      getRecommendationsForUser(session.user.id, 'movie'),
+      getRecommendationsForUser(session.user.id, 'tv'),
+      getTasteProfile(session.user.id),
+      getUserHomeSummary(session.user.id),
+    ]);
 
   // Cold start remains a fallback only; Movies and TV are handled independently so that having enough movie signals does not affect TV recommendations, and vice versa.
 
@@ -35,7 +38,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero />
+      <Hero summary={homeSummary} />
 
       {profile && !profile.onboardingCompleted && (
         <section className="container-content pt-10 lg:pt-12">
