@@ -97,23 +97,77 @@ function RankingListSkeleton({ count = 8 }: { count?: number }) {
   );
 }
 
-function SearchResultsSkeleton() {
+function PeopleSearchCardsSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-      {Array.from({ length: 10 }, (_, index) => (
-        <article key={index}>
-          <Skeleton className="aspect-[2/3] w-full rounded-xl" />
-          <Skeleton className="mt-3 h-4 w-4/5" />
-          <Skeleton className="mt-2 h-3 w-1/2" />
-        </article>
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: count }, (_, index) => (
+        <div
+          key={index}
+          className="flex h-24 items-center gap-4 rounded-2xl p-4 surface"
+        >
+          <Skeleton className="size-16 shrink-0 rounded-xl" />
+
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="mt-2 h-3 w-1/2" />
+          </div>
+        </div>
       ))}
     </div>
   );
 }
 
-function MediaDetailsSkeleton() {
+function SearchResultsSkeleton() {
+  return (
+    <div className="mt-10 space-y-12">
+      {/* Movies and TV series */}
+      <section>
+        <Skeleton className="mb-5 h-6 w-32" />
+
+        <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {Array.from({ length: 10 }, (_, index) => (
+            <article key={index}>
+              <Skeleton className="aspect-[2/3] w-full rounded-xl" />
+              <Skeleton className="mt-3 h-4 w-4/5" />
+              <Skeleton className="mt-2 h-3 w-1/2" />
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* People */}
+      <section>
+        <Skeleton className="mb-5 h-6 w-20" />
+
+        <PeopleSearchCardsSkeleton count={4} />
+      </section>
+    </div>
+  );
+}
+
+function MediaRecommendationSectionSkeleton() {
+  return (
+    <section className="container-content py-14 lg:py-20">
+      <div className="mb-7">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="mt-2 h-8 w-48 max-w-full" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        {Array.from({ length: 6 }, (_, index) => (
+          <MediaCardSkeleton key={index} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function MediaDetailsSkeleton({ type }: { type: 'movie' | 'tv' }) {
+  const isTv = type === 'tv';
+
   return (
     <main>
+      {/* Hero: poster + media details */}
       <section className="relative overflow-hidden border-b border-border/60">
         <div className="absolute inset-0 bg-surface/30" />
 
@@ -121,17 +175,18 @@ function MediaDetailsSkeleton() {
           <div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-14">
             <Skeleton className="mx-auto aspect-[2/3] w-full max-w-70 rounded-xl" />
 
-            <div className="flex flex-col justify-center">
-              <Skeleton className="h-4 w-32" />
+            <div className="flex min-w-0 flex-col justify-center">
+              <Skeleton className="h-4 w-40" />
 
               <Skeleton className="mt-4 h-12 w-full max-w-2xl sm:h-14 lg:h-16" />
 
-              <Skeleton className="mt-4 h-4 w-48" />
+              <Skeleton className="mt-3 h-4 w-64 max-w-full" />
 
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap gap-2">
                 <Skeleton className="h-7 w-20 rounded-full" />
                 <Skeleton className="h-7 w-24 rounded-full" />
                 <Skeleton className="h-7 w-16 rounded-full" />
+                <Skeleton className="h-7 w-24 rounded-full" />
               </div>
 
               <div className="mt-7 max-w-2xl space-y-2">
@@ -140,49 +195,249 @@ function MediaDetailsSkeleton() {
                 <Skeleton className="h-4 w-4/5" />
               </div>
 
-              <Skeleton className="mt-7 h-12 w-56 rounded-lg" />
+              {isTv ? (
+                <>
+                  {/* TV-specific metadata */}
+                  <div className="mt-7 grid gap-4 sm:grid-cols-3">
+                    {Array.from({ length: 3 }, (_, index) => (
+                      <div key={index}>
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="mt-2 h-4 w-24" />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6">
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="mt-2 h-4 w-48 max-w-full" />
+                  </div>
+                </>
+              ) : (
+                /* Movie-specific crew */
+                <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                  {Array.from({ length: 2 }, (_, index) => (
+                    <div key={index}>
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="mt-2 h-4 w-40 max-w-full" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* TMDB rating */}
+              <div className="mt-7 flex items-center gap-3">
+                <Skeleton className="h-10 w-24 rounded-lg" />
+                <Skeleton className="h-3 w-28" />
+              </div>
+
+              {/* User actions */}
+              <div className="mt-7 flex flex-wrap gap-2">
+                <Skeleton className="h-11 w-32 rounded-lg" />
+                <Skeleton className="h-11 w-28 rounded-lg" />
+                <Skeleton className="h-11 w-28 rounded-lg" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* TV seasons — present only for the TV variant */}
+      {isTv && (
+        <section className="border-t border-border/60 bg-surface/20">
+          <div className="container-content py-14 lg:py-20">
+            <div className="mb-8">
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="mt-2 h-8 w-32" />
+            </div>
+
+            <div className="space-y-3">
+              {Array.from({ length: 3 }, (_, index) => (
+                <article
+                  key={index}
+                  className="flex gap-4 overflow-hidden rounded-2xl border border-border/60 bg-surface p-4 sm:gap-6 sm:p-5"
+                >
+                  <Skeleton className="aspect-[2/3] w-28 shrink-0 rounded-xl sm:w-32 lg:w-36" />
+
+                  <div className="min-w-0 flex-1 self-center">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="mt-3 h-6 w-48 max-w-full sm:h-7" />
+                    <Skeleton className="mt-2 h-4 w-24" />
+
+                    <div className="mt-3 hidden max-w-2xl space-y-2 sm:block">
+                      <Skeleton className="h-3 w-full" />
+                      <Skeleton className="h-3 w-4/5" />
+                    </div>
+                  </div>
+
+                  <Skeleton className="mt-2 size-9 shrink-0 rounded-full" />
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Cast */}
       <section className="border-t border-border/60">
         <div className="container-content py-14 lg:py-20">
           <div className="mb-7">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="mt-3 h-8 w-32" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="mt-2 h-8 w-32" />
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-            {Array.from({ length: 6 }, (_, index) => (
-              <div key={index}>
-                <Skeleton className="aspect-[2/3] rounded-xl" />
+            {Array.from({ length: 12 }, (_, index) => (
+              <article key={index}>
+                <Skeleton className="aspect-[2/3] w-full rounded-xl" />
                 <Skeleton className="mt-3 h-4 w-4/5" />
-                <Skeleton className="mt-2 h-3 w-1/2" />
-              </div>
+                <Skeleton className="mt-2 h-3 w-3/5" />
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-t border-border/60">
+      {/* Trailer */}
+      <section className="border-t border-border/60 bg-surface/20">
+        <div className="container-content py-14 lg:py-20">
+          <div className="mb-7">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="mt-2 h-8 w-28" />
+          </div>
+
+          <Skeleton className="mx-auto aspect-video w-full max-w-5xl rounded-2xl" />
+        </div>
+      </section>
+
+      {/* Your review */}
+      <section className="scroll-mt-24 border-t border-border/60">
+        <div className="container-content py-14 lg:py-20">
+          <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+            <div>
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="mt-2 h-8 w-32" />
+
+              <div className="mt-3 max-w-md space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
+            </div>
+
+            <div className="rounded-2xl p-5 surface sm:p-7">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="mt-4 h-10 w-full rounded-lg" />
+              <Skeleton className="mt-3 h-24 w-full rounded-lg" />
+
+              <div className="mt-5 flex flex-wrap justify-between gap-3">
+                <Skeleton className="h-9 w-28 rounded-lg" />
+                <Skeleton className="h-9 w-32 rounded-lg" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community reviews */}
+      <section className="border-t border-border/60 bg-surface/20">
         <div className="container-content py-14 lg:py-20">
           <div className="mb-8">
             <Skeleton className="h-3 w-28" />
-            <Skeleton className="mt-3 h-8 w-40" />
+            <Skeleton className="mt-2 h-8 w-32" />
+            <Skeleton className="mt-2 h-4 w-full max-w-xl" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
             {Array.from({ length: 4 }, (_, index) => (
-              <div key={index} className="rounded-2xl p-5 surface">
-                <Skeleton className="h-5 w-2/3" />
-                <Skeleton className="mt-4 h-4 w-full" />
-                <Skeleton className="mt-2 h-4 w-full" />
-                <Skeleton className="mt-2 h-4 w-4/5" />
-              </div>
+              <article key={index} className="rounded-2xl p-5 surface">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="size-9 shrink-0 rounded-full" />
+
+                    <div>
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="mt-1 h-3 w-24" />
+                    </div>
+                  </div>
+
+                  <Skeleton className="h-4 w-14" />
+                </div>
+
+                <Skeleton className="mt-5 h-5 w-2/3" />
+
+                <div className="mt-4 space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+
+                <Skeleton className="mt-5 h-3 w-24" />
+              </article>
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Community discussion */}
+      <section className="border-t border-border/60">
+        <div className="container-content py-14 lg:py-20">
+          <div className="mb-8">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="mt-2 h-8 w-40" />
+            <Skeleton className="mt-2 h-4 w-full max-w-xl" />
+          </div>
+
+          {/* Post composer */}
+          <div className="rounded-2xl p-5 surface sm:p-6">
+            <div className="flex items-start gap-3">
+              <Skeleton className="size-9 shrink-0 rounded-full" />
+
+              <div className="min-w-0 flex-1">
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="mt-3 h-20 w-full rounded-xl" />
+
+                <div className="mt-4 flex justify-end">
+                  <Skeleton className="h-9 w-28 rounded-lg" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Existing posts */}
+          <div className="mt-4 space-y-4">
+            {Array.from({ length: 3 }, (_, index) => (
+              <article key={index} className="rounded-2xl p-5 surface sm:p-6">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-9 shrink-0 rounded-full" />
+
+                  <div>
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="mt-2 h-3 w-40" />
+                  </div>
+                </div>
+
+                <Skeleton className="mt-5 h-5 w-3/4 max-w-lg" />
+
+                <div className="mt-4 space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-4 border-t border-border/60 pt-4">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Recommendations */}
+      <section className="border-t border-border/60 bg-surface/20">
+        <MediaRecommendationSectionSkeleton />
+        <MediaRecommendationSectionSkeleton />
       </section>
     </main>
   );
@@ -213,10 +468,38 @@ function HomeSkeleton() {
               </div>
             </div>
 
-            <div className="relative mx-auto h-125 w-full max-w-140">
-              <Skeleton className="absolute top-1/2 left-1/2 aspect-[2/3] w-52 -translate-x-1/2 -translate-y-1/2 rounded-xl" />
-              <Skeleton className="absolute top-[15%] left-[10%] hidden aspect-[2/3] w-44 rotate-[-8deg] rounded-xl sm:block" />
-              <Skeleton className="absolute top-[18%] right-[10%] hidden aspect-[2/3] w-44 rotate-[8deg] rounded-xl sm:block" />
+            <div className="relative mx-auto h-125 w-full max-w-140 sm:h-140">
+              <Skeleton className="absolute top-4 left-1/2 z-20 aspect-[2/3] w-45 -translate-x-1/2 rotate-[1deg] rounded-xl sm:top-0 sm:w-[210px] lg:top-4 lg:w-[230px]" />
+
+              <Skeleton className="absolute top-16 left-0 hidden aspect-[2/3] w-45 rotate-[-10deg] rounded-xl sm:block sm:w-[210px] lg:top-20 lg:left-8 lg:w-[230px]" />
+
+              <Skeleton className="absolute top-20 right-0 hidden aspect-[2/3] w-45 rotate-[9deg] rounded-xl sm:block sm:w-[210px] lg:top-24 lg:right-8 lg:w-[230px]" />
+
+              {/* Collection statistics card */}
+              <div className="absolute right-2 bottom-2 z-30 hidden w-64 rounded-xl p-4 glass-strong sm:block lg:right-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="mt-2 h-8 w-12" />
+                    <Skeleton className="mt-1 h-3 w-32 max-w-full" />
+                  </div>
+
+                  <div className="flex shrink-0 -space-x-2">
+                    <Skeleton className="size-8 rounded-full border-2 border-background" />
+                    <Skeleton className="size-8 rounded-full border-2 border-background" />
+                    <Skeleton className="size-8 rounded-full border-2 border-background" />
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/60 pt-3">
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <div key={index}>
+                      <Skeleton className="h-4 w-8" />
+                      <Skeleton className="mt-2 h-3 w-12 max-w-full" />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -404,6 +687,18 @@ function PersonCreditGridSkeleton({ count = 5 }: { count?: number }) {
   );
 }
 
+function PersonCreditSectionSkeleton({ count = 5 }: { count?: number }) {
+  return (
+    <section>
+      <div className="mb-8">
+        <Skeleton className="h-8 w-44" />
+      </div>
+
+      <PersonCreditGridSkeleton count={count} />
+    </section>
+  );
+}
+
 function FilmographyRowsSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className="overflow-hidden rounded-2xl surface">
@@ -440,6 +735,7 @@ function FilmographyRowsSkeleton({ count = 4 }: { count?: number }) {
 function PersonPageSkeleton() {
   return (
     <main>
+      {/* Person header */}
       <section className="border-b border-border/60">
         <div className="container-content py-12 lg:py-16">
           <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
@@ -477,8 +773,10 @@ function PersonPageSkeleton() {
         </div>
       </section>
 
+      {/* Filmography and credits */}
       <section>
         <div className="container-content space-y-16 py-14 lg:space-y-20 lg:py-20">
+          {/* Known for */}
           <section>
             <div className="mb-8">
               <Skeleton className="h-3 w-20" />
@@ -488,6 +786,7 @@ function PersonPageSkeleton() {
             <PersonCreditGridSkeleton count={5} />
           </section>
 
+          {/* Acting filmography */}
           <section>
             <div className="mb-8">
               <Skeleton className="h-3 w-24" />
@@ -495,31 +794,33 @@ function PersonPageSkeleton() {
             </div>
 
             <div className="space-y-10">
+              {/* Movies */}
               <div>
                 <div className="mb-4 flex items-baseline gap-4">
                   <Skeleton className="h-5 w-24" />
                   <Skeleton className="h-3 w-8" />
                 </div>
+
                 <FilmographyRowsSkeleton count={4} />
               </div>
 
+              {/* TV series */}
               <div>
                 <div className="mb-4 flex items-baseline gap-4">
                   <Skeleton className="h-5 w-28" />
                   <Skeleton className="h-3 w-8" />
                 </div>
+
                 <FilmographyRowsSkeleton count={3} />
               </div>
             </div>
           </section>
 
-          <section>
-            <div className="mb-8">
-              <Skeleton className="h-8 w-40" />
-            </div>
-
-            <PersonCreditGridSkeleton count={5} />
-          </section>
+          {/* Other credit categories */}
+          <PersonCreditSectionSkeleton count={4} />
+          <PersonCreditSectionSkeleton count={4} />
+          <PersonCreditSectionSkeleton count={4} />
+          <PersonCreditSectionSkeleton count={4} />
         </div>
       </section>
     </main>

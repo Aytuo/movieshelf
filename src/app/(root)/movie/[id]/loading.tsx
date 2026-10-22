@@ -1,5 +1,5 @@
 import { MediaDetailsSkeleton } from '@/components/ui/page-skeletons';
 
 export default function Loading() {
-  return <MediaDetailsSkeleton />;
+  return <MediaDetailsSkeleton type="movie" />;
 }

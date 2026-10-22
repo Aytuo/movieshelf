@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { authClient } from '@/lib/auth/client';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -93,7 +94,9 @@ function AccountRow({
   return (
     <div className="flex items-center justify-between gap-4 p-5">
       <div className="flex min-w-0 items-center gap-3.5">
-        {connected && profile ? (
+        {loading ? (
+          <Skeleton className="size-10 shrink-0 rounded-full" />
+        ) : connected && profile ? (
           <Avatar profile={profile} label={label} />
         ) : (
           <div className="size-10 shrink-0" aria-hidden="true" />
@@ -102,7 +105,12 @@ function AccountRow({
         <div className="min-w-0">
           <p className="text-sm font-semibold">{label}</p>
 
-          {connected && profile ? (
+          {loading ? (
+            <div className="mt-2 space-y-2">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          ) : connected && profile ? (
             <div className="mt-1 min-w-0">
               {profile.displayName && (
                 <p className="truncate text-xs text-foreground">
@@ -126,7 +134,9 @@ function AccountRow({
         </div>
       </div>
 
-      {!loading && onConnect && onDisconnect ? (
+      {loading ? (
+        <Skeleton className="h-8 w-20 shrink-0 rounded-lg" />
+      ) : onConnect && onDisconnect ? (
         <Button
           type="button"
           size="sm"
@@ -147,18 +157,16 @@ function AccountRow({
               : 'Connect'}
         </Button>
       ) : (
-        !loading && (
-          <span
-            className={cn(
-              'rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase',
-              connected
-                ? 'bg-primary-muted text-primary'
-                : 'bg-surface-hover text-muted-foreground'
-            )}
-          >
-            {connected ? 'Connected' : 'Not connected'}
-          </span>
-        )
+        <span
+          className={cn(
+            'rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase',
+            connected
+              ? 'bg-primary-muted text-primary'
+              : 'bg-surface-hover text-muted-foreground'
+          )}
+        >
+          {connected ? 'Connected' : 'Not connected'}
+        </span>
       )}
     </div>
   );

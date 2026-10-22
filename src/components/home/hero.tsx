@@ -1,34 +1,7 @@
-import { UserHomeSummary } from '@/lib/services/media-interaction-service';
+import type { UserHomeSummary } from '@/lib/services/media-interaction-service';
 import { ArrowRight, Bookmark, Check, Heart, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-// const featuredMovies = [
-//   {
-//     title: 'Interstellar',
-//     year: 2014,
-//     rating: '8.7',
-//     image: 'https://image.tmdb.org/t/p/w780/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-//     className:
-//       'left-0 top-16 hidden rotate-[-10deg] sm:block lg:left-8 lg:top-20',
-//   },
-//   {
-//     title: 'Dune: Part Two',
-//     year: 2024,
-//     rating: '8.6',
-//     image: 'https://image.tmdb.org/t/p/w780/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
-//     className:
-//       'left-1/2 top-4 z-20 -translate-x-1/2 rotate-[1deg] sm:top-0 lg:top-4',
-//   },
-//   {
-//     title: 'The Godfather',
-//     year: 1972,
-//     rating: '9.2',
-//     image: 'https://image.tmdb.org/t/p/w780/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
-//     className:
-//       'right-0 top-20 hidden rotate-[9deg] sm:block lg:right-8 lg:top-24',
-//   },
-// ];
 
 const centerPosterClass =
   'left-1/2 top-4 z-20 -translate-x-1/2 rotate-[1deg] sm:top-0 lg:top-4';
@@ -162,7 +135,7 @@ const Hero = ({ summary }: HeroProps) => {
                           <div className="absolute inset-0 flex items-center justify-center bg-surface-hover">
                             <Bookmark className="size-9 text-muted-foreground/60" />
                           </div>
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90" />
+                          <div className="absolute inset-0 bg-linear-to-b from-transparent to-background/90" />
                         </>
                       )}
 
