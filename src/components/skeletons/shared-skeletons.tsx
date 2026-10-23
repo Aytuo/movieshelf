@@ -1,5 +1,36 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
+export function NavbarSkeleton() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="container-content">
+        <div className="flex h-(--header-height) items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="size-9 rounded-lg md:hidden" />
+
+            <div className="flex items-center gap-2.5">
+              <Skeleton className="size-8 rounded-lg" />
+              <Skeleton className="h-5 w-24" />
+            </div>
+          </div>
+
+          <nav className="hidden items-center gap-8 md:flex">
+            {Array.from({ length: 4 }, (_, index) => (
+              <Skeleton key={index} className="h-4 w-16" />
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <Skeleton className="size-9 rounded-lg" />
+            <Skeleton className="size-9 rounded-lg" />
+            <Skeleton className="size-9 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export function PageHeaderSkeleton() {
   return (
     <header>
