@@ -1,4 +1,4 @@
-import { FollowListSkeleton } from '@/components/ui/page-skeletons';
+import { FollowListSkeleton } from '@/components/skeletons/profile-skeletons';
 
 export default function Loading() {
   return <FollowListSkeleton />;

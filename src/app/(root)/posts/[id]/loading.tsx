@@ -1,4 +1,4 @@
-import { PostPageSkeleton } from '@/components/ui/page-skeletons';
+import { PostPageSkeleton } from '@/components/skeletons/post-skeletons';
 
 export default function Loading() {
   return <PostPageSkeleton />;
