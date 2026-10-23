@@ -1,6 +1,14 @@
-import MediaCatalog from '@/components/catalog/media-catalog';
-import { getMovieCatalogSections } from '@/lib/services/media-catalog-service';
+import { MediaCatalogHeader } from '@/components/catalog/media-catalog';
+import {
+  MovieFeaturedCatalogSections,
+  MovieReleaseCatalogSections,
+} from '@/components/catalog/streamed-catalog-sections';
+import {
+  MoviesFeaturedSectionsSkeleton,
+  MoviesReleaseSectionsSkeleton,
+} from '@/components/skeletons/catalog-page-skeletons';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Movies',
@@ -8,59 +16,24 @@ export const metadata: Metadata = {
     'Discover movies worth watching, from what is trending now to timeless favorites.',
 };
 
-export default async function MoviesPage() {
-  const sections = await getMovieCatalogSections();
-
+export default function MoviesPage() {
   return (
-    <MediaCatalog
-      eyebrow="Explore"
-      title="Movies"
-      description="Discover what's worth watching, from what's trending now to timeless favorites."
-      blocks={[
-        {
-          type: 'carousel',
-          eyebrow: 'Popular picks',
-          title: 'Most popular',
-          description: 'The movies getting the most attention right now.',
-          media: sections.popular,
-        },
-        {
-          type: 'carousel',
-          eyebrow: 'Trending now',
-          title: "What's hot today",
-          description:
-            'The movies everyone seems to be talking about right now.',
-          media: sections.trending,
-        },
-        {
-          type: 'ranking',
-          eyebrow: 'Weekly top 10',
-          title: 'Top picks this week',
-          description: 'The biggest movies of the week, ranked.',
-          media: sections.topPicks,
-        },
-        {
-          type: 'carousel',
-          eyebrow: 'In cinemas',
-          title: 'Now playing',
-          description: 'Movies currently showing in cinemas.',
-          media: sections.nowPlaying,
-        },
-        {
-          type: 'carousel',
-          eyebrow: 'Upcoming',
-          title: 'Coming soon',
-          description: 'A first look at movies on the horizon.',
-          media: sections.upcoming,
-        },
-        {
-          type: 'carousel',
-          eyebrow: 'All-time favorites',
-          title: 'Top rated',
-          description: 'Some of the highest-rated movies worth discovering.',
-          media: sections.topRated,
-        },
-      ]}
-    />
+    <main className="container-content py-12 lg:py-16">
+      <MediaCatalogHeader
+        eyebrow="Explore"
+        title="Movies"
+        description="Discover what's worth watching, from what's trending now to timeless favorites."
+      />
+
+      <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
+        <Suspense fallback={<MoviesFeaturedSectionsSkeleton />}>
+          <MovieFeaturedCatalogSections />
+        </Suspense>
+
+        <Suspense fallback={<MoviesReleaseSectionsSkeleton />}>
+          <MovieReleaseCatalogSections />
+        </Suspense>
+      </div>
+    </main>
   );
 }

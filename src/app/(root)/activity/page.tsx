@@ -1,19 +1,48 @@
 import ActivityTimeline from '@/components/activity/activity-timeline';
+import { ActivityTimelineSectionSkeleton } from '@/components/skeletons/activity-skeletons';
 import EmptyState from '@/components/ui/empty-state';
 import { requireSession } from '@/lib/auth/require-session';
 import { getUserMediaActivity } from '@/lib/services/media-activity-service';
 import { Activity, ArrowRight } from 'lucide-react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Activity',
   description: 'See your latest activity across MovieShelf.',
 };
 
+async function ActivityContent({ userId }: { userId: string }) {
+  const activities = await getUserMediaActivity(userId);
+
+  return (
+    <section className="py-10 lg:py-14">
+      {activities.length === 0 ? (
+        <div className="mt-0 rounded-2xl p-12 surface">
+          <EmptyState
+            icon={Activity}
+            title="Your activity is empty"
+            description="Your cinematic journey will appear here as you watch, rate, review, and add movies and TV series to your shelf."
+            action={
+              <Link
+                href="/discover"
+                className="inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+              >
+                Discover
+              </Link>
+            }
+          />
+        </div>
+      ) : (
+        <ActivityTimeline activities={activities} />
+      )}
+    </section>
+  );
+}
+
 const ActivityPage = async () => {
   const session = await requireSession();
-  const activities = await getUserMediaActivity(session.user.id);
 
   return (
     <main className="container-content py-12 lg:py-16">
@@ -40,27 +69,9 @@ const ActivityPage = async () => {
         </Link>
       </div>
 
-      <section className="py-10 lg:py-14">
-        {activities.length === 0 ? (
-          <div className="mt-0 rounded-2xl p-12 surface">
-            <EmptyState
-              icon={Activity}
-              title="Your activity is empty"
-              description="Your cinematic journey will appear here as you watch, rate, review, and add movies and TV series to your shelf."
-              action={
-                <Link
-                  href="/discover"
-                  className="inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
-                >
-                  Discover
-                </Link>
-              }
-            />
-          </div>
-        ) : (
-          <ActivityTimeline activities={activities} />
-        )}
-      </section>
+      <Suspense fallback={<ActivityTimelineSectionSkeleton />}>
+        <ActivityContent userId={session.user.id} />
+      </Suspense>
     </main>
   );
 };

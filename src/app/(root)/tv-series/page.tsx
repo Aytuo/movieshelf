@@ -1,6 +1,14 @@
-import MediaCatalog from '@/components/catalog/media-catalog';
-import { getTvCatalogSections } from '@/lib/services/media-catalog-service';
+import { MediaCatalogHeader } from '@/components/catalog/media-catalog';
+import {
+  TvFeaturedCatalogSections,
+  TvScheduleCatalogSections,
+} from '@/components/catalog/streamed-catalog-sections';
+import {
+  TvFeaturedSectionsSkeleton,
+  TvScheduleSectionsSkeleton,
+} from '@/components/skeletons/catalog-page-skeletons';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'TV Series',
@@ -8,59 +16,24 @@ export const metadata: Metadata = {
     'Discover TV series worth watching, from what is trending now to all-time favorites.',
 };
 
-export default async function TvSeriesPage() {
-  const sections = await getTvCatalogSections();
-
+export default function TvSeriesPage() {
   return (
-    <MediaCatalog
-      eyebrow="Explore"
-      title="TV Series"
-      description="Discover what's worth watching, from what's trending now to all-time favorites."
-      blocks={[
-        {
-          type: 'carousel',
-          eyebrow: 'Popular picks',
-          title: 'Most popular',
-          description: 'The series getting the most attention right now.',
-          media: sections.popular,
-        },
-        {
-          type: 'carousel',
-          eyebrow: 'Trending now',
-          title: "What's hot today",
-          description:
-            'The series everyone seems to be talking about right now.',
-          media: sections.trending,
-        },
-        {
-          type: 'ranking',
-          eyebrow: 'Weekly top 10',
-          title: 'Top picks this week',
-          description: 'The biggest shows of the week, ranked.',
-          media: sections.topPicks,
-        },
-        {
-          type: 'schedule',
-          eyebrow: 'Airing today',
-          title: 'On today',
-          description: 'Series with new episodes airing today.',
-          items: sections.airingToday,
-        },
-        {
-          type: 'schedule',
-          eyebrow: 'Currently airing',
-          title: 'On the air',
-          description: 'Series currently in active release.',
-          items: sections.onTheAir,
-        },
-        {
-          type: 'carousel',
-          eyebrow: 'All-time favorites',
-          title: 'Top rated',
-          description: 'Some of the highest-rated series worth discovering.',
-          media: sections.topRated,
-        },
-      ]}
-    />
+    <main className="container-content py-12 lg:py-16">
+      <MediaCatalogHeader
+        eyebrow="Explore"
+        title="TV Series"
+        description="Discover what's worth watching, from what's trending now to all-time favorites."
+      />
+
+      <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
+        <Suspense fallback={<TvFeaturedSectionsSkeleton />}>
+          <TvFeaturedCatalogSections />
+        </Suspense>
+
+        <Suspense fallback={<TvScheduleSectionsSkeleton />}>
+          <TvScheduleCatalogSections />
+        </Suspense>
+      </div>
+    </main>
   );
 }

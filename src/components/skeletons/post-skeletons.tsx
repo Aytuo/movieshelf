@@ -27,6 +27,30 @@ function PostCommentSkeleton() {
   );
 }
 
+export function PostCommentsSkeleton() {
+  return (
+    <section
+      id="comments"
+      className="mt-14 scroll-mt-24 border-t border-border/60 pt-10 sm:mt-16 sm:pt-12"
+    >
+      <div className="mb-8">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="mt-2 h-8 w-40" />
+      </div>
+
+      <div className="mb-8">
+        <Skeleton className="h-10 w-48 rounded-lg" />
+      </div>
+
+      <div className="space-y-4">
+        {Array.from({ length: 3 }, (_, index) => (
+          <PostCommentSkeleton key={index} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function PostPageSkeleton() {
   return (
     <main className="container-content py-10 sm:py-14 lg:py-20">
@@ -75,22 +99,7 @@ export function PostPageSkeleton() {
             </div>
           </article>
 
-          <section className="mt-14 border-t border-border/60 pt-10 sm:mt-16 sm:pt-12">
-            <div className="mb-8">
-              <Skeleton className="h-3 w-20" />
-              <Skeleton className="mt-2 h-8 w-40" />
-            </div>
-
-            <div className="mb-8">
-              <Skeleton className="h-10 w-48 rounded-lg" />
-            </div>
-
-            <div className="space-y-4">
-              {Array.from({ length: 3 }, (_, index) => (
-                <PostCommentSkeleton key={index} />
-              ))}
-            </div>
-          </section>
+          <PostCommentsSkeleton />
         </div>
       </div>
     </main>

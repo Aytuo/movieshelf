@@ -1,11 +1,20 @@
+import {
+  MediaCommunityPostsSection,
+  MediaCommunityReviewsSection,
+} from '@/components/media/media-community-sections';
 import MediaDetailsView from '@/components/media/media-details-view';
+import {
+  MediaCommunityPostsSkeleton,
+  MediaCommunityReviewsSkeleton,
+} from '@/components/skeletons/media-skeletons';
 import { requireSession } from '@/lib/auth/require-session';
 import {
   getMediaDetails,
-  getMediaDetailsPageData,
+  getMediaDetailsCorePageData,
 } from '@/lib/services/media-service';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 type TvDetailsPageProps = {
   params: Promise<{
@@ -50,23 +59,36 @@ const TvDetailsPage = async ({ params }: TvDetailsPageProps) => {
 
   const session = await requireSession();
 
-  let data;
-
-  try {
-    data = await getMediaDetailsPageData('tv', tmdbId, session.user.id);
-  } catch {
-    notFound();
-  }
+  const data = await getMediaDetailsCorePageData(
+    'tv',
+    tmdbId,
+    session.user.id
+  ).catch(() => notFound());
 
   return (
     <MediaDetailsView
       media={data.media}
       mediaInteraction={data.mediaInteraction}
       existingReview={data.existingReview}
-      reviews={data.reviews}
       watchNumber={data.watchNumber}
-      posts={data.posts}
-      postCursor={data.postCursor}
+      reviewsSection={
+        <Suspense fallback={<MediaCommunityReviewsSkeleton />}>
+          <MediaCommunityReviewsSection
+            mediaRecordId={data.mediaRecordId}
+            mediaType="tv"
+          />
+        </Suspense>
+      }
+      postsSection={
+        <Suspense fallback={<MediaCommunityPostsSkeleton />}>
+          <MediaCommunityPostsSection
+            mediaRecordId={data.mediaRecordId}
+            userId={session.user.id}
+            mediaType="tv"
+            tmdbId={data.media.tmdbId}
+          />
+        </Suspense>
+      }
     />
   );
 };

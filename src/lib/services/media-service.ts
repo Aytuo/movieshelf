@@ -32,7 +32,7 @@ export async function getMediaDetails(
 /*                         GET MEDIA DETAILS PAGE DATA                        */
 /* ========================================================================== */
 
-export async function getMediaDetailsPageData(
+export async function getMediaDetailsCorePageData(
   type: MediaType,
   tmdbId: number,
   userId: string
@@ -54,17 +54,10 @@ export async function getMediaDetailsPageData(
 
   const mediaRecord = await getOrCreateMediaRecord(type, tmdbId, mediaDetails);
 
-  const postsPagePromise = getMediaPosts(mediaRecord.id, userId, {
-    limit: 5,
-  });
-
-  const [mediaInteraction, existingReview, reviews, postsPage] =
-    await Promise.all([
-      getUserMediaInteraction(userId, mediaRecord.id),
-      getUserReviewForMedia(userId, mediaRecord.id),
-      getMediaReviews(mediaRecord.id),
-      postsPagePromise,
-    ]);
+  const [mediaInteraction, existingReview] = await Promise.all([
+    getUserMediaInteraction(userId, mediaRecord.id),
+    getUserReviewForMedia(userId, mediaRecord.id),
+  ]);
 
   const watchNumber =
     mediaInteraction?.status === 'watched'
@@ -73,9 +66,43 @@ export async function getMediaDetailsPageData(
 
   return {
     media: mediaWithRatedRelatedItems,
+    mediaRecordId: mediaRecord.id,
     mediaInteraction,
     watchNumber,
     existingReview,
+  };
+}
+
+export async function getMediaDetailsReviews(mediaRecordId: string) {
+  return getMediaReviews(mediaRecordId);
+}
+
+export async function getMediaDetailsPosts(
+  mediaRecordId: string,
+  userId: string
+) {
+  return getMediaPosts(mediaRecordId, userId, {
+    limit: 5,
+  });
+}
+
+export async function getMediaDetailsPageData(
+  type: MediaType,
+  tmdbId: number,
+  userId: string
+) {
+  const core = await getMediaDetailsCorePageData(type, tmdbId, userId);
+
+  const [reviews, postsPage] = await Promise.all([
+    getMediaDetailsReviews(core.mediaRecordId),
+    getMediaDetailsPosts(core.mediaRecordId, userId),
+  ]);
+
+  return {
+    media: core.media,
+    mediaInteraction: core.mediaInteraction,
+    watchNumber: core.watchNumber,
+    existingReview: core.existingReview,
     reviews,
     posts: postsPage.posts,
     postCursor: postsPage.nextCursor,

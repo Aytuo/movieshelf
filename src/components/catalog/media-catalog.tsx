@@ -39,6 +39,26 @@ type MediaCatalogProps = {
   blocks: MediaCatalogBlock[];
 };
 
+export function MediaCatalogHeader({
+  eyebrow,
+  title,
+  description,
+}: Pick<MediaCatalogProps, 'eyebrow' | 'title' | 'description'>) {
+  return (
+    <header>
+      <p className="eyebrow">{eyebrow}</p>
+
+      <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+        {title}
+      </h1>
+
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+        {description}
+      </p>
+    </header>
+  );
+}
+
 const MediaCatalog = ({
   eyebrow,
   title,
@@ -47,17 +67,11 @@ const MediaCatalog = ({
 }: MediaCatalogProps) => {
   return (
     <main className="container-content py-12 lg:py-16">
-      <header>
-        <p className="eyebrow">{eyebrow}</p>
-
-        <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-          {title}
-        </h1>
-
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-          {description}
-        </p>
-      </header>
+      <MediaCatalogHeader
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
+      />
 
       <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
         {blocks.map((block, index) => {

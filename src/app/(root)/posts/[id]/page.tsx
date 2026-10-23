@@ -1,5 +1,6 @@
 import CommentList from '@/components/comments/comment-list';
 import PostCard from '@/components/posts/post-card';
+import { PostCommentsSkeleton } from '@/components/skeletons/post-skeletons';
 import { requireSession } from '@/lib/auth/require-session';
 import { getPostComments } from '@/lib/services/comment-service';
 import {
@@ -10,6 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 type PostPageProps = {
   params: Promise<{
@@ -36,15 +38,38 @@ export async function generateMetadata({
   };
 }
 
+type PostCommentsSectionProps = {
+  postId: string;
+  userId: string;
+  mediaType: 'movie' | 'tv';
+};
+
+const PostCommentsSection = async ({
+  postId,
+  userId,
+  mediaType,
+}: PostCommentsSectionProps) => {
+  const commentPage = await getPostComments(postId, userId);
+
+  return (
+    <CommentList
+      postId={postId}
+      comments={commentPage.comments}
+      commentCount={commentPage.totalCount}
+      nextCursor={commentPage.nextCursor}
+      hasMore={commentPage.hasMore}
+      mediaType={mediaType}
+      viewerUserId={userId}
+    />
+  );
+};
+
 const PostPage = async ({ params }: PostPageProps) => {
   const { id } = await params;
 
   const session = await requireSession();
 
-  const [post, commentPage] = await Promise.all([
-    getPostByIdWithReaction(id, session.user.id),
-    getPostComments(id, session.user.id),
-  ]);
+  const post = await getPostByIdWithReaction(id, session.user.id);
 
   if (!post) {
     notFound();
@@ -82,15 +107,13 @@ const PostPage = async ({ params }: PostPageProps) => {
 
           <PostCard post={post} variant="full" />
 
-          <CommentList
-            postId={post.id}
-            comments={commentPage.comments}
-            commentCount={commentPage.totalCount}
-            nextCursor={commentPage.nextCursor}
-            hasMore={commentPage.hasMore}
-            mediaType={post.media.type}
-            viewerUserId={session.user.id}
-          />
+          <Suspense fallback={<PostCommentsSkeleton />}>
+            <PostCommentsSection
+              postId={post.id}
+              userId={session.user.id}
+              mediaType={post.media.type}
+            />
+          </Suspense>
         </div>
       </div>
     </main>

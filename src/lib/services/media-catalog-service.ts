@@ -25,6 +25,26 @@ export type TvCatalogSections = {
   topRated: Media[];
 };
 
+export type MovieFeaturedSections = Pick<
+  MovieCatalogSections,
+  'popular' | 'trending' | 'topPicks'
+>;
+
+export type MovieReleaseSections = Pick<
+  MovieCatalogSections,
+  'nowPlaying' | 'upcoming' | 'topRated'
+>;
+
+export type TvFeaturedSections = Pick<
+  TvCatalogSections,
+  'popular' | 'trending' | 'topPicks'
+>;
+
+export type TvScheduleSections = Pick<
+  TvCatalogSections,
+  'airingToday' | 'onTheAir' | 'topRated'
+>;
+
 function applyRatingsToSchedule(
   items: TvScheduleItem[],
   storedRatings: StoredMediaRatingMap
@@ -47,62 +67,100 @@ function applyRatingsToSchedule(
   });
 }
 
-export async function getMovieCatalogSections(): Promise<MovieCatalogSections> {
-  const [popular, trending, topPicks, nowPlaying, upcoming, topRated] =
-    await Promise.all([
-      tmdbMovieRepository.getPopular(),
-      tmdbMovieRepository.getTrending(),
-      tmdbMovieRepository.getTopPicks(),
-      tmdbMovieRepository.getNowPlaying(),
-      tmdbMovieRepository.getUpcoming(),
-      tmdbMovieRepository.getTopRated(),
-    ]);
+export async function getMovieFeaturedSections(): Promise<MovieFeaturedSections> {
+  const [popular, trending, topPicks] = await Promise.all([
+    tmdbMovieRepository.getPopular(),
+    tmdbMovieRepository.getTrending(),
+    tmdbMovieRepository.getTopPicks(),
+  ]);
 
   const storedRatings = await getStoredMediaRatings([
     ...popular,
     ...trending,
     ...topPicks,
+  ]);
+
+  return {
+    popular: applyStoredMediaRatings(popular, storedRatings),
+    trending: applyStoredMediaRatings(trending, storedRatings),
+    topPicks: applyStoredMediaRatings(topPicks, storedRatings),
+  };
+}
+
+export async function getMovieReleaseSections(): Promise<MovieReleaseSections> {
+  const [nowPlaying, upcoming, topRated] = await Promise.all([
+    tmdbMovieRepository.getNowPlaying(),
+    tmdbMovieRepository.getUpcoming(),
+    tmdbMovieRepository.getTopRated(),
+  ]);
+
+  const storedRatings = await getStoredMediaRatings([
     ...nowPlaying,
     ...upcoming,
     ...topRated,
   ]);
 
   return {
-    popular: applyStoredMediaRatings(popular, storedRatings),
-    trending: applyStoredMediaRatings(trending, storedRatings),
-    topPicks: applyStoredMediaRatings(topPicks, storedRatings),
     nowPlaying: applyStoredMediaRatings(nowPlaying, storedRatings),
     upcoming: applyStoredMediaRatings(upcoming, storedRatings),
     topRated: applyStoredMediaRatings(topRated, storedRatings),
   };
 }
 
-export async function getTvCatalogSections(): Promise<TvCatalogSections> {
-  const [popular, trending, topPicks, airingToday, onTheAir, topRated] =
-    await Promise.all([
-      tmdbTvRepository.getPopular(),
-      tmdbTvRepository.getTrending(),
-      tmdbTvRepository.getTopPicks(),
-      tmdbTvRepository.getAiringToday(),
-      tmdbTvRepository.getOnTheAir(),
-      tmdbTvRepository.getTopRated(),
-    ]);
+export async function getTvFeaturedSections(): Promise<TvFeaturedSections> {
+  const [popular, trending, topPicks] = await Promise.all([
+    tmdbTvRepository.getPopular(),
+    tmdbTvRepository.getTrending(),
+    tmdbTvRepository.getTopPicks(),
+  ]);
 
   const storedRatings = await getStoredMediaRatings([
     ...popular,
     ...trending,
     ...topPicks,
-    ...airingToday.map((item) => item.media),
-    ...onTheAir.map((item) => item.media),
-    ...topRated,
   ]);
 
   return {
     popular: applyStoredMediaRatings(popular, storedRatings),
     trending: applyStoredMediaRatings(trending, storedRatings),
     topPicks: applyStoredMediaRatings(topPicks, storedRatings),
+  };
+}
+
+export async function getTvScheduleSections(): Promise<TvScheduleSections> {
+  const [airingToday, onTheAir, topRated] = await Promise.all([
+    tmdbTvRepository.getAiringToday(),
+    tmdbTvRepository.getOnTheAir(),
+    tmdbTvRepository.getTopRated(),
+  ]);
+
+  const storedRatings = await getStoredMediaRatings([
+    ...airingToday.map((item) => item.media),
+    ...onTheAir.map((item) => item.media),
+    ...topRated,
+  ]);
+
+  return {
     airingToday: applyRatingsToSchedule(airingToday, storedRatings),
     onTheAir: applyRatingsToSchedule(onTheAir, storedRatings),
     topRated: applyStoredMediaRatings(topRated, storedRatings),
   };
+}
+
+export async function getMovieCatalogSections(): Promise<MovieCatalogSections> {
+  const [featured, releases] = await Promise.all([
+    getMovieFeaturedSections(),
+    getMovieReleaseSections(),
+  ]);
+
+  return { ...featured, ...releases };
+}
+
+export async function getTvCatalogSections(): Promise<TvCatalogSections> {
+  const [featured, schedule] = await Promise.all([
+    getTvFeaturedSections(),
+    getTvScheduleSections(),
+  ]);
+
+  return { ...featured, ...schedule };
 }

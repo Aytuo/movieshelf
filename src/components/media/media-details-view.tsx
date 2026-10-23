@@ -1,14 +1,12 @@
 import type { MediaDetails } from '@/lib/media';
 import { tmdbImage } from '@/lib/tmdb/images';
-import type { MediaInteraction, Post } from '@/types';
-import { MessageSquareText, Star } from 'lucide-react';
+import type { MediaInteraction } from '@/types';
+import { Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import PostList from '../posts/post-list';
-import ReviewCard from '../reviews/review-card';
+import type { ReactNode } from 'react';
 import YourReviewSection from '../reviews/your-review-section';
 import TvSeasons from '../tv/tv-seasons';
-import EmptyState from '../ui/empty-state';
 import MediaActions from './media-actions';
 import MediaCast from './media-cast';
 import MediaRecommendations from './media-recommendations';
@@ -16,7 +14,6 @@ import MediaVideo from './media-video';
 
 type MediaDetailsViewProps = {
   media: MediaDetails;
-
   mediaInteraction: MediaInteraction | null;
 
   existingReview: {
@@ -29,30 +26,11 @@ type MediaDetailsViewProps = {
     updatedAt: Date;
   } | null;
 
-  reviews: {
-    review: {
-      id: string;
-      title: string | null;
-      content: string;
-      rating: number | null;
-      containsSpoilers: boolean;
-      createdAt: Date;
-      updatedAt: Date;
-    };
-
-    profile: {
-      username: string;
-      displayName: string | null;
-      avatarUrl: string | null;
-    };
-  }[];
-
   watchNumber: number | null;
-
   showType?: boolean;
 
-  posts: Post[];
-  postCursor: string | null;
+  reviewsSection: ReactNode;
+  postsSection: ReactNode;
 };
 
 function getYear(releaseDate: string | null): number | null {
@@ -69,11 +47,10 @@ const MediaDetailsView = ({
   media,
   mediaInteraction,
   existingReview,
-  reviews,
   watchNumber,
   showType = false,
-  posts,
-  postCursor,
+  reviewsSection,
+  postsSection,
 }: MediaDetailsViewProps) => {
   const poster = tmdbImage(media.posterPath, 'w500');
 
@@ -391,54 +368,13 @@ const MediaDetailsView = ({
       {/* Community reviews                                                */}
       {/* ---------------------------------------------------------------- */}
 
-      <section className="border-t border-border/60 bg-surface/20">
-        <div className="container-content py-14 lg:py-20">
-          <div className="mb-8">
-            <p className="eyebrow">From the community</p>
-
-            <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-              Reviews
-            </h2>
-
-            <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-              See what other people thought about this{' '}
-              {media.type === 'movie' ? 'movie' : 'TV series'}.
-            </p>
-          </div>
-
-          {reviews.length > 0 ? (
-            <div className="grid gap-4 lg:grid-cols-2">
-              {reviews.map(({ review, profile }) => (
-                <ReviewCard key={review.id} review={review} profile={profile} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl p-12 surface">
-              <EmptyState
-                icon={MessageSquareText}
-                title="No reviews yet"
-                description={
-                  <>
-                    Be the first to share your thoughts about this{' '}
-                    {media.type === 'movie' ? 'movie' : 'TV series'}.
-                  </>
-                }
-              />
-            </div>
-          )}
-        </div>
-      </section>
+      {reviewsSection}
 
       {/* ---------------------------------------------------------------- */}
-      {/* Community reviews                                                */}
+      {/* Community posts                                                  */}
       {/* ---------------------------------------------------------------- */}
 
-      <PostList
-        posts={posts}
-        postCursor={postCursor}
-        type={media.type}
-        tmdbId={media.tmdbId}
-      />
+      {postsSection}
 
       {/* ---------------------------------------------------------------- */}
       {/* Similar / recommendations                                        */}

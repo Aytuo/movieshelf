@@ -80,12 +80,8 @@ export function MoviesPageSkeleton() {
       <PageHeaderSkeleton />
 
       <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
-        <MediaCarouselSkeleton />
-        <MediaCarouselSkeleton />
-        <RankedMediaGridSkeleton count={10} />
-        <MediaCarouselSkeleton />
-        <MediaCarouselSkeleton />
-        <MediaCarouselSkeleton />
+        <MoviesFeaturedSectionsSkeleton />
+        <MoviesReleaseSectionsSkeleton />
       </div>
     </main>
   );
@@ -97,12 +93,8 @@ export function TvSeriesPageSkeleton() {
       <PageHeaderSkeleton />
 
       <div className="mt-10 space-y-14 lg:mt-14 lg:space-y-20">
-        <MediaCarouselSkeleton />
-        <MediaCarouselSkeleton />
-        <RankedMediaGridSkeleton count={10} />
-        <TvScheduleCarouselSkeleton />
-        <TvScheduleCarouselSkeleton />
-        <MediaCarouselSkeleton />
+        <TvFeaturedSectionsSkeleton />
+        <TvScheduleSectionsSkeleton />
       </div>
     </main>
   );
@@ -126,5 +118,45 @@ export function RankingsPageSkeleton() {
         </div>
       </div>
     </main>
+  );
+}
+
+export function MoviesFeaturedSectionsSkeleton() {
+  return (
+    <div className="space-y-14 lg:space-y-20">
+      <MediaCarouselSkeleton />
+      <MediaCarouselSkeleton />
+      <RankedMediaGridSkeleton count={10} />
+    </div>
+  );
+}
+
+export function MoviesReleaseSectionsSkeleton() {
+  return (
+    <div className="space-y-14 lg:space-y-20">
+      <MediaCarouselSkeleton />
+      <MediaCarouselSkeleton />
+      <MediaCarouselSkeleton />
+    </div>
+  );
+}
+
+export function TvFeaturedSectionsSkeleton() {
+  return (
+    <div className="space-y-14 lg:space-y-20">
+      <MediaCarouselSkeleton />
+      <MediaCarouselSkeleton />
+      <RankedMediaGridSkeleton count={10} />
+    </div>
+  );
+}
+
+export function TvScheduleSectionsSkeleton() {
+  return (
+    <div className="space-y-14 lg:space-y-20">
+      <TvScheduleCarouselSkeleton />
+      <TvScheduleCarouselSkeleton />
+      <MediaCarouselSkeleton />
+    </div>
   );
 }
