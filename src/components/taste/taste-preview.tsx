@@ -38,7 +38,7 @@ const TastePreview = ({ taste, username }: TastePreviewProps) => {
               href={`/profile/${username}/taste`}
               className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
             >
-              Explore more
+              Dive deeper
               <ArrowRight className="size-4" />
             </Link>
           </div>

@@ -241,7 +241,14 @@ function ProfileTasteContentSkeleton() {
         {Array.from({ length: 4 }, (_, index) => (
           <div key={index} className="rounded-xl p-4 surface">
             <Skeleton className="h-3 w-16" />
-            <Skeleton className="mt-4 h-7 w-12" />
+
+            <div className="mt-4 flex min-h-7 items-center justify-center gap-1.5">
+              <Skeleton className="h-7 w-12" />
+
+              {index === 3 && (
+                <Skeleton className="size-3.5 shrink-0 rounded-full" />
+              )}
+            </div>
           </div>
         ))}
       </section>
@@ -270,6 +277,46 @@ function ProfileTasteContentSkeleton() {
             </div>
           </div>
         ))}
+      </section>
+
+      {/* Rating distribution */}
+      <section className="rounded-2xl p-6 surface sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="mt-2 h-4 w-56 max-w-full" />
+          </div>
+
+          <Skeleton className="h-6 w-20 shrink-0 rounded-full" />
+        </div>
+
+        <div className="mt-8 flex h-56 items-stretch gap-1 sm:gap-3">
+          {Array.from({ length: 10 }, (_, index) => {
+            const height = [14, 24, 36, 52, 68, 78, 64, 46, 30, 18][index];
+
+            return (
+              <div key={index} className="flex min-w-0 flex-1 flex-col">
+                <div className="relative min-h-0 flex-1">
+                  <Skeleton
+                    className="absolute left-1/2 h-2 w-3 -translate-x-1/2"
+                    style={{
+                      bottom: `calc(${height}% + 6px)`,
+                    }}
+                  />
+
+                  <Skeleton
+                    className="absolute inset-x-0 bottom-0 rounded-t-md"
+                    style={{
+                      height: `${height}%`,
+                    }}
+                  />
+                </div>
+
+                <Skeleton className="mx-auto mt-2 h-2.5 w-3" />
+              </div>
+            );
+          })}
+        </div>
       </section>
     </div>
   );

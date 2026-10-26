@@ -23,14 +23,12 @@ function Stat({
 }) {
   return (
     <div className="rounded-xl p-4 surface">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        {icon}
-        {label}
-      </div>
+      <div className="text-xs text-muted-foreground">{label}</div>
 
-      <p className="mt-4 font-heading text-2xl font-bold tracking-tight">
-        {value}
-      </p>
+      <div className="mt-4 flex items-center justify-center gap-1.5 font-heading text-2xl font-bold tracking-tight">
+        {icon}
+        <span>{value}</span>
+      </div>
     </div>
   );
 }
@@ -45,6 +43,11 @@ const TasteOverview = ({ taste }: TasteOverviewProps) => {
   const maxRatingCount = Math.max(
     ...stats.ratingDistribution.map((item) => item.count),
     1
+  );
+
+  const totalRatingCount = stats.ratingDistribution.reduce(
+    (total, item) => total + item.count,
+    0
   );
 
   const tasteProgress = Math.min(stats.watched / 50, 1);
@@ -97,7 +100,7 @@ const TasteOverview = ({ taste }: TasteOverviewProps) => {
             {summary.title}
           </h2>
 
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+          <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground sm:text-base">
             {summary.description}
           </p>
         </div>
@@ -229,44 +232,67 @@ const TasteOverview = ({ taste }: TasteOverviewProps) => {
 
       {/* Rating distribution */}
       <section className="rounded-2xl p-6 surface sm:p-7">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.15em] text-muted-foreground uppercase">
-            Rating distribution
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold tracking-[0.15em] text-foreground uppercase">
+              Rating distribution
+            </p>
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            How you score the {label} you watch.
-          </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              How you score the {label} you watch.
+            </p>
+          </div>
+
+          <span className="shrink-0 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-muted-foreground tabular-nums">
+            {totalRatingCount} ratings
+          </span>
         </div>
 
-        <div className="mt-8 flex h-48 items-end gap-2 sm:gap-3">
-          {stats.ratingDistribution.map((item) => {
-            const height =
-              item.count === 0
-                ? 4
-                : Math.max((item.count / maxRatingCount) * 100, 10);
+        {totalRatingCount > 0 ? (
+          <div className="mt-8 flex h-56 items-stretch gap-1 sm:gap-3">
+            {stats.ratingDistribution.map((item) => {
+              const barHeight = (item.count / maxRatingCount) * 78;
 
-            return (
-              <div
-                key={item.rating}
-                className="flex h-full flex-1 flex-col justify-end"
-              >
-                <div className="group relative flex flex-1 items-end">
-                  <div
-                    className="w-full rounded-t-md bg-primary/70 transition-[height,background-color] duration-300 group-hover:bg-primary"
-                    style={{
-                      height: `${height}%`,
-                    }}
-                  />
+              return (
+                <div key={item.rating} className="flex min-w-0 flex-1 flex-col">
+                  <div className="group relative min-h-0 flex-1">
+                    <span
+                      className="absolute z-10 -translate-x-1/2 text-[10px] leading-none whitespace-nowrap text-muted-foreground tabular-nums"
+                      style={{
+                        left: '50%',
+                        bottom:
+                          item.count > 0 ? `calc(${barHeight}% + 6px)` : '7px',
+                      }}
+                    >
+                      {item.count}
+                    </span>
+
+                    <div
+                      className={`absolute inset-x-0 bottom-0 rounded-t-md transition-colors duration-300 ${
+                        item.count > 0
+                          ? 'bg-primary/70 group-hover:bg-primary'
+                          : 'bg-border'
+                      }`}
+                      style={{
+                        height: item.count > 0 ? `${barHeight}%` : '1px',
+                      }}
+                    />
+                  </div>
+
+                  <span className="mt-2 text-center text-[10px] text-muted-foreground tabular-nums">
+                    {item.rating}
+                  </span>
                 </div>
-
-                <span className="mt-2 text-center text-[10px] text-muted-foreground">
-                  {item.rating}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mt-8 flex min-h-48 items-center justify-center rounded-xl border border-dashed border-border/70 bg-surface/40 px-6 text-center">
+            <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+              Rate a few {label} to see how your ratings are distributed.
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );

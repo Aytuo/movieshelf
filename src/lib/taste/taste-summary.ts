@@ -28,8 +28,8 @@ export function getTasteSummary(taste: TasteStats, type: MediaType) {
           : `You have a soft spot for ${genre} series.`,
       description:
         type === 'movie'
-          ? `Your movie shelf leans toward ${genre} and you seem especially drawn to movies from the ${topDecade}. Your current average rating is ${taste.averageRating}/10.`
-          : `Your TV shelf leans toward ${genre} and you seem especially drawn to series from the ${topDecade}. Your current average rating is ${taste.averageRating}/10.`,
+          ? `Your movie shelf leans toward ${genre}, with a soft spot for ${topDecade} films. Your current average rating is ${taste.averageRating}/10.`
+          : `Your TV shelf leans toward ${genre}, with a soft spot for ${topDecade} series. Your current average rating is ${taste.averageRating}/10.`,
     };
   }
 
