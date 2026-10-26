@@ -3,6 +3,7 @@ import {
   getUserLatestRated,
   getUserMediaInteraction,
   getUserMediaStats,
+  getUserShelfPreview,
   getUserShelf as getUserShelfRepository,
   markMediaAsDropped,
   markMediaAsWatched,
@@ -27,6 +28,12 @@ export type UserHomeSummary = {
     tmdbRating: number | null;
     userRating: number | null;
   }[];
+  shelfPreview: {
+    tmdbId: number;
+    type: MediaType;
+    title: string;
+    posterPath: string | null;
+  }[];
 };
 
 /* ========================================================================== */
@@ -44,9 +51,10 @@ export async function getUserShelf(userId: string) {
 export async function getUserHomeSummary(
   userId: string
 ): Promise<UserHomeSummary> {
-  const [statsRows, latestRatedRows] = await Promise.all([
+  const [statsRows, latestRatedRows, shelfPreviewRows] = await Promise.all([
     getUserMediaStats(userId),
     getUserLatestRated(userId, 3),
+    getUserShelfPreview(userId, 16),
   ]);
 
   const stats = statsRows.reduce(
@@ -64,17 +72,36 @@ export async function getUserHomeSummary(
     }
   );
 
+  const latestRated = latestRatedRows.map(({ media, interaction }) => ({
+    tmdbId: media.tmdbId,
+    type: media.type,
+    title: media.title,
+    posterPath: media.posterPath,
+    releaseDate: media.releaseDate,
+    tmdbRating: media.tmdbRating === null ? null : Number(media.tmdbRating),
+    userRating: interaction.rating,
+  }));
+
+  const latestRatedKeys = new Set(
+    latestRated.map((item) => `${item.type}:${item.tmdbId}`)
+  );
+
+  const shelfPreview = [
+    ...latestRated.map(({ tmdbId, type, title, posterPath }) => ({
+      tmdbId,
+      type,
+      title,
+      posterPath,
+    })),
+    ...shelfPreviewRows.filter(
+      (item) => !latestRatedKeys.has(`${item.type}:${item.tmdbId}`)
+    ),
+  ].slice(0, 8);
+
   return {
     ...stats,
-    latestRated: latestRatedRows.map(({ media, interaction }) => ({
-      tmdbId: media.tmdbId,
-      type: media.type,
-      title: media.title,
-      posterPath: media.posterPath,
-      releaseDate: media.releaseDate,
-      tmdbRating: media.tmdbRating === null ? null : Number(media.tmdbRating),
-      userRating: interaction.rating,
-    })),
+    latestRated,
+    shelfPreview,
   };
 }
 

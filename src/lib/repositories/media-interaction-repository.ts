@@ -20,6 +20,9 @@ export type UserMediaStatsRow = {
   type: MediaType;
   total: number;
   watched: number;
+  watchlist: number;
+  watching: number;
+  dropped: number;
   rated: number;
   favorites: number;
   averageRating: number | null;
@@ -83,6 +86,21 @@ export async function getUserWatchedOrRatedMediaKeys(
         or(eq(mediaActivity.type, 'watched'), eq(mediaActivity.type, 'rated'))
       )
     );
+}
+
+export async function getUserShelfPreview(userId: string, limit = 16) {
+  return db
+    .select({
+      tmdbId: media.tmdbId,
+      type: media.type,
+      title: media.title,
+      posterPath: media.posterPath,
+    })
+    .from(mediaInteraction)
+    .innerJoin(media, eq(media.id, mediaInteraction.mediaId))
+    .where(eq(mediaInteraction.userId, userId))
+    .orderBy(desc(mediaInteraction.updatedAt))
+    .limit(limit);
 }
 
 export async function getUserShelf(userId: string): Promise<UserShelfRow[]> {
@@ -529,6 +547,21 @@ export async function getUserMediaStats(
       watched: sql<number>`
         count(*) filter (
           where ${mediaInteraction.status} = 'watched'
+        )
+      `,
+      watchlist: sql<number>`
+        count(*) filter (
+          where ${mediaInteraction.status} = 'watchlist'
+        )
+      `,
+      watching: sql<number>`
+        count(*) filter (
+          where ${mediaInteraction.status} = 'watching'
+        )
+      `,
+      dropped: sql<number>`
+        count(*) filter (
+          where ${mediaInteraction.status} = 'dropped'
         )
       `,
       rated: sql<number>`

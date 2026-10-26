@@ -3,7 +3,17 @@ import { ProfileMediaShelf } from '@/components/profile/profile-media-shelf';
 import ProfileNavbar from '@/components/profile/profile-navbar';
 import { requireSession } from '@/lib/auth/require-session';
 import { getPublicProfile } from '@/lib/services/profile-service';
-import { Film, Heart, History, Star, Tv } from 'lucide-react';
+import {
+  Bookmark,
+  Check,
+  Clock3,
+  Film,
+  Heart,
+  History,
+  Star,
+  Tv,
+  X,
+} from 'lucide-react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -128,27 +138,39 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
             <div className="mt-5 grid grid-cols-4 gap-3">
               <div>
-                <p className="text-2xl font-bold">{stats.movies.watched}</p>
+                <div className="flex items-center gap-1.5">
+                  <Check className="size-4 shrink-0 text-muted-foreground" />
+
+                  <p className="text-2xl font-bold">{stats.movies.watched}</p>
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">watched</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{stats.movies.rated}</p>
+                <div className="flex items-center gap-1.5">
+                  <Star className="size-4 shrink-0 text-muted-foreground" />
+
+                  <p className="text-2xl font-bold">{stats.movies.rated}</p>
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">rated</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{stats.movies.favorites}</p>
+                <div className="flex items-center gap-1.5">
+                  <Heart className="size-4 shrink-0 text-muted-foreground" />
+
+                  <p className="text-2xl font-bold">{stats.movies.favorites}</p>
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">favorites</p>
               </div>
 
               <div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {stats.movies.averageRating !== null && (
-                    <Star className="size-3.5 fill-current text-rating" />
+                    <Star className="size-4 shrink-0 fill-current text-rating" />
                   )}
 
                   <p className="text-2xl font-bold">
@@ -157,6 +179,48 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
                 </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">average</p>
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-border pt-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Bookmark className="size-3.5 shrink-0 text-muted-foreground" />
+
+                    <p className="text-lg font-semibold">
+                      {stats.movies.watchlist}
+                    </p>
+                  </div>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    watchlist
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Clock3 className="size-3.5 shrink-0 text-muted-foreground" />
+
+                    <p className="text-lg font-semibold">
+                      {stats.movies.watching}
+                    </p>
+                  </div>
+
+                  <p className="mt-1 text-xs text-muted-foreground">watching</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <X className="size-3.5 shrink-0 text-muted-foreground" />
+
+                    <p className="text-lg font-semibold">
+                      {stats.movies.dropped}
+                    </p>
+                  </div>
+
+                  <p className="mt-1 text-xs text-muted-foreground">dropped</p>
+                </div>
               </div>
             </div>
           </section>
@@ -177,27 +241,39 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
 
             <div className="mt-5 grid grid-cols-4 gap-3">
               <div>
-                <p className="text-2xl font-bold">{stats.tv.watched}</p>
+                <div className="flex items-center gap-1.5">
+                  <Check className="size-4 shrink-0 text-muted-foreground" />
+
+                  <p className="text-2xl font-bold">{stats.tv.watched}</p>
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">watched</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{stats.tv.rated}</p>
+                <div className="flex items-center gap-1.5">
+                  <Star className="size-4 shrink-0 text-muted-foreground" />
+
+                  <p className="text-2xl font-bold">{stats.tv.rated}</p>
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">rated</p>
               </div>
 
               <div>
-                <p className="text-2xl font-bold">{stats.tv.favorites}</p>
+                <div className="flex items-center gap-1.5">
+                  <Heart className="size-4 shrink-0 text-muted-foreground" />
+
+                  <p className="text-2xl font-bold">{stats.tv.favorites}</p>
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">favorites</p>
               </div>
 
               <div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {stats.tv.averageRating !== null && (
-                    <Star className="size-3.5 fill-current text-rating" />
+                    <Star className="size-4 shrink-0 fill-current text-rating" />
                   )}
 
                   <p className="text-2xl font-bold">
@@ -206,6 +282,44 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
                 </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">average</p>
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-border pt-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Bookmark className="size-3.5 shrink-0 text-muted-foreground" />
+
+                    <p className="text-lg font-semibold">
+                      {stats.tv.watchlist}
+                    </p>
+                  </div>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    watchlist
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Clock3 className="size-3.5 shrink-0 text-muted-foreground" />
+
+                    <p className="text-lg font-semibold">{stats.tv.watching}</p>
+                  </div>
+
+                  <p className="mt-1 text-xs text-muted-foreground">watching</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <X className="size-3.5 shrink-0 text-muted-foreground" />
+
+                    <p className="text-lg font-semibold">{stats.tv.dropped}</p>
+                  </div>
+
+                  <p className="mt-1 text-xs text-muted-foreground">dropped</p>
+                </div>
               </div>
             </div>
           </section>

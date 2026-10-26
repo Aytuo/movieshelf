@@ -52,6 +52,9 @@ function createEmptyMediaStats() {
   return {
     total: 0,
     watched: 0,
+    watchlist: 0,
+    watching: 0,
+    dropped: 0,
     rated: 0,
     favorites: 0,
     averageRating: null,
@@ -73,6 +76,9 @@ function mapPublicMediaStats(rows: UserMediaStatsRow[]) {
     movies: {
       total: Number(movie.total),
       watched: Number(movie.watched),
+      watchlist: Number(movie.watchlist),
+      watching: Number(movie.watching),
+      dropped: Number(movie.dropped),
       rated: Number(movie.rated),
       favorites: Number(movie.favorites),
       averageRating: roundRating(
@@ -82,6 +88,9 @@ function mapPublicMediaStats(rows: UserMediaStatsRow[]) {
     tv: {
       total: Number(tv.total),
       watched: Number(tv.watched),
+      watchlist: Number(tv.watchlist),
+      watching: Number(tv.watching),
+      dropped: Number(tv.dropped),
       rated: Number(tv.rated),
       favorites: Number(tv.favorites),
       averageRating: roundRating(

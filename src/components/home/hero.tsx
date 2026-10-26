@@ -189,20 +189,12 @@ const Hero = ({ summary }: HeroProps) => {
                     ? 'Add movies and TV series to your collection and make this space yours.'
                     : 'Rate a movie or TV series to see your latest picks featured here.'}
                 </p>
-
-                <Link
-                  href="/discover"
-                  className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
-                >
-                  Discover titles
-                  <ArrowRight className="size-4" />
-                </Link>
               </div>
             )}
 
             {/* Floating shelf card */}
             {summary.shelfCount > 0 && (
-              <div className="absolute right-2 bottom-2 z-30 hidden w-64 rounded-xl p-4 shadow-2xl glass-strong sm:block lg:right-0">
+              <div className="absolute right-2 bottom-2 z-30 hidden w-84 rounded-xl p-4 shadow-2xl glass-strong sm:block lg:right-0">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
@@ -219,56 +211,63 @@ const Hero = ({ summary }: HeroProps) => {
                   </div>
 
                   <div className="flex shrink-0 -space-x-2">
-                    {summary.latestRated
-                      .filter((item) => item.posterPath)
-                      .slice(0, 3)
-                      .map((item) => (
-                        <Image
-                          key={`${item.type}-${item.tmdbId}`}
-                          src={getTmdbPosterUrl(item.posterPath!)}
-                          alt=""
-                          width={32}
-                          height={32}
-                          className="size-8 rounded-full border-2 border-background object-cover"
-                        />
-                      ))}
+                    {summary.shelfPreview.slice(0, 8).map((item) => (
+                      <div
+                        key={`${item.type}-${item.tmdbId}`}
+                        className="relative size-8 shrink-0 overflow-hidden rounded-full border-2 border-background bg-surface-hover"
+                      >
+                        {item.posterPath ? (
+                          <Image
+                            src={getTmdbPosterUrl(item.posterPath)}
+                            alt=""
+                            fill
+                            sizes="32px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="flex size-full items-center justify-center">
+                            <Bookmark className="size-3.5 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/60 pt-3">
-                  <div>
-                    <div className="flex items-center gap-1.5">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
                       <Check className="size-3.5 text-primary" />
                       <span className="text-sm font-semibold">
                         {summary.watchedCount}
                       </span>
                     </div>
                     <div className="mt-1 text-[11px] text-muted-foreground">
-                      Watched
+                      watched
                     </div>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
                       <Star className="size-3.5 text-rating" />
                       <span className="text-sm font-semibold">
                         {summary.ratedCount}
                       </span>
                     </div>
                     <div className="mt-1 text-[11px] text-muted-foreground">
-                      Rated
+                      rated
                     </div>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
                       <Heart className="size-3.5 text-rose-400" />
                       <span className="text-sm font-semibold">
                         {summary.favoritesCount}
                       </span>
                     </div>
                     <div className="mt-1 text-[11px] text-muted-foreground">
-                      Favorites
+                      favorites
                     </div>
                   </div>
                 </div>
