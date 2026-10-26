@@ -42,8 +42,8 @@ export function HomeHeroSectionSkeleton() {
 
             <Skeleton className="absolute top-20 right-0 hidden aspect-[2/3] w-45 rotate-[9deg] rounded-xl sm:block sm:w-[210px] lg:top-24 lg:right-8 lg:w-[230px]" />
 
-            <div className="absolute right-2 bottom-2 z-30 hidden w-64 rounded-xl p-4 glass-strong sm:block lg:right-0">
-              <div className="flex items-start justify-between gap-3">
+            <div className="absolute right-2 bottom-2 z-30 hidden w-84 rounded-xl p-4 glass-strong sm:block lg:right-0">
+              <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <Skeleton className="h-3 w-20" />
                   <Skeleton className="mt-2 h-8 w-12" />
@@ -51,17 +51,24 @@ export function HomeHeroSectionSkeleton() {
                 </div>
 
                 <div className="flex shrink-0 -space-x-2">
-                  <Skeleton className="size-8 rounded-full border-2 border-background" />
-                  <Skeleton className="size-8 rounded-full border-2 border-background" />
-                  <Skeleton className="size-8 rounded-full border-2 border-background" />
+                  {Array.from({ length: 8 }, (_, index) => (
+                    <Skeleton
+                      key={index}
+                      className="size-8 shrink-0 rounded-full border-2 border-background"
+                    />
+                  ))}
                 </div>
               </div>
 
               <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/60 pt-3">
                 {Array.from({ length: 3 }, (_, index) => (
-                  <div key={index}>
-                    <Skeleton className="h-4 w-8" />
-                    <Skeleton className="mt-2 h-3 w-12 max-w-full" />
+                  <div key={index} className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Skeleton className="size-3.5 shrink-0 rounded-sm" />
+                      <Skeleton className="h-4 w-8" />
+                    </div>
+
+                    <Skeleton className="mx-auto mt-1 h-3 w-12 max-w-full" />
                   </div>
                 ))}
               </div>

@@ -68,10 +68,29 @@ export function ProfilePageSkeleton() {
               <div className="mt-5 grid grid-cols-4 gap-3">
                 {Array.from({ length: 4 }, (_, statIndex) => (
                   <div key={statIndex}>
-                    <Skeleton className="h-7 w-10 max-w-full" />
-                    <Skeleton className="mt-2 h-3 w-12 max-w-full" />
+                    <div className="flex items-center gap-1.5">
+                      <Skeleton className="size-4 shrink-0 rounded-sm" />
+                      <Skeleton className="h-7 w-10 max-w-full" />
+                    </div>
+
+                    <Skeleton className="mt-1 h-3 w-12 max-w-full" />
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-6 border-t border-border pt-4">
+                <div className="grid grid-cols-3 gap-3">
+                  {Array.from({ length: 3 }, (_, statIndex) => (
+                    <div key={statIndex} className="text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Skeleton className="size-3.5 shrink-0 rounded-sm" />
+                        <Skeleton className="h-5 w-8" />
+                      </div>
+
+                      <Skeleton className="mx-auto mt-1 h-3 w-12 max-w-full" />
+                    </div>
+                  ))}
+                </div>
               </div>
             </article>
           ))}
