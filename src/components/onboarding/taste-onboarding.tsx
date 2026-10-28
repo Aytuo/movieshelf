@@ -39,7 +39,6 @@ const TasteOnboarding = ({ movieResult, tvResult }: TasteOnboardingProps) => {
   const [isPending, startTransition] = useTransition();
 
   const initialResult = type === 'movie' ? movieResult : tvResult;
-  const media = initialResult.media;
 
   const selectedMedia = type === 'movie' ? movieSelectedMedia : tvSelectedMedia;
 
@@ -98,8 +97,10 @@ const TasteOnboarding = ({ movieResult, tvResult }: TasteOnboardingProps) => {
       return;
     }
 
-    setCurrentRatings(
-      Object.fromEntries(selectedIds.map((tmdbId) => [tmdbId, DEFAULT_RATING]))
+    setCurrentRatings((current) =>
+      Object.fromEntries(
+        selectedIds.map((tmdbId) => [tmdbId, current[tmdbId] ?? DEFAULT_RATING])
+      )
     );
 
     setStep('rating');

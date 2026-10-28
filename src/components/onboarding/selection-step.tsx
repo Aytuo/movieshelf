@@ -16,6 +16,9 @@ import { useRef, useState } from 'react';
 import OnboardingMediaCard from './onboarding-media-card';
 import OnboardingStepIndicator from './onboarding-step-indicator';
 
+const MIN_SELECTIONS = 5;
+const MAX_SELECTIONS = 10;
+
 type SelectionStepProps = {
   initialResult: MediaSearchResult;
   type: MediaType;
@@ -41,6 +44,25 @@ const SelectionStep = ({
 }: SelectionStepProps) => {
   const isMovie = type === 'movie';
   const mediaLabel = isMovie ? 'movies' : 'TV series';
+
+  const titlesNeededToContinue = Math.max(
+    MIN_SELECTIONS - selectedIds.length,
+    0
+  );
+
+  const titlesRemainingForGoal = Math.max(
+    MAX_SELECTIONS - selectedIds.length,
+    0
+  );
+
+  const progressMessage =
+    titlesNeededToContinue > 0
+      ? `Choose ${titlesNeededToContinue} more ${
+          titlesNeededToContinue === 1 ? 'title' : 'titles'
+        } to continue.`
+      : titlesRemainingForGoal > 0
+        ? `Minimum reached — ${titlesRemainingForGoal} more for better recommendations.`
+        : 'Great! Your recommendations can now be better tailored.';
 
   const [query, setQuery] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
@@ -150,23 +172,40 @@ const SelectionStep = ({
           </h1>
 
           <p className="mt-5 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">
-            Choose at least 5 titles you&apos;ve already seen Don&apos;t
+            Choose at least 5 titles you&apos;ve already seen. Don&apos;t
             overthink it — pick the ones that feel most like you.
           </p>
 
-          <div className="mt-6 flex items-center gap-3">
-            <div className="h-[6px] flex-1 overflow-hidden rounded-full bg-surface-hover">
+          <div className="mt-6">
+            <div className="mb-2 flex items-start justify-between gap-3">
+              <p
+                aria-live="polite"
+                className="min-w-0 text-xs leading-5 text-muted-foreground"
+              >
+                {progressMessage}
+              </p>
+
+              <span className="shrink-0 text-xs font-medium text-muted-foreground tabular-nums">
+                {selectedIds.length}/{MAX_SELECTIONS}
+              </span>
+            </div>
+
+            <div
+              role="progressbar"
+              aria-label="Title selection progress"
+              aria-valuemin={0}
+              aria-valuemax={MAX_SELECTIONS}
+              aria-valuenow={selectedIds.length}
+              aria-valuetext={`${selectedIds.length} of ${MAX_SELECTIONS} titles selected`}
+              className="h-[6px] overflow-hidden rounded-full bg-surface-hover"
+            >
               <div
                 className="h-full rounded-full bg-primary transition-[width] duration-300"
                 style={{
-                  width: `${Math.max((selectedIds.length / 5) * 100, 8)}%`,
+                  width: `${(selectedIds.length / MAX_SELECTIONS) * 100}%`,
                 }}
               />
             </div>
-
-            <span className="text-xs text-muted-foreground">
-              {selectedIds.length}/5
-            </span>
           </div>
         </div>
 
@@ -228,13 +267,7 @@ const SelectionStep = ({
 
           {selectedMedia.length > 0 && (
             <div className="mt-6">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold">Selected titles</p>
-
-                <span className="text-xs text-muted-foreground tabular-nums">
-                  {selectedIds.length}/10
-                </span>
-              </div>
+              <p className="text-sm font-semibold">Selected titles</p>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {selectedMedia.map((item) => (
@@ -254,7 +287,7 @@ const SelectionStep = ({
             </div>
           )}
 
-          {selectedIds.length >= 10 && (
+          {selectedIds.length >= MAX_SELECTIONS && (
             <p className="mt-3 text-xs text-muted-foreground">
               You&apos;ve reached the 10-title limit. Remove a selected title
               before choosing another.
