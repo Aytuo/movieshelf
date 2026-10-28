@@ -4,11 +4,16 @@ import { requireSession } from '@/lib/auth/require-session';
 import { setRating } from '@/lib/services/media-interaction-service';
 import { getOrCreateMediaRecord } from '@/lib/services/media-service';
 import {
+  onboardingMediaPageSchema,
   onboardingRatingsSchema,
+  type OnboardingMediaPageInput,
   type OnboardingRatingsInput,
 } from '@/lib/validations/onboarding';
 import { revalidatePath } from 'next/cache';
-import { completeTasteOnboarding } from '../services/onboarding-service';
+import {
+  completeTasteOnboarding,
+  getOnboardingMediaPage,
+} from '../services/onboarding-service';
 
 export async function saveTasteRatings(input: OnboardingRatingsInput) {
   const session = await requireSession();
@@ -52,4 +57,25 @@ export async function skipTasteOnboarding() {
   return {
     success: true,
   };
+}
+
+export async function fetchOnboardingMedia(input: OnboardingMediaPageInput) {
+  await requireSession();
+
+  const parsed = onboardingMediaPageSchema.safeParse(input);
+
+  if (!parsed.success) {
+    throw new Error('Invalid onboarding request.');
+  }
+
+  const { type, query, page } = parsed.data;
+
+  if (query && query.length < 2) {
+    throw new Error('Enter at least 2 characters to search.');
+  }
+
+  return getOnboardingMediaPage(type, {
+    query: query || undefined,
+    page,
+  });
 }

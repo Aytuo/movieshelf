@@ -6,54 +6,70 @@ import {
   skipTasteOnboarding,
 } from '@/lib/actions/onboarding-action';
 import type { Media } from '@/lib/media';
+import type { MediaSearchResult } from '@/types';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
+import OnboardingCompleteStep from './onboarding-complete-step';
 import RatingStep from './rating-step';
 import SelectionStep from './selection-step';
 
 type TasteOnboardingProps = {
-  movieMedia: Media[];
-  tvMedia: Media[];
+  movieResult: MediaSearchResult;
+  tvResult: MediaSearchResult;
 };
 
 type OnboardingType = 'movie' | 'tv';
-type Step = 'selection' | 'rating';
+type Step = 'selection' | 'rating' | 'complete';
 
 const MIN_SELECTIONS = 5;
 const MAX_SELECTIONS = 10;
 const DEFAULT_RATING = 8;
 
-const TasteOnboarding = ({ movieMedia, tvMedia }: TasteOnboardingProps) => {
+const TasteOnboarding = ({ movieResult, tvResult }: TasteOnboardingProps) => {
   const router = useRouter();
 
   const [type, setType] = useState<OnboardingType>('movie');
   const [step, setStep] = useState<Step>('selection');
-  const [movieSelectedIds, setMovieSelectedIds] = useState<number[]>([]);
-  const [tvSelectedIds, setTvSelectedIds] = useState<number[]>([]);
+  const [movieSelectedMedia, setMovieSelectedMedia] = useState<Media[]>([]);
+  const [tvSelectedMedia, setTvSelectedMedia] = useState<Media[]>([]);
   const [movieRatings, setMovieRatings] = useState<Record<number, number>>({});
   const [tvRatings, setTvRatings] = useState<Record<number, number>>({});
   const [error, setError] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
-  const media = type === 'movie' ? movieMedia : tvMedia;
+  const initialResult = type === 'movie' ? movieResult : tvResult;
+  const media = initialResult.media;
 
-  const selectedIds = type === 'movie' ? movieSelectedIds : tvSelectedIds;
+  const selectedMedia = type === 'movie' ? movieSelectedMedia : tvSelectedMedia;
+
+  const selectedIds = selectedMedia.map((item) => item.tmdbId);
 
   const ratings = type === 'movie' ? movieRatings : tvRatings;
 
-  const selectedMedia = useMemo(
-    () => media.filter((item) => selectedIds.includes(item.tmdbId)),
-    [media, selectedIds]
-  );
+  function toggleMedia(mediaItem: Media) {
+    const updateSelection = (current: Media[]) => {
+      const alreadySelected = current.some(
+        (item) => item.tmdbId === mediaItem.tmdbId
+      );
 
-  function setSelectedIds(
-    update: number[] | ((current: number[]) => number[])
-  ) {
+      if (alreadySelected) {
+        return current.filter((item) => item.tmdbId !== mediaItem.tmdbId);
+      }
+
+      if (current.length >= MAX_SELECTIONS) {
+        return current;
+      }
+
+      return [...current, mediaItem];
+    };
+
+    setError(null);
+
     if (type === 'movie') {
-      setMovieSelectedIds(update);
+      setMovieSelectedMedia(updateSelection);
     } else {
-      setTvSelectedIds(update);
+      setTvSelectedMedia(updateSelection);
     }
   }
 
@@ -67,20 +83,6 @@ const TasteOnboarding = ({ movieMedia, tvMedia }: TasteOnboardingProps) => {
     } else {
       setTvRatings(update);
     }
-  }
-
-  function toggleMedia(tmdbId: number) {
-    setSelectedIds((current) => {
-      if (current.includes(tmdbId)) {
-        return current.filter((id) => id !== tmdbId);
-      }
-
-      if (current.length >= MAX_SELECTIONS) {
-        return current;
-      }
-
-      return [...current, tmdbId];
-    });
   }
 
   function beginRatings() {
@@ -138,10 +140,7 @@ const TasteOnboarding = ({ movieMedia, tvMedia }: TasteOnboardingProps) => {
           return;
         }
 
-        await finishTasteOnboarding();
-
-        router.replace('/home');
-        router.refresh();
+        setStep('complete');
       } catch (error) {
         setError(
           error instanceof Error
@@ -169,15 +168,46 @@ const TasteOnboarding = ({ movieMedia, tvMedia }: TasteOnboardingProps) => {
     });
   }
 
+  function enterApp() {
+    setError(null);
+
+    startTransition(async () => {
+      try {
+        await finishTasteOnboarding();
+
+        router.replace('/home');
+        router.refresh();
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : 'Something went wrong. Please try again.'
+        );
+      }
+    });
+  }
+
   if (step === 'selection') {
     return (
       <SelectionStep
-        media={media}
+        key={type}
+        initialResult={initialResult}
         type={type}
+        selectedMedia={selectedMedia}
         selectedIds={selectedIds}
         onToggle={toggleMedia}
         onContinue={beginRatings}
         onSkip={skip}
+        error={error}
+        isPending={isPending}
+      />
+    );
+  }
+
+  if (step === 'complete') {
+    return (
+      <OnboardingCompleteStep
+        onEnter={enterApp}
         error={error}
         isPending={isPending}
       />

@@ -33,3 +33,13 @@ export const onboardingRatingsSchema = z.object({
 });
 
 export type OnboardingRatingsInput = z.infer<typeof onboardingRatingsSchema>;
+
+export const onboardingMediaPageSchema = z.object({
+  type: mediaTypeSchema,
+  query: z.string().trim().max(100).optional(),
+  page: z.number().int().min(1).max(500).default(1),
+});
+
+export type OnboardingMediaPageInput = z.input<
+  typeof onboardingMediaPageSchema
+>;

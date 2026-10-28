@@ -4,32 +4,51 @@ import {
   tmdbMovieRepository,
   tmdbTvRepository,
 } from '@/lib/repositories';
+import type { MediaSearchResult } from '@/types';
 
 export async function getOnboardingCandidates(
   type: MediaType
 ): Promise<Media[]> {
-  const repository = type === 'movie' ? tmdbMovieRepository : tmdbTvRepository;
+  const result = await getOnboardingMediaPage(type);
 
-  const [popular, trending] = await Promise.all([
-    repository.getPopular(),
-    repository.getTrending(),
-  ]);
+  return result.media;
+}
 
-  const uniqueMedia = new Map<string, Media>();
+export async function getOnboardingMediaPage(
+  type: MediaType,
+  options: {
+    query?: string;
+    page?: number;
+  } = {}
+): Promise<MediaSearchResult> {
+  const page = options.page ?? 1;
+  const query = options.query?.trim();
 
-  for (const item of [...popular, ...trending]) {
-    if (item.type !== type) {
-      continue;
-    }
-
-    const key = `${item.type}:${item.tmdbId}`;
-
-    if (!uniqueMedia.has(key)) {
-      uniqueMedia.set(key, item);
-    }
+  if (query) {
+    return type === 'movie'
+      ? tmdbMovieRepository.search(query, { page })
+      : tmdbTvRepository.search(query, { page });
   }
 
-  return Array.from(uniqueMedia.values()).slice(0, 24);
+  const result =
+    type === 'movie'
+      ? await tmdbMovieRepository.discover({
+          type: 'movie',
+          page,
+          sortBy: 'popularity.desc',
+        })
+      : await tmdbTvRepository.discover({
+          type: 'tv',
+          page,
+          sortBy: 'popularity.desc',
+        });
+
+  return {
+    media: result.media,
+    page: result.page,
+    totalPages: result.totalPages,
+    totalResults: result.totalResults,
+  };
 }
 
 export async function completeTasteOnboarding(userId: string) {

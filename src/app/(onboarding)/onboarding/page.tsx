@@ -1,13 +1,13 @@
 import TasteOnboarding from '@/components/onboarding/taste-onboarding';
-import { getOnboardingCandidates } from '@/lib/services/onboarding-service';
+import { getOnboardingMediaPage } from '@/lib/services/onboarding-service';
 
 const OnboardingPage = async () => {
-  const [movieMedia, tvMedia] = await Promise.all([
-    getOnboardingCandidates('movie'),
-    getOnboardingCandidates('tv'),
+  const [movieResult, tvResult] = await Promise.all([
+    getOnboardingMediaPage('movie'),
+    getOnboardingMediaPage('tv'),
   ]);
 
-  return <TasteOnboarding movieMedia={movieMedia} tvMedia={tvMedia} />;
+  return <TasteOnboarding movieResult={movieResult} tvResult={tvResult} />;
 };
 
 export default OnboardingPage;

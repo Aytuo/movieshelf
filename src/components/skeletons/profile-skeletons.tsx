@@ -232,9 +232,15 @@ function ProfileTasteContentSkeleton() {
 
       <section className="rounded-2xl border border-primary/15 bg-primary-muted p-6 sm:p-8">
         <Skeleton className="h-3 w-44" />
+
         <Skeleton className="mt-4 h-8 w-full max-w-xl" />
-        <Skeleton className="mt-3 h-4 w-full max-w-2xl" />
-        <Skeleton className="mt-2 h-4 w-4/5 max-w-xl" />
+
+        <div className="mt-3 max-w-4xl space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="hidden h-4 w-4/5 sm:block lg:hidden" />
+          <Skeleton className="h-4 w-4/5 sm:hidden" />
+          <Skeleton className="h-4 w-2/3 sm:hidden" />
+        </div>
       </section>
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -243,11 +249,11 @@ function ProfileTasteContentSkeleton() {
             <Skeleton className="h-3 w-16" />
 
             <div className="mt-4 flex min-h-7 items-center justify-center gap-1.5">
-              <Skeleton className="h-7 w-12" />
-
               {index === 3 && (
                 <Skeleton className="size-3.5 shrink-0 rounded-full" />
               )}
+
+              <Skeleton className="h-7 w-12" />
             </div>
           </div>
         ))}
