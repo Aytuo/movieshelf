@@ -50,7 +50,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
       {/* Profile header */}
       <header>
         <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex min-w-0 items-end gap-5">
+          <div className="flex min-w-0 items-start gap-5">
             <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-2xl font-bold">
               {profile.avatarUrl ? (
                 <Image
@@ -66,15 +66,17 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             </div>
 
             <div className="min-w-0">
-              <p className="eyebrow">MovieShelf profile</p>
+              <p className="eyebrow">Profile</p>
 
               <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight sm:text-4xl">
                 {profile.displayName || `@${profile.username}`}
               </h1>
 
-              <p className="mt-1 text-sm text-muted-foreground">
-                @{profile.username}
-              </p>
+              {profile.displayName && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  @{profile.username}
+                </p>
+              )}
 
               {profile.bio && (
                 <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">

@@ -26,12 +26,12 @@ export function ProfilePageSkeleton() {
     <main className="container-content py-12 lg:py-16">
       <header>
         <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex min-w-0 items-end gap-5">
+          <div className="flex min-w-0 items-start gap-5">
             <Skeleton className="size-24 shrink-0 rounded-2xl" />
 
             <div className="min-w-0 flex-1">
-              <Skeleton className="h-3 w-36" />
-              <Skeleton className="mt-3 h-9 w-full max-w-sm sm:h-10" />
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="mt-2 h-9 w-full max-w-sm sm:h-10" />
               <Skeleton className="mt-2 h-4 w-32" />
 
               <div className="mt-4 flex flex-wrap gap-4">
