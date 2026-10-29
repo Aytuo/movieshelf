@@ -7,6 +7,7 @@ import {
 import {
   MediaGridSkeleton,
   PageHeaderSkeleton,
+  PageHeaderWithActionSkeleton,
 } from '@/components/skeletons/shared-skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -43,7 +44,7 @@ export function DiscoverPageSkeleton() {
 export function ShelfPageSkeleton() {
   return (
     <main className="container-content py-12 lg:py-16">
-      <PageHeaderSkeleton />
+      <PageHeaderWithActionSkeleton action="activity" />
 
       <section className="py-10 lg:py-14">
         <div className="mb-10 space-y-4">

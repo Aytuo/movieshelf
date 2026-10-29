@@ -1,10 +1,13 @@
-import { PageHeaderSkeleton } from '@/components/skeletons/shared-skeletons';
+import {
+  PageHeaderSkeleton,
+  PageHeaderWithActionSkeleton,
+} from '@/components/skeletons/shared-skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function ActivityPageSkeleton() {
   return (
     <main className="container-content py-12 lg:py-16">
-      <PageHeaderSkeleton />
+      <PageHeaderWithActionSkeleton action="watch-history" />
 
       <section className="py-10 lg:py-14">
         <div className="space-y-6">
@@ -37,7 +40,7 @@ export function ActivityPageSkeleton() {
 export function HistoryPageSkeleton() {
   return (
     <main className="container-content py-12 lg:py-16">
-      <PageHeaderSkeleton />
+      <PageHeaderWithActionSkeleton action="activity" />
 
       <section className="py-10 lg:py-14">
         <div className="grid gap-4 lg:grid-cols-2">
