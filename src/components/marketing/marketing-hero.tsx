@@ -245,7 +245,7 @@ const MarketingHero = () => {
       <div className="relative container-content flex min-h-screen items-center">
         <div className="marketing-copy relative z-30 max-w-3xl py-24">
           <p className="marketing-eyebrow mb-7 text-xs font-semibold tracking-[0.24em] text-primary uppercase">
-            MovieShelf · Personal Cinema Archive
+            MovieShelf · Personal Entertainment Shelf
           </p>
 
           <h1 className="max-w-4xl font-heading text-6xl leading-[0.92] font-bold tracking-[-0.065em] sm:text-7xl lg:text-8xl">
@@ -257,9 +257,9 @@ const MarketingHero = () => {
           </h1>
 
           <p className="marketing-description mt-8 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-            Discover films beyond the obvious. Keep the ones that matter. Rate
-            what you&apos;ve seen and build a collection that feels unmistakably
-            yours.
+            Discover movies and TV shows beyond the obvious. Keep the ones that
+            matter. Rate what you&apos;ve seen and build a collection that feels
+            unmistakably yours.
           </p>
 
           <div className="marketing-actions mt-9 flex flex-wrap gap-3">

@@ -14,21 +14,21 @@ const pillars = [
     eyebrow: '01 · Discover',
     title: 'Go beyond the obvious.',
     description:
-      'Explore films, directors, genres and stories that deserve a place in your movie world.',
+      'Explore movies, TV shows, directors, actors, genres or stories that deserve your attention and place in your movie world.',
   },
   {
     icon: Bookmark,
     eyebrow: '02 · Collect',
     title: "Build something that's yours.",
     description:
-      "Keep a personal shelf of films you've seen, want to see or never want to forget.",
+      "Keep a personal shelf of movies and TV shows you've seen, want to watch or never want to forget.",
   },
   {
     icon: Star,
     eyebrow: '03 · Remember',
     title: 'Make your taste visible.',
     description:
-      'Rate movies, save favorites and turn years of watching into something you can actually see.',
+      'Rate movies and TV shows, save favorites and turn years of watching into something you can actually see.',
   },
 ];
 
@@ -136,12 +136,14 @@ const PhilosophySection = () => {
             <p className="philosophy-eyebrow eyebrow">The MovieShelf idea</p>
 
             <h2 className="mt-5 max-w-lg font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
-              <span className="philosophy-title-line block">Some films</span>
+              <span className="philosophy-title-line block">Some stories</span>
 
-              <span className="philosophy-title-line block">you watch.</span>
+              <span className="philosophy-title-line block">
+                entertain you.
+              </span>
 
               <span className="philosophy-title-line block text-gradient-primary">
-                Some films stay
+                Others stay
               </span>
 
               <span className="philosophy-title-line block text-gradient-primary">
@@ -150,9 +152,9 @@ const PhilosophySection = () => {
             </h2>
 
             <p className="philosophy-description mt-6 max-w-md text-sm leading-6 text-muted-foreground">
-              MovieShelf gives the films that matter to you a place to live —
-              not just in your watch history, but in a collection that reflects
-              who you are.
+              MovieShelf gives the movies and TV shows that matter to you a
+              place to live — not just in your watch history, but in a
+              collection that reflects who you are.
             </p>
           </div>
 

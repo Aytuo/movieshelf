@@ -30,7 +30,7 @@ const ProfileTastePage = async ({ params }: ProfileTastePageProps) => {
         </h1>
 
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-          A visual snapshot of the movies, ratings, and eras that define this
+          A visual snapshot of the titles, ratings, and eras that shape this
           taste profile.
         </p>
 

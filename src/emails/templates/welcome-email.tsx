@@ -25,7 +25,7 @@ export function getWelcomeEmailText({ name, url }: WelcomeEmailProps) {
     '',
     'Your email is verified and your MovieShelf account is ready to go.',
     '',
-    'Build your shelf, rate what you watch and develop your own movie taste over time.',
+    'Build your shelf with movies and TV shows, rate what you watch, and discover how your taste evolves over time.',
     '',
     'Open MovieShelf:',
     url,
@@ -42,8 +42,8 @@ export function WelcomeEmail({ name, url }: WelcomeEmailProps) {
       <Head />
 
       <Preview>
-        Your MovieShelf account is ready. Start building your personal cinema
-        archive.
+        Your MovieShelf account is ready. Start building your personal
+        entertainment shelf.
       </Preview>
 
       <Body
@@ -131,8 +131,8 @@ export function WelcomeEmail({ name, url }: WelcomeEmailProps) {
                 color: emailTheme.muted,
               }}
             >
-              Build your shelf, rate what you watch and develop your own movie
-              taste over time.
+              Build your shelf with movies and TV shows, rate what you watch,
+              and discover how your taste evolves over time.
             </Text>
 
             <Section style={{ marginTop: '30px' }}>
@@ -162,7 +162,7 @@ export function WelcomeEmail({ name, url }: WelcomeEmailProps) {
                 color: emailTheme.mutedStrong,
               }}
             >
-              Your personal cinema archive starts here.
+              Your personal entertainment shelf starts here.
             </Text>
           </Section>
 
@@ -185,7 +185,7 @@ export function WelcomeEmail({ name, url }: WelcomeEmailProps) {
               <span style={{ padding: '0 7px', color: emailTheme.border }}>
                 ·
               </span>
-              Your movies. Your taste.
+              Your movies. Your shows. Your taste.
             </Text>
           </Section>
         </Container>

@@ -17,8 +17,8 @@ const MarketingCta = () => {
           </h2>
 
           <p className="mx-auto mt-6 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-            Discover films, remember the ones that matter and build a collection
-            that says something about you.
+            Discover movies and TV shows, remember the ones that matter, and
+            build a collection that says something about you.
           </p>
 
           <Link
@@ -30,7 +30,7 @@ const MarketingCta = () => {
           </Link>
 
           <p className="mt-5 text-xs text-muted-foreground">
-            Built for people who love movies.
+            Built for people who love movies and TV shows.
           </p>
         </div>
       </div>

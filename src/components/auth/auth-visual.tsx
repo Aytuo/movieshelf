@@ -35,7 +35,7 @@ const AuthVisual = () => {
             </p>
 
             <p className="mt-2 text-xs tracking-[0.2em] text-white/65 uppercase">
-              Personal cinema archive
+              Personal entertainment shelf
             </p>
           </div>
 
@@ -45,7 +45,7 @@ const AuthVisual = () => {
             </p>
 
             <p className="mt-1 text-xs text-white/45">
-              Your movies. Your taste.
+              Your movies. Your shows. Your taste.
             </p>
           </div>
         </div>

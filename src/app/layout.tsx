@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: '%s | MovieShelf',
   },
   description:
-    'Discover movies, build your personal shelf, rate what you watch and develop your own movie taste.',
+    'Discover movies and TV shows, build your personal shelf, rate what you watch, and develop your own taste.',
 };
 
 export default function RootLayout({

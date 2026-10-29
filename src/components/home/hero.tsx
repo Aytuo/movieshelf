@@ -49,18 +49,21 @@ const Hero = ({ summary }: HeroProps) => {
           <div className="relative z-30 max-w-2xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-muted px-3 py-1.5 text-xs font-medium text-primary">
               <span className="size-1.5 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]" />
-              Your personal movie shelf
+              Your personal entertainment shelf
             </div>
 
-            <h1 className="text-5xl font-bold tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-bold tracking-[-0.045em] sm:text-6xl lg:text-7xl">
               Your movies.
+              <br />
+              Your shows.
               <br />
               <span className="text-gradient-brand">Your taste.</span>
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-              Discover movies worth remembering, build your personal collection
-              and keep track of the films that shaped your taste.
+              Discover movies and TV series worth remembering, build your
+              personal collection, and keep track of the titles that shape your
+              taste.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -68,7 +71,7 @@ const Hero = ({ summary }: HeroProps) => {
                 href="/discover"
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_8px_30px_var(--primary-glow)] transition-all duration-200 hover:bg-primary-hover hover:shadow-[0_12px_40px_var(--primary-glow)]"
               >
-                Explore movies
+                Explore titles
                 <ArrowRight className="size-4" />
               </Link>
 

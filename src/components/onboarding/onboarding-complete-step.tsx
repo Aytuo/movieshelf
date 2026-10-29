@@ -43,8 +43,8 @@ const OnboardingCompleteStep = ({
           </h1>
 
           <p className="mt-5 max-w-lg text-sm leading-7 text-muted-foreground sm:text-base">
-            Your picks will help us recommend movies and series that match your
-            taste.
+            Your picks will help us recommend movies and TV shows that match
+            your taste.
           </p>
 
           {error && (

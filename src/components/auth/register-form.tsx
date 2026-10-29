@@ -80,7 +80,7 @@ const RegisterForm = () => {
         </h1>
 
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Build your personal movie taste, one film at a time.
+          Build your taste in movies and TV shows, one title at a time.
         </p>
       </div>
 

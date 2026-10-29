@@ -23,7 +23,7 @@ async function ActivityContent({ userId }: { userId: string }) {
           <EmptyState
             icon={Activity}
             title="Your activity is empty"
-            description="Your cinematic journey will appear here as you watch, rate, review, and add movies and TV series to your shelf."
+            description="Your viewing journey will appear here as you watch, rate, review, and add movies and TV series to your shelf."
             action={
               <Link
                 href="/discover"

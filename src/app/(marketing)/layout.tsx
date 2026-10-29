@@ -18,7 +18,7 @@ const MarketingLayout = async ({
 
       <main className="flex-1">{children}</main>
 
-      <Footer />
+      <Footer authenticated={Boolean(session)} />
     </div>
   );
 };

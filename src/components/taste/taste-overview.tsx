@@ -94,7 +94,7 @@ const TasteOverview = ({ taste }: TasteOverviewProps) => {
         <div className="pointer-events-none absolute top-[-35%] right-[-10%] size-72 rounded-full bg-primary/10 blur-[90px]" />
 
         <div className="relative">
-          <p className="eyebrow">Your cinematic fingerprint</p>
+          <p className="eyebrow">Your taste fingerprint</p>
 
           <h2 className="mt-4 max-w-2xl font-heading text-2xl font-bold tracking-tight sm:text-3xl">
             {summary.title}

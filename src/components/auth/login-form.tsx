@@ -80,7 +80,7 @@ const LoginForm = () => {
         </h1>
 
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Continue building your personal movie collection.
+          Continue building your personal shelf.
         </p>
       </div>
 

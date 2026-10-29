@@ -166,7 +166,7 @@ const SelectionStep = ({
           <p className="eyebrow">Let&apos;s get to know your taste</p>
 
           <h1 className="mt-4 font-heading text-4xl font-bold tracking-tight sm:text-5xl">
-            Pick the {isMovie ? 'movies' : 'series'}
+            Pick {isMovie ? 'movies' : 'TV series'}
             <br />
             <span className="text-gradient-primary">you already love.</span>
           </h1>
@@ -411,7 +411,7 @@ const SelectionStep = ({
               {selectedIds.length === 1
                 ? isMovie
                   ? 'movie'
-                  : 'series'
+                  : 'TV series'
                 : mediaLabel}
             </button>
 

@@ -30,7 +30,7 @@ export function getVerificationEmailText({
     '',
     'Welcome to MovieShelf.',
     '',
-    'Verify your email address to finish setting up your personal cinema archive:',
+    'Verify your email address to finish setting up your personal entertainment shelf:',
     '',
     url,
     '',
@@ -134,7 +134,7 @@ export function VerificationEmail({ name, url }: VerificationEmailProps) {
               }}
             >
               Welcome to MovieShelf. Verify your email address to finish setting
-              up your personal cinema archive.
+              up your personal entertainment shelf.
             </Text>
 
             <Section style={{ marginTop: '30px' }}>
@@ -254,7 +254,7 @@ export function VerificationEmail({ name, url }: VerificationEmailProps) {
               <span style={{ padding: '0 7px', color: emailTheme.border }}>
                 ·
               </span>
-              Your movies. Your taste.
+              Your movies. Your shows. Your taste.
             </Text>
           </Section>
         </Container>

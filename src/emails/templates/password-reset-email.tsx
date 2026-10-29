@@ -262,7 +262,7 @@ export function PasswordResetEmail({ name, url }: PasswordResetEmailProps) {
               <span style={{ padding: '0 7px', color: emailTheme.border }}>
                 ·
               </span>
-              Your movies. Your taste.
+              Your movies. Your shows. Your taste.
             </Text>
           </Section>
         </Container>
