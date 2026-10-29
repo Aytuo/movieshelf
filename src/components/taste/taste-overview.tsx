@@ -25,7 +25,7 @@ function Stat({
     <div className="rounded-xl p-4 surface">
       <div className="text-xs text-muted-foreground">{label}</div>
 
-      <div className="mt-4 flex items-center justify-center gap-1.5 font-heading text-2xl font-bold tracking-tight">
+      <div className="mt-4 flex items-center justify-start gap-1.5 font-heading text-2xl font-bold tracking-tight">
         {icon}
         <span>{value}</span>
       </div>

@@ -53,22 +53,33 @@ const Footer = ({ authenticated = false }: FooterProps) => {
               </p>
             </div>
 
-            {authenticated && (
-              <nav
-                aria-label="Footer navigation"
-                className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4"
-              >
-                {footerLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            )}
+            <nav
+              aria-label="Footer navigation"
+              className="grid grid-cols-2 gap-x-8 gap-y-3 sm:gap-x-12"
+            >
+              {authenticated && (
+                <div className="flex flex-col gap-3">
+                  {footerLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3">
+                <Link
+                  href="/"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  About
+                </Link>
+              </div>
+            </nav>
           </div>
 
           {/* Bottom */}

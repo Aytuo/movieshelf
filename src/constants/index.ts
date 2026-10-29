@@ -72,10 +72,115 @@ export const HOME_SECTION_TITLES = {
 } as const;
 
 /* -------------------------------------------------------------------------- */
-/* TMDB mock data                                                             */
+/* TMDB API                                                                   */
 /* -------------------------------------------------------------------------- */
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
+
+/* -------------------------------------------------------------------------- */
+/* Marketing page demo data                                                   */
+/* -------------------------------------------------------------------------- */
+
+export const MARKETING_DEMO_TITLES = [
+  {
+    title: 'Interstellar',
+    rating: '9',
+    tmdbRating: '8.7',
+    year: '2014',
+    type: 'Movie',
+    favorite: true,
+    image: `${TMDB_IMAGE_BASE}/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg`,
+  },
+  {
+    title: 'Stranger Things',
+    rating: '8',
+    tmdbRating: '8.6',
+    year: '2016',
+    type: 'TV Series',
+    favorite: false,
+    image: `${TMDB_IMAGE_BASE}/w342/x2LSRK2Cm7MZhjluni1msVJ3wDF.jpg`,
+  },
+  {
+    title: 'Dune: Part Two',
+    rating: '8',
+    tmdbRating: '8.2',
+    year: '2024',
+    type: 'Movie',
+    favorite: false,
+    image: `${TMDB_IMAGE_BASE}/w342/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg`,
+  },
+  {
+    title: 'Breaking Bad',
+    rating: '10',
+    tmdbRating: '8.9',
+    year: '2008',
+    type: 'TV Series',
+    favorite: true,
+    image: `${TMDB_IMAGE_BASE}/w342/ggFHVNu6YYI5L9pCfOacjizRGt.jpg`,
+  },
+  {
+    title: 'The Godfather',
+    rating: '7',
+    tmdbRating: '8.7',
+    year: '1972',
+    type: 'Movie',
+    favorite: false,
+    image: `${TMDB_IMAGE_BASE}/w342/3bhkrj58Vtu7enYsRolD1fZdja1.jpg`,
+  },
+] as const;
+
+export const MARKETING_DEMO_GENRES = [
+  ['Drama', 32],
+  ['Science Fiction', 24],
+  ['Thriller', 18],
+  ['Comedy', 12],
+] as const;
+
+export const MARKETING_DEMO_DECADES = [
+  ['2010s', 48],
+  ['2000s', 22],
+  ['1990s', 18],
+] as const;
+
+export const MARKETING_DEMO_RATING_DISTRIBUTION = [
+  { rating: 1, count: 0 },
+  { rating: 2, count: 0 },
+  { rating: 3, count: 1 },
+  { rating: 4, count: 1 },
+  { rating: 5, count: 2 },
+  { rating: 6, count: 3 },
+  { rating: 7, count: 4 },
+  { rating: 8, count: 6 },
+  { rating: 9, count: 7 },
+  { rating: 10, count: 4 },
+] as const;
+
+const marketingDemoRatedCount = MARKETING_DEMO_RATING_DISTRIBUTION.reduce(
+  (total, item) => total + item.count,
+  0
+);
+
+const marketingDemoRatingSum = MARKETING_DEMO_RATING_DISTRIBUTION.reduce(
+  (total, item) => total + item.rating * item.count,
+  0
+);
+
+export const MARKETING_DEMO_STATS = {
+  totalTitles: 42,
+  movies: 28,
+  tvSeries: 14,
+  watched: 34,
+  rated: marketingDemoRatedCount,
+  favorites: 8,
+  averageRating:
+    marketingDemoRatedCount > 0
+      ? Number((marketingDemoRatingSum / marketingDemoRatedCount).toFixed(1))
+      : 0,
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* TMDB mock data                                                             */
+/* -------------------------------------------------------------------------- */
 
 export const MOCK_MOVIES: MovieDetails[] = [
   {

@@ -1,5 +1,6 @@
 'use client';
 
+import { MARKETING_DEMO_STATS, MARKETING_DEMO_TITLES } from '@/constants';
 import {
   ArrowRight,
   Bell,
@@ -20,53 +21,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 
-const titles = [
-  {
-    title: 'Interstellar',
-    rating: '10',
-    tmdbRating: '8.7',
-    year: '2014',
-    type: 'Movie',
-    favorite: true,
-    image: 'https://image.tmdb.org/t/p/w342/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-  },
-  {
-    title: 'Stranger Things',
-    rating: '9',
-    tmdbRating: '8.6',
-    year: '2016',
-    type: 'TV Series',
-    favorite: false,
-    image: 'https://image.tmdb.org/t/p/w342/x2LSRK2Cm7MZhjluni1msVJ3wDF.jpg',
-  },
-  {
-    title: 'Dune: Part Two',
-    rating: '9',
-    tmdbRating: '8.2',
-    year: '2024',
-    type: 'Movie',
-    favorite: false,
-    image: 'https://image.tmdb.org/t/p/w342/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
-  },
-  {
-    title: 'Breaking Bad',
-    rating: '10',
-    tmdbRating: '8.9',
-    year: '2008',
-    type: 'TV Series',
-    favorite: true,
-    image: 'https://image.tmdb.org/t/p/w342/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',
-  },
-  {
-    title: 'The Godfather',
-    rating: '10',
-    tmdbRating: '8.7',
-    year: '1972',
-    type: 'Movie',
-    favorite: false,
-    image: 'https://image.tmdb.org/t/p/w342/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
-  },
-];
+const titles = MARKETING_DEMO_TITLES;
 
 const ShelfPreview = () => {
   return (
@@ -173,15 +128,24 @@ const ShelfPreview = () => {
 
                 <div className="flex flex-wrap gap-1.5">
                   <span className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary-muted px-2 py-1.5 text-[10px] font-medium text-primary">
-                    All <span className="opacity-60">42</span>
+                    All{' '}
+                    <span className="opacity-60">
+                      {MARKETING_DEMO_STATS.totalTitles}
+                    </span>
                   </span>
 
                   <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-2 py-1.5 text-[10px] font-medium text-muted-foreground">
-                    Movies <span className="opacity-60">28</span>
+                    Movies{' '}
+                    <span className="opacity-60">
+                      {MARKETING_DEMO_STATS.movies}
+                    </span>
                   </span>
 
                   <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-2 py-1.5 text-[10px] font-medium text-muted-foreground">
-                    TV Series <span className="opacity-60">14</span>
+                    TV Series{' '}
+                    <span className="opacity-60">
+                      {MARKETING_DEMO_STATS.tvSeries}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -195,7 +159,10 @@ const ShelfPreview = () => {
                 <div className="flex flex-wrap gap-1.5">
                   <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary-muted px-2 py-1.5 text-[10px] font-medium text-primary">
                     <Library className="size-3" />
-                    All <span className="opacity-60">42</span>
+                    All{' '}
+                    <span className="opacity-60">
+                      {MARKETING_DEMO_STATS.totalTitles}
+                    </span>
                   </span>
 
                   <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-1.5 text-[10px] font-medium text-muted-foreground">
@@ -305,7 +272,9 @@ const ShelfPreview = () => {
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="rounded-xl p-4 surface">
                 <Bookmark className="size-4 text-primary" />
-                <div className="mt-4 text-2xl font-bold">42</div>
+                <div className="mt-4 text-2xl font-bold">
+                  {MARKETING_DEMO_STATS.totalTitles}
+                </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   titles collected
                 </p>
@@ -313,13 +282,17 @@ const ShelfPreview = () => {
 
               <div className="rounded-xl p-4 surface">
                 <Heart className="size-4 text-primary" />
-                <div className="mt-4 text-2xl font-bold">8</div>
+                <div className="mt-4 text-2xl font-bold">
+                  {MARKETING_DEMO_STATS.favorites}
+                </div>
                 <p className="mt-1 text-xs text-muted-foreground">favorites</p>
               </div>
 
               <div className="rounded-xl p-4 surface">
                 <Star className="size-4 text-rating" />
-                <div className="mt-4 text-2xl font-bold">17</div>
+                <div className="mt-4 text-2xl font-bold">
+                  {MARKETING_DEMO_STATS.rated}
+                </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   titles rated
                 </p>
@@ -328,7 +301,9 @@ const ShelfPreview = () => {
               <div className="rounded-xl p-4 surface">
                 <Star className="size-4 fill-current text-rating" />
 
-                <div className="mt-4 text-2xl font-bold">8.1</div>
+                <div className="mt-4 text-2xl font-bold">
+                  {MARKETING_DEMO_STATS.averageRating.toFixed(1)}
+                </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">
                   average rating

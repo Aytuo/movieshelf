@@ -248,7 +248,7 @@ function ProfileTasteContentSkeleton() {
           <div key={index} className="rounded-xl p-4 surface">
             <Skeleton className="h-3 w-16" />
 
-            <div className="mt-4 flex min-h-7 items-center justify-center gap-1.5">
+            <div className="mt-4 flex min-h-7 items-center justify-start gap-1.5">
               {index === 3 && (
                 <Skeleton className="size-3.5 shrink-0 rounded-full" />
               )}

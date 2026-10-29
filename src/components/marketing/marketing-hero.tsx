@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRef } from 'react';
 import CinematicWall from './cinematic-wall';
+import { useMarketingAuth } from './marketing-auth-provider';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,6 +52,7 @@ const MARKETING_POSTERS = [
 ];
 
 const MarketingHero = () => {
+  const authenticated = useMarketingAuth();
   const container = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -264,10 +266,10 @@ const MarketingHero = () => {
 
           <div className="marketing-actions mt-9 flex flex-wrap gap-3">
             <Link
-              href="/register"
+              href={authenticated ? '/shelf' : '/register'}
               className="inline-flex h-11 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_10px_40px_var(--primary-glow)] transition-all duration-200 hover:bg-primary-hover"
             >
-              Build your shelf
+              {authenticated ? 'View your shelf' : 'Build your shelf'}
               <ArrowRight className="size-4" />
             </Link>
 

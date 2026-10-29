@@ -1,41 +1,21 @@
+import {
+  MARKETING_DEMO_DECADES,
+  MARKETING_DEMO_GENRES,
+  MARKETING_DEMO_RATING_DISTRIBUTION,
+  MARKETING_DEMO_STATS,
+} from '@/constants';
 import { Star } from 'lucide-react';
 
-const genres = [
-  ['Drama', 32],
-  ['Science Fiction', 24],
-  ['Thriller', 18],
-  ['Comedy', 12],
-] as const;
-
-const decades = [
-  ['2010s', 48],
-  ['2000s', 22],
-  ['1990s', 18],
-] as const;
-
-const ratingDistribution = [
-  { rating: 1, count: 0 },
-  { rating: 2, count: 0 },
-  { rating: 3, count: 1 },
-  { rating: 4, count: 1 },
-  { rating: 5, count: 2 },
-  { rating: 6, count: 3 },
-  { rating: 7, count: 4 },
-  { rating: 8, count: 6 },
-  { rating: 9, count: 7 },
-  { rating: 10, count: 4 },
-];
-
 const maxRatingCount = Math.max(
-  ...ratingDistribution.map((item) => item.count),
+  ...MARKETING_DEMO_RATING_DISTRIBUTION.map((item) => item.count),
   1
 );
 
 const TasteSection = () => {
-  const watched = 34;
-  const rated = 28;
-  const favorites = 8;
-  const averageRating = '8.1';
+  const watched = MARKETING_DEMO_STATS.watched;
+  const rated = MARKETING_DEMO_STATS.rated;
+  const favorites = MARKETING_DEMO_STATS.favorites;
+  const averageRating = MARKETING_DEMO_STATS.averageRating.toFixed(1);
   const tasteProgress = Math.min(watched / 50, 1);
 
   return (
@@ -105,7 +85,7 @@ const TasteSection = () => {
                 </div>
 
                 <span className="shrink-0 text-xs text-muted-foreground">
-                  {watched} movies
+                  {watched} titles
                 </span>
               </div>
 
@@ -125,7 +105,7 @@ const TasteSection = () => {
                 </p>
 
                 <div className="mt-6 space-y-4">
-                  {genres.map(([genre, percentage]) => (
+                  {MARKETING_DEMO_GENRES.map(([genre, percentage]) => (
                     <div key={genre}>
                       <div className="mb-2 flex items-center justify-between gap-2 text-xs">
                         <span className="font-medium">{genre}</span>
@@ -151,7 +131,7 @@ const TasteSection = () => {
                 </p>
 
                 <div className="mt-6 space-y-4">
-                  {decades.map(([decade, percentage]) => (
+                  {MARKETING_DEMO_DECADES.map(([decade, percentage]) => (
                     <div key={decade}>
                       <div className="mb-2 flex items-center justify-between gap-2 text-xs">
                         <span className="font-medium">{decade}</span>
@@ -181,7 +161,7 @@ const TasteSection = () => {
                   </p>
 
                   <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                    How you score the movies you watch.
+                    How you rate the titles you watch.
                   </p>
                 </div>
 
@@ -191,7 +171,7 @@ const TasteSection = () => {
               </div>
 
               <div className="mt-6 flex h-36 items-stretch gap-1 sm:h-44 sm:gap-2">
-                {ratingDistribution.map((item) => {
+                {MARKETING_DEMO_RATING_DISTRIBUTION.map((item) => {
                   const barHeight = (item.count / maxRatingCount) * 78;
 
                   return (
