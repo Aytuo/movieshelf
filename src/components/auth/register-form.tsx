@@ -78,7 +78,11 @@ const RegisterForm = () => {
     <div className="w-full max-w-md">
       <div className="rounded-2xl border border-white/10 bg-[#101217]/90 p-5 cinematic-glow backdrop-blur-xl sm:p-7">
         {/* Logo */}
-        <div className="mb-8 flex items-center justify-center gap-2">
+        <Link
+          href="/"
+          aria-label="MovieShelf home"
+          className="mb-8 flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+        >
           <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Clapperboard className="size-3.5" />
           </span>
@@ -86,7 +90,7 @@ const RegisterForm = () => {
           <span className="text-xl font-bold tracking-tight">
             Movie<span className="text-primary">Shelf</span>
           </span>
-        </div>
+        </Link>
 
         {/* Header */}
         <div className="mb-8 text-center">

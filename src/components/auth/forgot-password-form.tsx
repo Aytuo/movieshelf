@@ -54,7 +54,11 @@ const ForgotPasswordForm = () => {
     return (
       <div className="w-full">
         <div className="rounded-2xl border border-white/10 bg-[#101217]/90 p-6 cinematic-glow backdrop-blur-xl sm:p-10">
-          <div className="mb-8 flex items-center justify-center gap-2">
+          <Link
+            href="/"
+            aria-label="MovieShelf home"
+            className="mb-8 flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+          >
             <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Clapperboard className="size-3.5" />
             </span>
@@ -62,7 +66,7 @@ const ForgotPasswordForm = () => {
             <span className="text-xl font-bold tracking-tight">
               Movie<span className="text-primary">Shelf</span>
             </span>
-          </div>
+          </Link>
 
           <div className="mb-8 text-center">
             <h1 className="font-heading text-3xl font-bold tracking-tight text-white">
@@ -99,7 +103,11 @@ const ForgotPasswordForm = () => {
   return (
     <div className="w-full">
       <div className="rounded-2xl border border-white/10 bg-[#101217]/90 p-6 cinematic-glow backdrop-blur-xl sm:p-10">
-        <div className="mb-8 flex items-center justify-center gap-2">
+        <Link
+          href="/"
+          aria-label="MovieShelf home"
+          className="mb-8 flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+        >
           <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Clapperboard className="size-3.5" />
           </span>
@@ -107,7 +115,7 @@ const ForgotPasswordForm = () => {
           <span className="text-xl font-bold tracking-tight">
             Movie<span className="text-primary">Shelf</span>
           </span>
-        </div>
+        </Link>
 
         <div className="mb-8 text-center">
           <h1 className="font-heading text-3xl font-bold tracking-tight text-white">

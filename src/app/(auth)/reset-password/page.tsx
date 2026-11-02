@@ -22,7 +22,11 @@ const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
         <div className="w-full max-w-md">
           {invalidToken ? (
             <div className="rounded-2xl border border-white/10 bg-[#101217]/90 p-6 cinematic-glow backdrop-blur-xl sm:p-10">
-              <div className="mb-8 flex items-center justify-center gap-2">
+              <Link
+                href="/"
+                aria-label="MovieShelf home"
+                className="mb-8 flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+              >
                 <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Clapperboard className="size-3.5" />
                 </span>
@@ -30,16 +34,16 @@ const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
                 <span className="text-xl font-bold tracking-tight">
                   Movie<span className="text-primary">Shelf</span>
                 </span>
-              </div>
+              </Link>
 
               <div className="mb-8 text-center">
                 <h1 className="font-heading text-3xl font-bold tracking-tight text-white">
-                  Reset link unavailable
+                  Link is no longer valid
                 </h1>
 
                 <p className="mt-3 text-sm leading-6 text-zinc-400">
-                  This password reset link is invalid or has expired. Request a
-                  new link to continue.
+                  It may have expired or be invalid. Request a new link to
+                  choose a new password.
                 </p>
               </div>
 
