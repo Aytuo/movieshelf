@@ -1,7 +1,4 @@
-import {
-  PageHeaderSkeleton,
-  PageHeaderWithActionSkeleton,
-} from '@/components/skeletons/shared-skeletons';
+import { PageHeaderWithActionSkeleton } from '@/components/skeletons/shared-skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function ActivityPageSkeleton() {

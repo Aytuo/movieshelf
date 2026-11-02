@@ -1,15 +1,15 @@
 'use client';
 
+import { authClient } from '@/lib/auth/client';
+import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Clapperboard, Loader2, LockKeyhole, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-
-import { authClient } from '@/lib/auth/client';
-import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import AuthInput from './auth-input';
 import SocialButtons from './social-buttons';
 
 const LoginForm = () => {
@@ -71,102 +71,123 @@ const LoginForm = () => {
   const isSubmitting = form.formState.isSubmitting;
 
   return (
-    <div>
-      <div className="mb-8">
-        <p className="text-sm font-medium text-primary">Welcome back</p>
+    <div className="w-full">
+      <div className="rounded-2xl border border-white/10 bg-[#101217]/90 p-6 cinematic-glow backdrop-blur-xl sm:p-10">
+        <div className="mb-8 flex items-center justify-center gap-2">
+          <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Clapperboard className="size-3.5" />
+          </span>
 
-        <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight">
-          Sign in to MovieShelf
-        </h1>
-
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Continue building your personal shelf.
-        </p>
-      </div>
-
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <div>
-          <label htmlFor="email" className="mb-2 block text-sm font-medium">
-            Email
-          </label>
-
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            {...form.register('email')}
-            placeholder="you@example.com"
-            aria-invalid={Boolean(form.formState.errors.email)}
-          />
-
-          {form.formState.errors.email && (
-            <p className="mt-2 text-xs text-destructive">
-              {form.formState.errors.email.message}
-            </p>
-          )}
+          <span className="text-xl font-bold tracking-tight">
+            Movie<span className="text-primary">Shelf</span>
+          </span>
         </div>
 
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium">
+        <div className="mb-8 text-center">
+          <h1 className="font-heading text-3xl font-bold tracking-tight text-white">
+            Welcome back
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-zinc-400">
+            Continue building your personal shelf.
+          </p>
+        </div>
+
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-5"
+          noValidate
+        >
+          <div className="space-y-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-zinc-200"
+            >
+              Email address
+            </label>
+
+            <AuthInput
+              id="email"
+              type="email"
+              icon={Mail}
+              autoComplete="email"
+              placeholder="johndoe@example.com"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(form.formState.errors.email)}
+              {...form.register('email')}
+            />
+
+            {form.formState.errors.email && (
+              <p role="alert" className="text-sm text-destructive">
+                {form.formState.errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-zinc-200"
+            >
               Password
             </label>
 
-            <Link
-              href="/forgot-password"
-              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Forgot password?
-            </Link>
+            <AuthInput
+              id="password"
+              type="password"
+              icon={LockKeyhole}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(form.formState.errors.password)}
+              {...form.register('password')}
+            />
+
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-primary transition-colors hover:text-primary-hover"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            {form.formState.errors.password && (
+              <p role="alert" className="text-sm text-destructive">
+                {form.formState.errors.password.message}
+              </p>
+            )}
           </div>
 
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            {...form.register('password')}
-            placeholder="••••••••"
-            aria-invalid={Boolean(form.formState.errors.password)}
-          />
+          <Button
+            type="submit"
+            size="xl"
+            disabled={isSubmitting}
+            className="h-12 w-full transition-colors duration-300 hover:bg-primary-hover"
+          >
+            {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
+          </Button>
+        </form>
 
-          {form.formState.errors.password && (
-            <p className="mt-2 text-xs text-destructive">
-              {form.formState.errors.password.message}
-            </p>
-          )}
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-white/10" />
+          <span className="text-xs text-zinc-500">OR</span>
+          <div className="h-px flex-1 bg-white/10" />
         </div>
 
-        <Button
-          type="submit"
-          size="xl"
-          className="w-full"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Signing in...' : 'Sign in'}
-        </Button>
-      </form>
+        <SocialButtons />
 
-      <div className="my-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-
-        <span className="text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
-          or continue with
-        </span>
-
-        <div className="h-px flex-1 bg-border" />
+        <p className="mt-8 text-center text-sm text-zinc-400">
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/register"
+            className="font-medium text-primary transition-colors hover:text-primary-hover hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
-
-      <SocialButtons />
-
-      <p className="mt-8 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{' '}
-        <Link
-          href="/register"
-          className="font-medium text-foreground hover:text-primary"
-        >
-          Create one
-        </Link>
-      </p>
     </div>
   );
 };
