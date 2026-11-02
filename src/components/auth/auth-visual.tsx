@@ -29,7 +29,7 @@ const AuthVisual = () => {
       <div className="absolute inset-8 rounded-[1.75rem] border border-white/10" />
 
       {/* Product highlights */}
-      <div className="absolute inset-x-8 bottom-8 xl:inset-x-12 xl:bottom-12">
+      <div className="absolute inset-x-8 bottom-10 xl:inset-x-12 xl:bottom-12">
         <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 pt-6">
           <div className="min-w-0 px-2 text-center">
             <div className="flex items-center justify-center gap-2.5">

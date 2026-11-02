@@ -143,6 +143,12 @@ const LoginForm = () => {
               {...form.register('password')}
             />
 
+            {form.formState.errors.password && (
+              <p role="alert" className="text-sm text-destructive">
+                {form.formState.errors.password.message}
+              </p>
+            )}
+
             <div className="flex justify-end">
               <Link
                 href="/forgot-password"
@@ -151,12 +157,6 @@ const LoginForm = () => {
                 Forgot password?
               </Link>
             </div>
-
-            {form.formState.errors.password && (
-              <p role="alert" className="text-sm text-destructive">
-                {form.formState.errors.password.message}
-              </p>
-            )}
           </div>
 
           <Button
