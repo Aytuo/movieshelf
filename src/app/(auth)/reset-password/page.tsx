@@ -1,5 +1,6 @@
 import AuthVisual from '@/components/auth/auth-visual';
 import ResetPasswordForm from '@/components/auth/reset-password-form';
+import { Clapperboard } from 'lucide-react';
 import Link from 'next/link';
 
 type ResetPasswordPageProps = {
@@ -20,17 +21,23 @@ const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
       <div className="flex items-center justify-center px-6 py-12 sm:px-10 lg:px-16 xl:px-24">
         <div className="w-full max-w-md">
           {invalidToken ? (
-            <div>
-              <div className="mb-8">
-                <p className="text-sm font-medium text-destructive">
-                  Password reset
-                </p>
+            <div className="rounded-2xl border border-white/10 bg-[#101217]/90 p-6 cinematic-glow backdrop-blur-xl sm:p-10">
+              <div className="mb-8 flex items-center justify-center gap-2">
+                <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <Clapperboard className="size-3.5" />
+                </span>
 
-                <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight">
-                  Reset link expired
+                <span className="text-xl font-bold tracking-tight">
+                  Movie<span className="text-primary">Shelf</span>
+                </span>
+              </div>
+
+              <div className="mb-8 text-center">
+                <h1 className="font-heading text-3xl font-bold tracking-tight text-white">
+                  Reset link unavailable
                 </h1>
 
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                <p className="mt-3 text-sm leading-6 text-zinc-400">
                   This password reset link is invalid or has expired. Request a
                   new link to continue.
                 </p>
@@ -38,16 +45,16 @@ const ResetPasswordPage = async ({ searchParams }: ResetPasswordPageProps) => {
 
               <Link
                 href="/forgot-password"
-                className="block w-full rounded-lg bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                className="block w-full rounded-lg bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-primary-hover"
               >
                 Request a new link
               </Link>
 
-              <p className="mt-8 text-center text-sm text-muted-foreground">
+              <p className="mt-8 text-center text-sm text-zinc-400">
                 Remember your password?{' '}
                 <Link
                   href="/login"
-                  className="font-medium text-foreground hover:text-primary"
+                  className="font-medium text-primary transition-colors hover:text-primary-hover hover:underline"
                 >
                   Back to sign in
                 </Link>

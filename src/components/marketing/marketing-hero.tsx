@@ -247,7 +247,7 @@ const MarketingHero = () => {
       <div className="relative container-content flex min-h-screen items-center">
         <div className="marketing-copy relative z-30 max-w-3xl py-24">
           <p className="marketing-eyebrow mb-7 text-xs font-semibold tracking-[0.24em] text-primary uppercase">
-            MovieShelf · Personal Entertainment Shelf
+            Movies &amp; TV, curated by you
           </p>
 
           <h1 className="max-w-4xl font-heading text-6xl leading-[0.92] font-bold tracking-[-0.065em] sm:text-7xl lg:text-8xl">

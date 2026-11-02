@@ -38,7 +38,7 @@ export function EmailBrand() {
           color: emailTheme.mutedStrong,
         }}
       >
-        Personal Cinema Archive
+        Personal Entertainment Shelf
       </Text>
     </Section>
   );
