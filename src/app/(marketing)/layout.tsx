@@ -14,11 +14,11 @@ const MarketingLayout = async ({
   });
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen w-full max-w-full min-w-0 flex-col overflow-x-clip">
       <MarketingNavbar authenticated={Boolean(session)} />
 
       <MarketingAuthProvider authenticated={Boolean(session)}>
-        <main className="flex-1">{children}</main>
+        <main className="w-full max-w-full min-w-0 flex-1">{children}</main>
       </MarketingAuthProvider>
 
       <Footer authenticated={Boolean(session)} />
