@@ -18,7 +18,10 @@ export default async function HomePage() {
   return (
     <>
       <Suspense fallback={<HomeHeroSectionSkeleton />}>
-        <HomeHeroSection userId={session.user.id} />
+        <HomeHeroSection
+          userId={session.user.id}
+          userName={session.user.name}
+        />
       </Suspense>
 
       <main>

@@ -8,15 +8,23 @@ import { getRecommendationsForUser } from '@/lib/services/recommendation-service
 import { getTasteProfile } from '@/lib/services/taste-service';
 import Link from 'next/link';
 
+type HomeHeroSectionProps = {
+  userId: string;
+  userName: string | null;
+};
+
+export async function HomeHeroSection({
+  userId,
+  userName,
+}: HomeHeroSectionProps) {
+  const summary = await getUserHomeSummary(userId);
+
+  return <Hero summary={summary} userName={userName} />;
+}
+
 type HomeSectionProps = {
   userId: string;
 };
-
-export async function HomeHeroSection({ userId }: HomeSectionProps) {
-  const summary = await getUserHomeSummary(userId);
-
-  return <Hero summary={summary} />;
-}
 
 type HomeTasteSectionProps = {
   userId: string;

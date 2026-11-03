@@ -29,9 +29,12 @@ function getTmdbPosterUrl(posterPath: string) {
 
 type HeroProps = {
   summary: UserHomeSummary;
+  userName: string | null;
 };
 
-const Hero = ({ summary }: HeroProps) => {
+const Hero = ({ summary, userName }: HeroProps) => {
+  const firstName = userName?.trim().split(/\s+/)[0];
+
   return (
     <section className="relative isolate overflow-hidden border-b border-border/40">
       {/* Background atmosphere */}
@@ -47,6 +50,10 @@ const Hero = ({ summary }: HeroProps) => {
         <div className="grid min-h-[calc(100vh-var(--header-height))] items-center gap-16 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:py-20">
           {/* Content */}
           <div className="relative z-30 max-w-2xl">
+            <p className="mb-3 text-sm font-medium text-muted-foreground">
+              {firstName ? `Welcome back, ${firstName}.` : 'Welcome back.'}
+            </p>
+
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-muted px-3 py-1.5 text-xs font-medium text-primary">
               <span className="size-1.5 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]" />
               Your personal entertainment shelf
@@ -117,9 +124,14 @@ const Hero = ({ summary }: HeroProps) => {
                 const year = item.releaseDate?.slice(0, 4);
 
                 return (
-                  <div
+                  <Link
+                    href={
+                      item.type === 'movie'
+                        ? `/movie/${item.tmdbId}`
+                        : `/tv/${item.tmdbId}`
+                    }
                     key={`${item.type}-${item.tmdbId}`}
-                    className={`absolute w-45 poster-frame transition-transform duration-500 hover:z-40 hover:scale-[1.03] sm:w-[210px] lg:w-[230px] ${getPosterClassName(index, summary.latestRated.length)}`}
+                    className={`absolute w-45 poster-frame transition-transform duration-500 hover:z-40 hover:scale-[1.03] focus-visible:z-40 focus-visible:scale-[1.03] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary sm:w-[210px] lg:w-[230px] ${getPosterClassName(index, summary.latestRated.length)}`}
                   >
                     <div className="relative aspect-[2/3]">
                       {posterUrl ? (
@@ -172,7 +184,7 @@ const Hero = ({ summary }: HeroProps) => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })
             ) : (
