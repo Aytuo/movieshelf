@@ -6,7 +6,7 @@ const CinematicWall = () => {
     >
       {/* Cinematic image */}
       <div
-        className="cinematic-wall-image absolute inset-0 scale-[1.08] bg-cover bg-center"
+        className="cinematic-wall-image absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('/images/marketing/hero-background.png')",
         }}

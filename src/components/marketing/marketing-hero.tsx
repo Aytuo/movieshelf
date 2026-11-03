@@ -13,12 +13,63 @@ import { useMarketingAuth } from './marketing-auth-provider';
 gsap.registerPlugin(ScrollTrigger);
 
 const MARKETING_POSTER_POSITIONS = [
-  { x: '28%', y: '22%', z: 90, rotateX: 7, rotateY: -15, scale: 1.03 },
-  { x: '74%', y: '17%', z: -45, rotateX: -6, rotateY: 12, scale: 0.94 },
-  { x: '47%', y: '51%', z: 65, rotateX: 4, rotateY: -8, scale: 1.08 },
-  { x: '89%', y: '68%', z: -70, rotateX: 10, rotateY: 16, scale: 0.93 },
-  { x: '21%', y: '82%', z: 105, rotateX: -8, rotateY: -12, scale: 1.02 },
-  { x: '69%', y: '84%', z: 25, rotateX: 5, rotateY: 9, scale: 0.98 },
+  { x: '30%', y: '26%', z: 70, rotateX: 7, rotateY: -14, scale: 0.98 },
+  { x: '78%', y: '25%', z: -35, rotateX: -6, rotateY: 12, scale: 0.92 },
+  { x: '48%', y: '52%', z: 55, rotateX: 4, rotateY: -8, scale: 1.02 },
+  { x: '85%', y: '56%', z: -55, rotateX: 9, rotateY: 15, scale: 0.93 },
+  { x: '31%', y: '78%', z: 85, rotateX: -8, rotateY: -12, scale: 0.98 },
+  { x: '73%', y: '77%', z: 20, rotateX: 5, rotateY: 9, scale: 0.96 },
+];
+
+const MARKETING_POSTER_SCROLL_MOTION = [
+  {
+    x: -42,
+    y: -52,
+    rotation: -3,
+    rotationX: -3,
+    rotationY: 5,
+    scale: 1.09,
+  },
+  {
+    x: 48,
+    y: -34,
+    rotation: 2,
+    rotationX: 3,
+    rotationY: -5,
+    scale: 0.96,
+  },
+  {
+    x: -38,
+    y: 42,
+    rotation: -2,
+    rotationX: -4,
+    rotationY: 4,
+    scale: 1.07,
+  },
+  {
+    x: 42,
+    y: 36,
+    rotation: 3,
+    rotationX: 3,
+    rotationY: -4,
+    scale: 0.95,
+  },
+  {
+    x: -34,
+    y: -38,
+    rotation: -3,
+    rotationX: -3,
+    rotationY: 5,
+    scale: 1.08,
+  },
+  {
+    x: 36,
+    y: -30,
+    rotation: 2,
+    rotationX: 3,
+    rotationY: -5,
+    scale: 0.96,
+  },
 ];
 
 const MARKETING_POSTERS = [
@@ -236,14 +287,6 @@ const MarketingHero = () => {
           countdownSeam,
           {
             autoAlpha: 0,
-            duration: 0.2,
-          },
-          '<'
-        )
-        .to(
-          countdownSeam,
-          {
-            autoAlpha: 0,
             duration: 0.35,
             ease: 'power1.out',
           },
@@ -273,7 +316,6 @@ const MarketingHero = () => {
             autoAlpha: 0,
             duration: 0.25,
             ease: 'power1.out',
-            onComplete: unlockIntroScroll,
           },
           'curtainOpen+=1.05'
         )
@@ -329,72 +371,57 @@ const MarketingHero = () => {
 
       if (!wall) return;
 
-      const scrollTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: container.current,
-          start: 'top top',
-          end: '+=900',
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
+      intro.eventCallback('onComplete', () => {
+        unlockIntroScroll();
 
-      scrollTimeline
-        .to('.marketing-copy', {
-          yPercent: -18,
-          opacity: 0.15,
-          scale: 0.96,
-          duration: 1,
-        })
-        .to(
-          '.poster-wall',
-          {
-            scale: 1.12,
-            yPercent: -8,
-            duration: 1,
+        const scrollTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: container.current,
+            start: 'top top',
+            end: '+=900',
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
           },
-          '<'
-        )
-        .to(
-          '.marketing-poster:nth-child(1)',
-          {
-            xPercent: -28,
-            rotation: -18,
+        });
+
+        scrollTimeline
+          .to('.marketing-copy', {
+            yPercent: -24,
+            opacity: 0,
+            scale: 0.96,
             duration: 1,
-          },
-          '<'
-        )
-        .to(
-          '.marketing-poster:nth-child(2)',
-          {
-            xPercent: 18,
-            yPercent: -12,
-            rotation: 12,
-            duration: 1,
-          },
-          '<'
-        )
-        .to(
-          '.marketing-poster:nth-child(3)',
-          {
-            xPercent: -14,
-            yPercent: 20,
-            rotation: -8,
-            duration: 1,
-          },
-          '<'
-        )
-        .to(
-          '.marketing-poster:nth-child(4)',
-          {
-            xPercent: 20,
-            yPercent: 14,
-            rotation: 15,
-            duration: 1,
-          },
-          '<'
-        );
+            ease: 'none',
+          })
+          .to(
+            '.poster-wall',
+            {
+              scale: 1.05,
+              yPercent: -4,
+              duration: 1,
+              ease: 'none',
+            },
+            '<'
+          )
+          .to(
+            posters,
+            {
+              x: (index) => MARKETING_POSTER_SCROLL_MOTION[index].x,
+              y: (index) => MARKETING_POSTER_SCROLL_MOTION[index].y,
+              rotation: (index) =>
+                MARKETING_POSTER_SCROLL_MOTION[index].rotation,
+              rotationX: (index) =>
+                MARKETING_POSTER_SCROLL_MOTION[index].rotationX,
+              rotationY: (index) =>
+                MARKETING_POSTER_SCROLL_MOTION[index].rotationY,
+              scale: (index) => MARKETING_POSTER_SCROLL_MOTION[index].scale,
+              duration: 1,
+              stagger: 0.07,
+              ease: 'none',
+            },
+            '<'
+          );
+      });
     },
     {
       scope: container,
@@ -411,21 +438,13 @@ const MarketingHero = () => {
       >
         <CinematicWall />
 
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-[-20%] left-[45%] size-[720px] rounded-full bg-primary/10 blur-[150px]" />
-
-          <div className="absolute top-[25%] right-[-10%] size-[450px] rounded-full bg-primary/8 blur-[130px]" />
-
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,var(--background)_76%)]" />
-        </div>
-
         <div className="relative container-content flex min-h-screen items-center">
-          <div className="marketing-copy relative z-30 max-w-3xl py-24">
+          <div className="marketing-copy relative z-30 w-full max-w-3xl py-24 lg:w-[48%] lg:max-w-[34rem]">
             <p className="marketing-eyebrow mb-7 text-xs font-semibold tracking-[0.24em] text-primary uppercase">
               Movies &amp; TV, curated by you
             </p>
 
-            <h1 className="max-w-4xl font-heading text-6xl leading-[0.92] font-bold tracking-[-0.065em] sm:text-7xl lg:text-8xl">
+            <h1 className="max-w-4xl font-heading text-6xl leading-[0.92] font-bold tracking-[-0.065em] sm:text-7xl lg:text-7xl xl:text-8xl">
               <span className="marketing-title-line block">Your taste</span>
 
               <span className="marketing-title-line block">
@@ -458,7 +477,7 @@ const MarketingHero = () => {
           </div>
 
           <div
-            className="poster-wall pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 lg:block"
+            className="poster-wall pointer-events-none absolute inset-y-0 right-0 hidden w-[48%] lg:block"
             style={{
               perspective: '1200px',
               transformStyle: 'preserve-3d',
@@ -471,8 +490,7 @@ const MarketingHero = () => {
               return (
                 <div
                   key={poster.title}
-                  data-initial-rotation={rotations[index]}
-                  className="marketing-poster absolute w-[140px] overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_rgb(0_0_0/55%)] sm:w-[160px] xl:w-[180px]"
+                  className="marketing-poster-position absolute w-[140px] sm:w-[160px] xl:w-[180px]"
                   style={{
                     top: position.y,
                     left: position.x,
@@ -488,25 +506,30 @@ const MarketingHero = () => {
                     backfaceVisibility: 'hidden',
                   }}
                 >
-                  <div className="relative aspect-[2/3]">
-                    <Image
-                      src={poster.image}
-                      alt=""
-                      fill
-                      sizes="215px"
-                      className="object-cover"
-                    />
+                  <div
+                    data-initial-rotation={rotations[index]}
+                    className="marketing-poster relative w-full overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_rgb(0_0_0/55%)]"
+                  >
+                    <div className="relative aspect-[2/3]">
+                      <Image
+                        src={poster.image}
+                        alt=""
+                        fill
+                        sizes="215px"
+                        className="object-cover"
+                      />
 
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-white/5" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-white/5" />
 
-                    <div className="absolute inset-x-0 bottom-0 p-4">
-                      <p className="text-xs font-semibold text-white">
-                        {poster.title}
-                      </p>
+                      <div className="absolute inset-x-0 bottom-0 p-4">
+                        <p className="text-xs font-semibold text-white">
+                          {poster.title}
+                        </p>
 
-                      <p className="mt-1 text-[11px] text-white/55">
-                        {poster.year} · ★ {poster.rating}
-                      </p>
+                        <p className="mt-1 text-[11px] text-white/55">
+                          {poster.year} · ★ {poster.rating}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
