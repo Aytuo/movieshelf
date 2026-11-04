@@ -1,20 +1,3 @@
-const CinematicWall = () => {
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
-    >
-      {/* Cinematic image */}
-      <div
-        className="cinematic-wall-image absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/images/marketing/hero-background.png')",
-        }}
-      />
-    </div>
-  );
-};
-
 export const CinematicCountdown = () => {
   return (
     <div
@@ -27,16 +10,13 @@ export const CinematicCountdown = () => {
       <div className="cinematic-curtain-bottom absolute inset-x-0 bottom-0 h-[calc(50%+2px)] bg-black" />
 
       {/* Film grain */}
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[url('/textures/noise.svg')] opacity-[0.08] mix-blend-screen" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[url('/textures/noise.svg')] opacity-[0.05] mix-blend-screen" />
 
       {/* Projector flash */}
       <div className="cinematic-countdown-flash pointer-events-none absolute inset-0 z-20 bg-white opacity-0" />
 
       {/* Horizontal center line */}
       <div className="cinematic-countdown-seam pointer-events-none absolute inset-x-0 top-1/2 z-20 h-px -translate-y-1/2 bg-white/45 shadow-[0_0_24px_5px_rgba(255,255,255,0.15)]" />
-
-      {/* Vertical center line */}
-      <div className="cinematic-countdown-seam-vertical pointer-events-none absolute inset-y-0 left-1/2 z-20 w-px -translate-x-1/2 bg-white/45 shadow-[0_0_24px_5px_rgba(255,255,255,0.15)]" />
 
       {/* Countdown dial */}
       <div className="cinematic-countdown-dial absolute top-1/2 left-1/2 z-30 flex size-[min(76vw,440px)] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
@@ -116,5 +96,3 @@ export const CinematicCountdown = () => {
     </div>
   );
 };
-
-export default CinematicWall;

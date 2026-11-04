@@ -2,11 +2,9 @@
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Bookmark, Film, Star } from 'lucide-react';
 import { useRef } from 'react';
-
-gsap.registerPlugin(ScrollTrigger);
+import { withMarketingMotion } from './marketing-motion';
 
 const pillars = [
   {
@@ -37,87 +35,63 @@ const PhilosophySection = () => {
 
   useGSAP(
     () => {
-      const titleLines = gsap.utils.toArray<HTMLElement>(
-        '.philosophy-title-line'
-      );
+      const section = sectionRef.current;
 
-      const pillars = gsap.utils.toArray<HTMLElement>('.philosophy-pillar');
+      if (!section) return;
 
-      const eyebrow = sectionRef.current?.querySelector('.philosophy-eyebrow');
+      return withMarketingMotion(section, (root) => {
+        const eyebrow = root.querySelector('.philosophy-eyebrow');
+        const titleLines = root.querySelectorAll('.philosophy-title-line');
+        const description = root.querySelector('.philosophy-description');
+        const pillars = root.querySelectorAll('.philosophy-pillar');
 
-      const description = sectionRef.current?.querySelector(
-        '.philosophy-description'
-      );
+        const timeline = gsap.timeline({
+          defaults: {
+            ease: 'none',
+          },
+          scrollTrigger: {
+            trigger: root,
+            start: 'top 88%',
+            end: 'bottom 25%',
+            scrub: 0.8,
+          },
+        });
 
-      if (!eyebrow || !description) {
-        return;
-      }
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          end: 'bottom 35%',
-          scrub: 1,
-        },
+        timeline
+          .fromTo(
+            eyebrow,
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0, duration: 0.7 }
+          )
+          .fromTo(
+            titleLines,
+            { autoAlpha: 0, y: 38 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 1.8,
+              stagger: 0.18,
+            },
+            0.35
+          )
+          .fromTo(
+            description,
+            { autoAlpha: 0, y: 22 },
+            { autoAlpha: 1, y: 0, duration: 0.9 },
+            1.35
+          )
+          .fromTo(
+            pillars,
+            { autoAlpha: 0, y: 30 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 1.1,
+              stagger: 0.35,
+            },
+            1.8
+          );
       });
-
-      timeline
-        .fromTo(
-          eyebrow,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-          }
-        )
-        .fromTo(
-          titleLines,
-          {
-            opacity: 0,
-            y: 70,
-            rotateX: -18,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            rotateX: 0,
-            stagger: 0.18,
-            duration: 1,
-          },
-          '-=0.35'
-        )
-        .fromTo(
-          description,
-          {
-            opacity: 0,
-            y: 30,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-          },
-          '-=0.55'
-        )
-        .fromTo(
-          pillars,
-          {
-            opacity: 0,
-            y: 70,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.18,
-            duration: 0.8,
-          },
-          '-=0.35'
-        );
     },
     {
       scope: sectionRef,
@@ -132,7 +106,7 @@ const PhilosophySection = () => {
     >
       <div className="container-content py-24 lg:py-32">
         <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="relative" style={{ perspective: '1000px' }}>
+          <div className="philosophy-copy relative">
             <p className="philosophy-eyebrow eyebrow">The MovieShelf idea</p>
 
             <h2 className="mt-5 max-w-lg font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">

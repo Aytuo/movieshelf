@@ -1,6 +1,8 @@
 'use client';
 
 import { MARKETING_DEMO_STATS, MARKETING_DEMO_TITLES } from '@/constants';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import {
   ArrowRight,
   Bell,
@@ -20,18 +22,157 @@ import {
   X,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRef } from 'react';
+import { withMarketingMotion } from './marketing-motion';
 
 const titles = MARKETING_DEMO_TITLES;
 
-const ShelfPreview = () => {
+const YourShelfSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+
+      if (!section) return;
+
+      return withMarketingMotion(section, (root) => {
+        const frame = root.querySelector('.shelf-preview-frame');
+        const nav = root.querySelector('.shelf-preview-nav');
+        const intro = root.querySelector('.shelf-preview-intro');
+        const filters = root.querySelectorAll('.shelf-preview-filters');
+        const posters = root.querySelectorAll('.shelf-poster');
+        const copy = root.querySelector('.shelf-preview-copy');
+        const stats = root.querySelectorAll('.shelf-preview-stat');
+
+        const timeline = gsap.timeline({
+          defaults: {
+            ease: 'none',
+          },
+          scrollTrigger: {
+            trigger: root,
+            start: 'top 88%',
+            end: 'bottom 20%',
+            scrub: 0.8,
+          },
+        });
+
+        timeline
+          .fromTo(
+            frame,
+            {
+              autoAlpha: 0,
+              y: 30,
+              scale: 0.98,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              duration: 1.1,
+            }
+          )
+          .fromTo(
+            nav,
+            {
+              autoAlpha: 0,
+              y: 14,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.65,
+            },
+            0.65
+          )
+          .fromTo(
+            intro,
+            {
+              autoAlpha: 0,
+              y: 18,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.75,
+            },
+            1.05
+          )
+          .fromTo(
+            filters,
+            {
+              autoAlpha: 0,
+              y: 14,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.65,
+              stagger: 0.15,
+            },
+            1.55
+          )
+          .fromTo(
+            posters,
+            {
+              autoAlpha: 0,
+              y: 22,
+              scale: 0.96,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.85,
+              stagger: 0.09,
+            },
+            2.05
+          )
+          .fromTo(
+            copy,
+            {
+              autoAlpha: 0,
+              y: 28,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.9,
+            },
+            2.75
+          )
+          .fromTo(
+            stats,
+            {
+              autoAlpha: 0,
+              y: 20,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.75,
+              stagger: 0.15,
+            },
+            3.35
+          );
+      });
+    },
+    {
+      scope: sectionRef,
+    }
+  );
+
   return (
-    <section id="shelf" className="overflow-hidden border-b border-border/60">
+    <section
+      ref={sectionRef}
+      id="shelf"
+      className="overflow-hidden border-b border-border/60"
+    >
       <div className="container-content py-24 lg:py-32">
         <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="overflow-hidden rounded-2xl border border-border/60 bg-background shadow-[0_30px_100px_rgb(0_0_0/35%)]">
+          <div className="shelf-preview-frame overflow-hidden rounded-2xl border border-border/60 bg-background shadow-[0_30px_100px_rgb(0_0_0/35%)]">
             {/* App navbar */}
-            <div className="relative grid h-12 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border/60 px-3 sm:px-4 md:flex md:justify-between">
-              {/* Left: mobile menu and desktop brand */}
+            <div className="shelf-preview-nav relative grid h-12 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border/60 px-3 sm:px-4 md:flex md:justify-between">
               <div className="flex min-w-0 items-center">
                 <span
                   aria-hidden="true"
@@ -51,7 +192,6 @@ const ShelfPreview = () => {
                 </div>
               </div>
 
-              {/* Center: mobile brand / desktop navigation */}
               <div className="flex items-center justify-self-center md:hidden">
                 <span className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
                   <Clapperboard className="size-3.5" />
@@ -69,7 +209,6 @@ const ShelfPreview = () => {
                 <span>Rankings</span>
               </nav>
 
-              {/* Right: search, notifications and profile */}
               <div className="flex shrink-0 items-center gap-1.5 justify-self-end md:flex-1 md:justify-end">
                 <span
                   aria-hidden="true"
@@ -98,7 +237,7 @@ const ShelfPreview = () => {
 
             {/* Shelf page */}
             <div className="p-4 sm:p-5">
-              <div className="flex items-end justify-between gap-3">
+              <div className="shelf-preview-intro flex items-end justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[10px] font-medium tracking-[0.16em] text-primary uppercase">
                     Your collection
@@ -121,7 +260,7 @@ const ShelfPreview = () => {
               </div>
 
               {/* Media filters */}
-              <div className="mt-5">
+              <div className="shelf-preview-filters mt-5">
                 <p className="mb-2 text-[10px] font-medium text-muted-foreground">
                   Media
                 </p>
@@ -151,7 +290,7 @@ const ShelfPreview = () => {
               </div>
 
               {/* Status filters */}
-              <div className="mt-4">
+              <div className="shelf-preview-filters mt-4">
                 <p className="mb-2 text-[10px] font-medium text-muted-foreground">
                   Status
                 </p>
@@ -195,7 +334,7 @@ const ShelfPreview = () => {
               {/* Media grid */}
               <div className="mt-6 grid grid-cols-3 gap-x-2.5 gap-y-4 sm:grid-cols-5">
                 {titles.map((title) => (
-                  <div key={title.title} className="group min-w-0">
+                  <div key={title.title} className="shelf-poster group min-w-0">
                     <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
                       <Image
                         src={title.image}
@@ -207,7 +346,6 @@ const ShelfPreview = () => {
 
                       <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-80" />
 
-                      {/* Movie or TV badge */}
                       <div
                         className="absolute top-1.5 left-1.5 flex size-5 items-center justify-center rounded bg-black/80 text-white shadow-sm"
                         title={title.type === 'Movie' ? 'Film' : 'TV'}
@@ -219,13 +357,11 @@ const ShelfPreview = () => {
                         )}
                       </div>
 
-                      {/* TMDB rating */}
                       <div className="absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 rounded bg-black/80 px-1 py-1 text-[8px] font-semibold text-white shadow-sm">
                         <Star className="size-2.5 fill-current text-rating" />
                         {title.tmdbRating}
                       </div>
 
-                      {/* User rating and favorite */}
                       <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1">
                         <span className="inline-flex items-center gap-0.5 rounded bg-black/75 px-1.5 py-1 text-[9px] font-semibold text-rating">
                           <Star className="size-2.5 fill-current" />
@@ -240,7 +376,6 @@ const ShelfPreview = () => {
                       </div>
                     </div>
 
-                    {/* MediaMeta */}
                     <div className="mt-2 min-w-0">
                       <p className="truncate text-[10px] font-semibold transition-colors group-hover:text-primary">
                         {title.title}
@@ -256,7 +391,8 @@ const ShelfPreview = () => {
             </div>
           </div>
 
-          <div>
+          {/* Editorial copy */}
+          <div className="shelf-preview-copy">
             <p className="eyebrow">Your shelf</p>
 
             <h2 className="mt-5 font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
@@ -270,7 +406,7 @@ const ShelfPreview = () => {
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="rounded-xl p-4 surface">
+              <div className="shelf-preview-stat rounded-xl p-4 surface">
                 <Bookmark className="size-4 text-primary" />
                 <div className="mt-4 text-2xl font-bold">
                   {MARKETING_DEMO_STATS.totalTitles}
@@ -280,7 +416,7 @@ const ShelfPreview = () => {
                 </p>
               </div>
 
-              <div className="rounded-xl p-4 surface">
+              <div className="shelf-preview-stat rounded-xl p-4 surface">
                 <Heart className="size-4 text-primary" />
                 <div className="mt-4 text-2xl font-bold">
                   {MARKETING_DEMO_STATS.favorites}
@@ -288,7 +424,7 @@ const ShelfPreview = () => {
                 <p className="mt-1 text-xs text-muted-foreground">favorites</p>
               </div>
 
-              <div className="rounded-xl p-4 surface">
+              <div className="shelf-preview-stat rounded-xl p-4 surface">
                 <Star className="size-4 text-rating" />
                 <div className="mt-4 text-2xl font-bold">
                   {MARKETING_DEMO_STATS.rated}
@@ -298,7 +434,7 @@ const ShelfPreview = () => {
                 </p>
               </div>
 
-              <div className="rounded-xl p-4 surface">
+              <div className="shelf-preview-stat rounded-xl p-4 surface">
                 <Star className="size-4 fill-current text-rating" />
 
                 <div className="mt-4 text-2xl font-bold">
@@ -317,4 +453,4 @@ const ShelfPreview = () => {
   );
 };
 
-export default ShelfPreview;
+export default YourShelfSection;

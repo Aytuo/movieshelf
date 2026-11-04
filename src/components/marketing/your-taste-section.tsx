@@ -1,29 +1,178 @@
+'use client';
+
 import {
   MARKETING_DEMO_DECADES,
   MARKETING_DEMO_GENRES,
   MARKETING_DEMO_RATING_DISTRIBUTION,
   MARKETING_DEMO_STATS,
 } from '@/constants';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { Star } from 'lucide-react';
+import { useRef } from 'react';
+import { withMarketingMotion } from './marketing-motion';
 
 const maxRatingCount = Math.max(
   ...MARKETING_DEMO_RATING_DISTRIBUTION.map((item) => item.count),
   1
 );
 
-const TasteSection = () => {
+const YourTasteSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+
   const watched = MARKETING_DEMO_STATS.watched;
   const rated = MARKETING_DEMO_STATS.rated;
   const favorites = MARKETING_DEMO_STATS.favorites;
   const averageRating = MARKETING_DEMO_STATS.averageRating.toFixed(1);
   const tasteProgress = Math.min(watched / 50, 1);
 
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+
+      if (!section) return;
+
+      return withMarketingMotion(section, (root) => {
+        const copy = root.querySelector('.taste-copy');
+        const stats = root.querySelectorAll('.taste-stat');
+        const profile = root.querySelector('.taste-profile');
+        const profileFill = root.querySelector('.taste-profile-fill');
+        const breakdowns = root.querySelectorAll('.taste-breakdown');
+        const distribution = root.querySelector('.taste-distribution');
+        const horizontalBars = root.querySelectorAll('.taste-bar-fill');
+        const ratingBars = root.querySelectorAll('.taste-rating-bar');
+
+        const timeline = gsap.timeline({
+          defaults: {
+            ease: 'none',
+          },
+          scrollTrigger: {
+            trigger: root,
+            start: 'top 88%',
+            end: 'bottom 20%',
+            scrub: 0.8,
+          },
+        });
+
+        timeline
+          .fromTo(
+            copy,
+            {
+              autoAlpha: 0,
+              y: 28,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.9,
+            }
+          )
+          .fromTo(
+            stats,
+            {
+              autoAlpha: 0,
+              y: 20,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.75,
+              stagger: 0.14,
+            },
+            0.55
+          )
+          .fromTo(
+            profile,
+            {
+              autoAlpha: 0,
+              y: 22,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+            },
+            1.35
+          )
+          .fromTo(
+            profileFill,
+            {
+              scaleX: 0,
+            },
+            {
+              scaleX: 1,
+              duration: 1.1,
+            },
+            1.8
+          )
+          .fromTo(
+            breakdowns,
+            {
+              autoAlpha: 0,
+              y: 20,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+              stagger: 0.18,
+            },
+            2.15
+          )
+          .fromTo(
+            horizontalBars,
+            {
+              scaleX: 0,
+            },
+            {
+              scaleX: 1,
+              duration: 0.9,
+              stagger: 0.08,
+            },
+            2.8
+          )
+          .fromTo(
+            distribution,
+            {
+              autoAlpha: 0,
+              y: 20,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+            },
+            3.55
+          )
+          .fromTo(
+            ratingBars,
+            {
+              scaleY: 0,
+            },
+            {
+              scaleY: 1,
+              duration: 0.95,
+              stagger: 0.07,
+            },
+            4.0
+          );
+      });
+    },
+    {
+      scope: sectionRef,
+    }
+  );
+
   return (
-    <section id="taste" className="border-b border-border/60 bg-surface/20">
+    <section
+      ref={sectionRef}
+      id="taste"
+      className="border-b border-border/60 bg-surface/20"
+    >
       <div className="container-content py-24 lg:py-32">
         <div className="grid items-center gap-14 lg:grid-cols-[0.75fr_1.25fr]">
           {/* Editorial copy */}
-          <div>
+          <div className="taste-copy">
             <p className="eyebrow">Your taste</p>
 
             <h2 className="mt-5 font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
@@ -39,32 +188,32 @@ const TasteSection = () => {
             </p>
           </div>
 
-          {/* TasteOverview-inspired preview */}
+          {/* Taste overview */}
           <div className="min-w-0 space-y-4">
             {/* Overview stats */}
             <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-xl p-3 surface sm:p-4">
+              <div className="taste-stat rounded-xl p-3 surface sm:p-4">
                 <p className="text-xs text-muted-foreground">Watched</p>
                 <p className="mt-3 font-heading text-2xl font-bold tracking-tight">
                   {watched}
                 </p>
               </div>
 
-              <div className="rounded-xl p-3 surface sm:p-4">
+              <div className="taste-stat rounded-xl p-3 surface sm:p-4">
                 <p className="text-xs text-muted-foreground">Rated</p>
                 <p className="mt-3 font-heading text-2xl font-bold tracking-tight">
                   {rated}
                 </p>
               </div>
 
-              <div className="rounded-xl p-3 surface sm:p-4">
+              <div className="taste-stat rounded-xl p-3 surface sm:p-4">
                 <p className="text-xs text-muted-foreground">Favorites</p>
                 <p className="mt-3 font-heading text-2xl font-bold tracking-tight">
                   {favorites}
                 </p>
               </div>
 
-              <div className="rounded-xl p-3 surface sm:p-4">
+              <div className="taste-stat rounded-xl p-3 surface sm:p-4">
                 <p className="text-xs text-muted-foreground">Average</p>
                 <div className="mt-3 flex items-center gap-1.5 font-heading text-2xl font-bold tracking-tight">
                   <Star className="size-3.5 fill-current text-rating" />
@@ -73,8 +222,8 @@ const TasteSection = () => {
               </div>
             </section>
 
-            {/* Taste profile maturity */}
-            <section className="rounded-2xl p-5 surface sm:p-6">
+            {/* Taste profile */}
+            <section className="taste-profile rounded-2xl p-5 surface sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium">Taste profile</p>
@@ -91,7 +240,7 @@ const TasteSection = () => {
 
               <div className="mt-5 h-[6px] overflow-hidden rounded-full bg-surface-hover">
                 <div
-                  className="h-full rounded-full bg-primary"
+                  className="taste-profile-fill h-full origin-left rounded-full bg-primary"
                   style={{ width: `${tasteProgress * 100}%` }}
                 />
               </div>
@@ -99,7 +248,7 @@ const TasteSection = () => {
 
             {/* Genres and decades */}
             <section className="grid gap-4 lg:grid-cols-2">
-              <div className="min-w-0 rounded-2xl p-5 surface sm:p-6">
+              <div className="taste-breakdown min-w-0 rounded-2xl p-5 surface sm:p-6">
                 <p className="text-xs font-semibold tracking-[0.15em] text-muted-foreground uppercase">
                   Top genres
                 </p>
@@ -116,7 +265,7 @@ const TasteSection = () => {
 
                       <div className="h-[6px] overflow-hidden rounded-full bg-surface-hover">
                         <div
-                          className="h-full rounded-full bg-primary"
+                          className="taste-bar-fill h-full origin-left rounded-full bg-primary"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
@@ -125,7 +274,7 @@ const TasteSection = () => {
                 </div>
               </div>
 
-              <div className="min-w-0 rounded-2xl p-5 surface sm:p-6">
+              <div className="taste-breakdown min-w-0 rounded-2xl p-5 surface sm:p-6">
                 <p className="text-xs font-semibold tracking-[0.15em] text-muted-foreground uppercase">
                   Favorite decades
                 </p>
@@ -142,7 +291,7 @@ const TasteSection = () => {
 
                       <div className="h-[6px] overflow-hidden rounded-full bg-surface-hover">
                         <div
-                          className="h-full rounded-full bg-accent"
+                          className="taste-bar-fill h-full origin-left rounded-full bg-accent"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
@@ -153,7 +302,7 @@ const TasteSection = () => {
             </section>
 
             {/* Rating distribution */}
-            <section className="rounded-2xl p-5 surface sm:p-6">
+            <section className="taste-distribution rounded-2xl p-5 surface sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-semibold tracking-[0.15em] uppercase">
@@ -194,7 +343,7 @@ const TasteSection = () => {
                         </span>
 
                         <div
-                          className={`absolute inset-x-0 bottom-0 rounded-t-md ${
+                          className={`taste-rating-bar absolute inset-x-0 bottom-0 origin-bottom rounded-t-md ${
                             item.count > 0 ? 'bg-primary/70' : 'bg-border'
                           }`}
                           style={{
@@ -218,4 +367,4 @@ const TasteSection = () => {
   );
 };
 
-export default TasteSection;
+export default YourTasteSection;

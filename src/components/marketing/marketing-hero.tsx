@@ -7,8 +7,9 @@ import { ArrowDown, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-import CinematicWall, { CinematicCountdown } from './cinematic-wall';
+import { CinematicCountdown } from './cinematic-countdown';
 import { useMarketingAuth } from './marketing-auth-provider';
+import MarketingBackground from './marketing-background';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -74,40 +75,40 @@ const MARKETING_POSTER_SCROLL_MOTION = [
 
 const MARKETING_POSTER_LIGHTING = [
   {
-    edge: 'linear-gradient(145deg, rgba(196,181,253,0.82), rgba(129,140,248,0.22) 48%, rgba(244,114,182,0.65))',
+    edge: 'linear-gradient(145deg, rgba(196,181,253,0.68), rgba(129,140,248,0.16) 48%, rgba(244,114,182,0.52))',
     reflection:
-      'linear-gradient(125deg, rgba(196,181,253,0.25), transparent 42%, transparent 70%, rgba(244,114,182,0.19))',
-    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 24px rgba(167,139,250,0.22), 8px 12px 32px rgba(244,114,182,0.12)',
+      'linear-gradient(125deg, rgba(196,181,253,0.16), transparent 42%, transparent 70%, rgba(244,114,182,0.13))',
+    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 20px rgba(167,139,250,0.16), 8px 12px 28px rgba(244,114,182,0.08)',
   },
   {
-    edge: 'linear-gradient(135deg, rgba(255,145,145,0.72), rgba(160,65,85,0.22) 48%, rgba(239,68,68,0.74))',
+    edge: 'linear-gradient(135deg, rgba(255,145,145,0.62), rgba(160,65,85,0.16) 48%, rgba(239,68,68,0.62))',
     reflection:
-      'linear-gradient(110deg, rgba(255,110,110,0.22), transparent 42%, transparent 68%, rgba(220,38,38,0.24))',
-    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 22px rgba(220,38,38,0.2), 8px 10px 30px rgba(244,63,94,0.13)',
+      'linear-gradient(110deg, rgba(255,110,110,0.15), transparent 42%, transparent 68%, rgba(220,38,38,0.16))',
+    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 18px rgba(220,38,38,0.14), 8px 10px 26px rgba(244,63,94,0.09)',
   },
   {
-    edge: 'linear-gradient(145deg, rgba(129,140,248,0.82), rgba(99,102,241,0.22) 48%, rgba(192,132,252,0.65))',
+    edge: 'linear-gradient(145deg, rgba(129,140,248,0.68), rgba(99,102,241,0.16) 48%, rgba(192,132,252,0.52))',
     reflection:
-      'linear-gradient(135deg, rgba(129,140,248,0.25), transparent 45%, transparent 70%, rgba(168,85,247,0.2))',
-    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 24px rgba(99,102,241,0.22), 8px 12px 30px rgba(168,85,247,0.12)',
+      'linear-gradient(135deg, rgba(129,140,248,0.16), transparent 45%, transparent 70%, rgba(168,85,247,0.14))',
+    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 20px rgba(99,102,241,0.16), 8px 12px 28px rgba(168,85,247,0.09)',
   },
   {
-    edge: 'linear-gradient(145deg, rgba(255,190,120,0.76), rgba(249,115,22,0.2) 45%, rgba(251,146,60,0.85))',
+    edge: 'linear-gradient(145deg, rgba(255,190,120,0.64), rgba(249,115,22,0.16) 45%, rgba(251,146,60,0.68))',
     reflection:
-      'linear-gradient(125deg, rgba(255,190,120,0.12), transparent 40%, transparent 65%, rgba(249,115,22,0.28))',
-    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 22px rgba(249,115,22,0.2), 8px 12px 34px rgba(251,146,60,0.16)',
+      'linear-gradient(125deg, rgba(255,190,120,0.09), transparent 40%, transparent 65%, rgba(249,115,22,0.19))',
+    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 18px rgba(249,115,22,0.14), 8px 12px 30px rgba(251,146,60,0.11)',
   },
   {
-    edge: 'linear-gradient(135deg, rgba(255,190,120,0.72), rgba(239,100,60,0.2) 46%, rgba(251,146,60,0.82))',
+    edge: 'linear-gradient(135deg, rgba(255,190,120,0.62), rgba(239,100,60,0.16) 46%, rgba(251,146,60,0.66))',
     reflection:
-      'linear-gradient(115deg, rgba(255,180,100,0.13), transparent 42%, transparent 66%, rgba(249,115,22,0.3))',
-    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 20px rgba(249,115,22,0.18), 8px 12px 32px rgba(239,100,60,0.16)',
+      'linear-gradient(115deg, rgba(255,180,100,0.10), transparent 42%, transparent 66%, rgba(249,115,22,0.20))',
+    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 17px rgba(249,115,22,0.13), 8px 12px 28px rgba(239,100,60,0.11)',
   },
   {
-    edge: 'linear-gradient(145deg, rgba(167,139,250,0.78), rgba(129,140,248,0.2) 48%, rgba(236,120,190,0.65))',
+    edge: 'linear-gradient(145deg, rgba(167,139,250,0.65), rgba(129,140,248,0.16) 48%, rgba(236,120,190,0.52))',
     reflection:
-      'linear-gradient(125deg, rgba(129,140,248,0.22), transparent 42%, transparent 68%, rgba(216,150,255,0.22))',
-    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 22px rgba(129,140,248,0.2), 8px 12px 30px rgba(192,132,252,0.14)',
+      'linear-gradient(125deg, rgba(129,140,248,0.15), transparent 42%, transparent 68%, rgba(216,150,255,0.15))',
+    glow: '0 28px 70px rgba(0,0,0,0.56), 0 0 18px rgba(129,140,248,0.15), 8px 12px 28px rgba(192,132,252,0.10)',
   },
 ];
 
@@ -220,9 +221,6 @@ const MarketingHero = () => {
         '.cinematic-countdown-flash'
       );
       const countdownSeam = document.querySelector('.cinematic-countdown-seam');
-      const countdownVerticalSeam = document.querySelector(
-        '.cinematic-countdown-seam-vertical'
-      );
       const curtainTop = document.querySelector('.cinematic-curtain-top');
       const curtainBottom = document.querySelector('.cinematic-curtain-bottom');
 
@@ -284,7 +282,7 @@ const MarketingHero = () => {
           .to(
             countdownFlash,
             {
-              opacity: 0.12,
+              opacity: 0.08,
               duration: 0.035,
               ease: 'none',
             },
@@ -321,15 +319,6 @@ const MarketingHero = () => {
             ease: 'power2.in',
           },
           '+=0.05'
-        )
-        .to(
-          countdownVerticalSeam,
-          {
-            autoAlpha: 0,
-            duration: 0.2,
-            ease: 'power1.out',
-          },
-          '<'
         )
         .to(
           countdownSeam,
@@ -376,10 +365,11 @@ const MarketingHero = () => {
           title,
           {
             opacity: 0,
-            y: 70,
-            rotateX: -20,
-            stagger: 0.08,
-            duration: 1,
+            y: 42,
+            rotateX: -10,
+            transformPerspective: 900,
+            stagger: 0.1,
+            duration: 0.82,
           },
           '-=0.4'
         )
@@ -405,20 +395,17 @@ const MarketingHero = () => {
           posters,
           {
             opacity: 0,
-            y: 120,
-            scale: 0.72,
+            y: 70,
+            scale: 0.9,
             rotation: (index) =>
-              Number(posters[index]?.dataset.initialRotation ?? 0) * 1.8,
-            stagger: 0.08,
-            duration: 1.1,
+              Number(posters[index]?.dataset.initialRotation ?? 0) * 1.45,
+            stagger: 0.1,
+            duration: 0.95,
           },
-          '-=0.9'
+          '-=0.3'
         );
 
       const wall = container.current?.querySelector('.poster-wall');
-
-      if (!wall) return;
-
       const scrollMedia = gsap.matchMedia();
 
       intro.eventCallback(
@@ -426,12 +413,14 @@ const MarketingHero = () => {
         contextSafe!(() => {
           unlockIntroScroll();
 
+          if (!wall) return;
+
           scrollMedia.add('(min-width: 1024px)', () => {
             const scrollTimeline = gsap.timeline({
               scrollTrigger: {
                 trigger: container.current,
                 start: 'top top',
-                end: '+=900',
+                end: '+=650',
                 scrub: 1,
                 pin: true,
                 anticipatePin: 1,
@@ -493,7 +482,7 @@ const MarketingHero = () => {
         ref={container}
         className="relative min-h-screen overflow-hidden bg-background"
       >
-        <CinematicWall />
+        <MarketingBackground />
 
         <div className="relative container-content flex min-h-screen items-center">
           <div className="marketing-copy relative z-30 w-full max-w-3xl py-24 lg:w-[48%] lg:max-w-[34rem]">
