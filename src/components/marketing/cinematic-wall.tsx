@@ -11,20 +11,6 @@ const CinematicWall = () => {
           backgroundImage: "url('/images/marketing/hero-background.png')",
         }}
       />
-
-      {/* Brand atmosphere */}
-      {/* <div className="absolute inset-0 bg-black/55" />
-
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_45%,rgba(239,68,68,0.16),transparent_48%)]" />
-
-      <div className="absolute inset-0 bg-linear-to-r from-background via-background/35 to-background/10" />
-
-      <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-background/20" /> */}
-
-      {/* Film grain */}
-      {/* <div className="absolute inset-0 opacity-[0.055] mix-blend-soft-light">
-        <div className="size-full bg-[url('/textures/noise.svg')]" />
-      </div> */}
     </div>
   );
 };
