@@ -10,7 +10,11 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Star } from 'lucide-react';
 import { useRef } from 'react';
-import { withMarketingMotion } from './marketing-motion';
+import {
+  createMarketingIntroTimeline,
+  createMarketingScrollTimeline,
+  withMarketingMotion,
+} from './marketing-motion';
 
 const maxRatingCount = Math.max(
   ...MARKETING_DEMO_RATING_DISTRIBUTION.map((item) => item.count),
@@ -29,133 +33,174 @@ const YourTasteSection = () => {
   useGSAP(
     () => {
       const section = sectionRef.current;
-
       if (!section) return;
 
       return withMarketingMotion(section, (root) => {
-        const copy = root.querySelector('.taste-copy');
-        const stats = root.querySelectorAll('.taste-stat');
-        const profile = root.querySelector('.taste-profile');
-        const profileFill = root.querySelector('.taste-profile-fill');
-        const breakdowns = root.querySelectorAll('.taste-breakdown');
-        const distribution = root.querySelector('.taste-distribution');
-        const horizontalBars = root.querySelectorAll('.taste-bar-fill');
-        const ratingBars = root.querySelectorAll('.taste-rating-bar');
+        const copy = root.querySelector<HTMLElement>('.taste-copy');
+        const eyebrow = root.querySelector<HTMLElement>('.taste-eyebrow');
+        const title = root.querySelector<HTMLElement>('.taste-title');
+        const description =
+          root.querySelector<HTMLElement>('.taste-description');
+        const overview = root.querySelector<HTMLElement>('.taste-overview');
+        const stats = root.querySelectorAll<HTMLElement>('.taste-stat');
+        const profile = root.querySelector<HTMLElement>('.taste-profile');
+        const profileFill = root.querySelector<HTMLElement>(
+          '.taste-profile-fill'
+        );
+        const breakdowns =
+          root.querySelectorAll<HTMLElement>('.taste-breakdown');
+        const distribution = root.querySelector<HTMLElement>(
+          '.taste-distribution'
+        );
+        const horizontalBars =
+          root.querySelectorAll<HTMLElement>('.taste-bar-fill');
+        const ratingBars =
+          root.querySelectorAll<HTMLElement>('.taste-rating-bar');
 
-        const timeline = gsap.timeline({
-          defaults: {
-            ease: 'none',
-          },
-          scrollTrigger: {
-            trigger: root,
+        const isDesktop = () =>
+          window.matchMedia('(min-width: 1024px)').matches;
+
+        // 1. Editorial introduction.
+        if (copy && eyebrow && title && description) {
+          createMarketingIntroTimeline({
+            trigger: copy,
+            eyebrow,
+            title,
+            description,
             start: 'top 88%',
-            end: 'bottom 20%',
-            scrub: 0.8,
-          },
+            end: 'top 42%',
+            scrub: true,
+          });
+        }
+
+        // 2. Analytics content.
+        if (!overview) return;
+
+        gsap.set(stats, {
+          opacity: 0,
+          y: 20,
         });
 
-        timeline
-          .fromTo(
-            copy,
-            {
-              autoAlpha: 0,
-              y: 28,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.9,
-            }
-          )
-          .fromTo(
-            stats,
-            {
-              autoAlpha: 0,
-              y: 20,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.75,
-              stagger: 0.14,
-            },
-            0.55
-          )
-          .fromTo(
+        if (profile) {
+          gsap.set(profile, {
+            opacity: 0,
+            y: 22,
+          });
+        }
+
+        if (profileFill) {
+          gsap.set(profileFill, {
+            scaleX: 0,
+          });
+        }
+
+        gsap.set(breakdowns, {
+          opacity: 0,
+          y: 20,
+        });
+
+        if (distribution) {
+          gsap.set(distribution, {
+            opacity: 0,
+            y: 20,
+          });
+        }
+
+        gsap.set(horizontalBars, {
+          scaleX: 0,
+        });
+
+        gsap.set(ratingBars, {
+          scaleY: 0,
+        });
+
+        const analyticsTimeline = createMarketingScrollTimeline(overview, {
+          // The desktop charts are aligned vertically with the copy.
+          // They should begin only after the introduction has progressed.
+          // On mobile, they enter naturally below the text.
+          start: () => (isDesktop() ? 'top 8%' : 'top 88%'),
+          end: () => (isDesktop() ? 'bottom 15%' : 'bottom 20%'),
+          scrub: 0.8,
+        });
+
+        // Overview statistics.
+        analyticsTimeline.to(stats, {
+          opacity: 1,
+          y: 0,
+          duration: 0.75,
+          stagger: 0.14,
+        });
+
+        // Taste profile.
+        if (profile) {
+          analyticsTimeline.to(
             profile,
             {
-              autoAlpha: 0,
-              y: 22,
-            },
-            {
-              autoAlpha: 1,
+              opacity: 1,
               y: 0,
               duration: 0.8,
             },
-            1.35
-          )
-          .fromTo(
+            1.25
+          );
+        }
+
+        if (profileFill) {
+          analyticsTimeline.to(
             profileFill,
-            {
-              scaleX: 0,
-            },
             {
               scaleX: 1,
               duration: 1.1,
             },
-            1.8
-          )
-          .fromTo(
-            breakdowns,
-            {
-              autoAlpha: 0,
-              y: 20,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.8,
-              stagger: 0.18,
-            },
-            2.15
-          )
-          .fromTo(
-            horizontalBars,
-            {
-              scaleX: 0,
-            },
-            {
-              scaleX: 1,
-              duration: 0.9,
-              stagger: 0.08,
-            },
-            2.8
-          )
-          .fromTo(
+            1.7
+          );
+        }
+
+        // Genres and decades.
+        analyticsTimeline.to(
+          breakdowns,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.18,
+          },
+          2.05
+        );
+
+        // Horizontal bars.
+        analyticsTimeline.to(
+          horizontalBars,
+          {
+            scaleX: 1,
+            duration: 0.9,
+            stagger: 0.08,
+          },
+          2.7
+        );
+
+        // Rating distribution.
+        if (distribution) {
+          analyticsTimeline.to(
             distribution,
             {
-              autoAlpha: 0,
-              y: 20,
-            },
-            {
-              autoAlpha: 1,
+              opacity: 1,
               y: 0,
               duration: 0.8,
             },
-            3.55
-          )
-          .fromTo(
-            ratingBars,
-            {
-              scaleY: 0,
-            },
-            {
-              scaleY: 1,
-              duration: 0.95,
-              stagger: 0.07,
-            },
-            4.0
+            3.45
           );
+        }
+
+        // Vertical rating bars.
+        analyticsTimeline.to(
+          ratingBars,
+          {
+            scaleY: 1,
+            duration: 0.95,
+            stagger: 0.07,
+          },
+          3.9
+        );
       });
     },
     {
@@ -173,15 +218,15 @@ const YourTasteSection = () => {
         <div className="grid items-center gap-14 lg:grid-cols-[0.75fr_1.25fr]">
           {/* Editorial copy */}
           <div className="taste-copy">
-            <p className="eyebrow">Your taste</p>
+            <p className="taste-eyebrow eyebrow">Your taste</p>
 
-            <h2 className="mt-5 font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
+            <h2 className="taste-title mt-5 font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
               Your taste,
               <br />
               <span className="text-gradient-primary">visualized.</span>
             </h2>
 
-            <p className="mt-6 max-w-md text-sm leading-6 text-muted-foreground">
+            <p className="taste-description mt-6 max-w-md text-sm leading-6 text-muted-foreground">
               Your ratings reveal more with every title. MovieShelf brings your
               movies and TV shows together to visualize the genres, eras and
               stories that shape your taste.
@@ -189,7 +234,7 @@ const YourTasteSection = () => {
           </div>
 
           {/* Taste overview */}
-          <div className="min-w-0 space-y-4">
+          <div className="taste-overview min-w-0 space-y-4">
             {/* Overview stats */}
             <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div className="taste-stat rounded-xl p-3 surface sm:p-4">

@@ -6,7 +6,10 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';
 import { useMarketingAuth } from './marketing-auth-provider';
-import { withMarketingMotion } from './marketing-motion';
+import {
+  createMarketingIntroTimeline,
+  withMarketingMotion,
+} from './marketing-motion';
 
 const MarketingCta = () => {
   const authenticated = useMarketingAuth();
@@ -15,59 +18,71 @@ const MarketingCta = () => {
   useGSAP(
     () => {
       const section = sectionRef.current;
-
       if (!section) return;
 
       return withMarketingMotion(section, (root) => {
-        const content = root.querySelector('.marketing-cta-content');
-        const eyebrow = root.querySelector('.marketing-cta-eyebrow');
-        const title = root.querySelector('.marketing-cta-title');
-        const description = root.querySelector('.marketing-cta-description');
-        const button = root.querySelector('.marketing-cta-button');
-        const footer = root.querySelector('.marketing-cta-footer');
+        const content = root.querySelector<HTMLElement>(
+          '.marketing-cta-content'
+        );
+        const eyebrow = root.querySelector<HTMLElement>(
+          '.marketing-cta-eyebrow'
+        );
+        const title = root.querySelector<HTMLElement>('.marketing-cta-title');
+        const description = root.querySelector<HTMLElement>(
+          '.marketing-cta-description'
+        );
+        const button = root.querySelector<HTMLElement>('.marketing-cta-button');
+        const footer = root.querySelector<HTMLElement>('.marketing-cta-footer');
 
-        const timeline = gsap.timeline({
-          defaults: {
-            ease: 'none',
-          },
-          scrollTrigger: {
-            trigger: content,
-            start: 'top 90%',
-            end: 'bottom 15%',
-            scrub: 0.8,
-          },
+        if (!content || !eyebrow || !title || !description) {
+          return;
+        }
+
+        const timeline = createMarketingIntroTimeline({
+          trigger: content,
+          eyebrow,
+          title,
+          description,
+          start: 'top 88%',
+          end: 'clamp(bottom 30%)',
+          scrub: true,
         });
 
-        timeline
-          .fromTo(
-            eyebrow,
-            { autoAlpha: 0, y: 18 },
-            { autoAlpha: 1, y: 0, duration: 0.7 }
-          )
-          .fromTo(
-            title,
-            { autoAlpha: 0, y: 38 },
-            { autoAlpha: 1, y: 0, duration: 1.4 },
-            0.35
-          )
-          .fromTo(
-            description,
-            { autoAlpha: 0, y: 22 },
-            { autoAlpha: 1, y: 0, duration: 1 },
-            1.15
-          )
-          .fromTo(
+        // CTA button.
+        if (button) {
+          gsap.set(button, {
+            opacity: 0,
+            y: 18,
+          });
+
+          timeline.to(
             button,
-            { autoAlpha: 0, y: 18 },
-            { autoAlpha: 1, y: 0, duration: 0.9 },
-            1.9
-          )
-          .fromTo(
-            footer,
-            { autoAlpha: 0, y: 12 },
-            { autoAlpha: 1, y: 0, duration: 0.7 },
-            2.35
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+            },
+            2.75
           );
+        }
+
+        // Supporting footer text.
+        if (footer) {
+          gsap.set(footer, {
+            opacity: 0,
+            y: 12,
+          });
+
+          timeline.to(
+            footer,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.55,
+            },
+            3.5
+          );
+        }
       });
     },
     {
@@ -98,7 +113,7 @@ const MarketingCta = () => {
 
           <Link
             href={authenticated ? '/discover' : '/register'}
-            className="marketing-cta-button mt-8 inline-flex h-12 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_12px_40px_var(--primary-glow)] transition-all hover:bg-primary-hover"
+            className="marketing-cta-button mt-8 inline-flex h-12 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_12px_40px_var(--primary-glow)] transition-colors hover:bg-primary-hover"
           >
             {authenticated
               ? 'Discover something new'

@@ -23,7 +23,11 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRef } from 'react';
-import { withMarketingMotion } from './marketing-motion';
+import {
+  createMarketingIntroTimeline,
+  createMarketingScrollTimeline,
+  withMarketingMotion,
+} from './marketing-motion';
 
 const titles = MARKETING_DEMO_TITLES;
 
@@ -33,128 +37,82 @@ const YourShelfSection = () => {
   useGSAP(
     () => {
       const section = sectionRef.current;
-
       if (!section) return;
 
       return withMarketingMotion(section, (root) => {
-        const frame = root.querySelector('.shelf-preview-frame');
-        const nav = root.querySelector('.shelf-preview-nav');
-        const intro = root.querySelector('.shelf-preview-intro');
-        const filters = root.querySelectorAll('.shelf-preview-filters');
-        const posters = root.querySelectorAll('.shelf-poster');
-        const copy = root.querySelector('.shelf-preview-copy');
-        const stats = root.querySelectorAll('.shelf-preview-stat');
+        const copy = root.querySelector<HTMLElement>('.shelf-preview-copy');
+        const eyebrow = root.querySelector<HTMLElement>(
+          '.shelf-preview-eyebrow'
+        );
+        const title = root.querySelector<HTMLElement>('.shelf-preview-title');
+        const description = root.querySelector<HTMLElement>(
+          '.shelf-preview-description'
+        );
+        const frame = root.querySelector<HTMLElement>('.shelf-preview-frame');
+        const statsContainer = root.querySelector<HTMLElement>(
+          '.shelf-preview-stats'
+        );
+        const stats = root.querySelectorAll<HTMLElement>('.shelf-preview-stat');
 
-        const timeline = gsap.timeline({
-          defaults: {
-            ease: 'none',
-          },
-          scrollTrigger: {
-            trigger: root,
+        const isDesktop = () =>
+          window.matchMedia('(min-width: 1024px)').matches;
+
+        // 1. Editorial introduction.
+        if (copy && eyebrow && title && description) {
+          createMarketingIntroTimeline({
+            trigger: copy,
+            eyebrow,
+            title,
+            description,
             start: 'top 88%',
-            end: 'bottom 20%',
-            scrub: 0.8,
-          },
-        });
+            end: 'top 42%',
+            scrub: true,
+          });
+        }
 
-        timeline
-          .fromTo(
-            frame,
-            {
-              autoAlpha: 0,
-              y: 30,
-              scale: 0.98,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              scale: 1,
-              duration: 1.1,
-            }
-          )
-          .fromTo(
-            nav,
-            {
-              autoAlpha: 0,
-              y: 14,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.65,
-            },
-            0.65
-          )
-          .fromTo(
-            intro,
-            {
-              autoAlpha: 0,
-              y: 18,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.75,
-            },
-            1.05
-          )
-          .fromTo(
-            filters,
-            {
-              autoAlpha: 0,
-              y: 14,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.65,
-              stagger: 0.15,
-            },
-            1.55
-          )
-          .fromTo(
-            posters,
-            {
-              autoAlpha: 0,
-              y: 22,
-              scale: 0.96,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.85,
-              stagger: 0.09,
-            },
-            2.05
-          )
-          .fromTo(
-            copy,
-            {
-              autoAlpha: 0,
-              y: 28,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.9,
-            },
-            2.75
-          )
-          .fromTo(
-            stats,
-            {
-              autoAlpha: 0,
-              y: 20,
-            },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.75,
-              stagger: 0.15,
-            },
-            3.35
-          );
+        // 2. Statistics.
+        if (statsContainer && stats.length > 0) {
+          gsap.set(stats, {
+            opacity: 0,
+            y: 24,
+          });
+
+          const statsTimeline = createMarketingScrollTimeline(statsContainer, {
+            start: () => (isDesktop() ? 'top 54%' : 'top 78%'),
+            end: () => (isDesktop() ? 'top 18%' : 'bottom 28%'),
+            scrub: true,
+          });
+
+          statsTimeline.to(stats, {
+            opacity: 1,
+            y: 0,
+            duration: 0.85,
+            stagger: 0.12,
+          });
+        }
+
+        // 3. Entire application preview.
+        // No animations are applied to its children.
+        if (frame) {
+          gsap.set(frame, {
+            opacity: 0,
+            y: 42,
+            scale: 0.975,
+          });
+
+          const frameTimeline = createMarketingScrollTimeline(frame, {
+            start: () => (isDesktop() ? 'top 18%' : 'top 88%'),
+            end: () => (isDesktop() ? 'top -14%' : 'top 44%'),
+            scrub: true,
+          });
+
+          frameTimeline.to(frame, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1,
+          });
+        }
       });
     },
     {
@@ -170,9 +128,9 @@ const YourShelfSection = () => {
     >
       <div className="container-content py-24 lg:py-32">
         <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="shelf-preview-frame overflow-hidden rounded-2xl border border-border/60 bg-background shadow-[0_30px_100px_rgb(0_0_0/35%)]">
+          <div className="shelf-preview-frame order-2 overflow-hidden rounded-2xl border border-border/60 bg-background shadow-[0_30px_100px_rgb(0_0_0/35%)] lg:order-1">
             {/* App navbar */}
-            <div className="shelf-preview-nav relative grid h-12 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border/60 px-3 sm:px-4 md:flex md:justify-between">
+            <div className="relative grid h-12 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border/60 px-3 sm:px-4 md:flex md:justify-between">
               <div className="flex min-w-0 items-center">
                 <span
                   aria-hidden="true"
@@ -237,7 +195,7 @@ const YourShelfSection = () => {
 
             {/* Shelf page */}
             <div className="p-4 sm:p-5">
-              <div className="shelf-preview-intro flex items-end justify-between gap-3">
+              <div className="flex items-end justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[10px] font-medium tracking-[0.16em] text-primary uppercase">
                     Your collection
@@ -260,7 +218,7 @@ const YourShelfSection = () => {
               </div>
 
               {/* Media filters */}
-              <div className="shelf-preview-filters mt-5">
+              <div className="mt-5">
                 <p className="mb-2 text-[10px] font-medium text-muted-foreground">
                   Media
                 </p>
@@ -290,7 +248,7 @@ const YourShelfSection = () => {
               </div>
 
               {/* Status filters */}
-              <div className="shelf-preview-filters mt-4">
+              <div className="mt-4">
                 <p className="mb-2 text-[10px] font-medium text-muted-foreground">
                   Status
                 </p>
@@ -334,7 +292,7 @@ const YourShelfSection = () => {
               {/* Media grid */}
               <div className="mt-6 grid grid-cols-3 gap-x-2.5 gap-y-4 sm:grid-cols-5">
                 {titles.map((title) => (
-                  <div key={title.title} className="shelf-poster group min-w-0">
+                  <div key={title.title} className="group min-w-0">
                     <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
                       <Image
                         src={title.image}
@@ -392,20 +350,20 @@ const YourShelfSection = () => {
           </div>
 
           {/* Editorial copy */}
-          <div className="shelf-preview-copy">
-            <p className="eyebrow">Your shelf</p>
+          <div className="shelf-preview-copy order-1 lg:order-2">
+            <p className="shelf-preview-eyebrow eyebrow">Your shelf</p>
 
-            <h2 className="mt-5 font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
+            <h2 className="shelf-preview-title mt-5 font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
               Build a collection that feels like you.
             </h2>
 
-            <p className="mt-6 text-base leading-7 text-muted-foreground">
+            <p className="shelf-preview-description mt-6 text-base leading-7 text-muted-foreground">
               Your shelf isn&apos;t another watch queue. It&apos;s a record of
               the movies and TV shows you&apos;ve discovered, loved, rated and
               decided to keep.
             </p>
 
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="shelf-preview-stats mt-8 grid grid-cols-2 gap-4">
               <div className="shelf-preview-stat rounded-xl p-4 surface">
                 <Bookmark className="size-4 text-primary" />
                 <div className="mt-4 text-2xl font-bold">

@@ -4,7 +4,11 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Bookmark, Film, Star } from 'lucide-react';
 import { useRef } from 'react';
-import { withMarketingMotion } from './marketing-motion';
+import {
+  createMarketingIntroTimeline,
+  createMarketingScrollTimeline,
+  withMarketingMotion,
+} from './marketing-motion';
 
 const pillars = [
   {
@@ -36,61 +40,64 @@ const PhilosophySection = () => {
   useGSAP(
     () => {
       const section = sectionRef.current;
-
       if (!section) return;
 
       return withMarketingMotion(section, (root) => {
-        const eyebrow = root.querySelector('.philosophy-eyebrow');
-        const titleLines = root.querySelectorAll('.philosophy-title-line');
-        const description = root.querySelector('.philosophy-description');
-        const pillars = root.querySelectorAll('.philosophy-pillar');
+        const copy = root.querySelector<HTMLElement>('.philosophy-copy');
+        const eyebrow = root.querySelector<HTMLElement>('.philosophy-eyebrow');
+        const titleLines = root.querySelectorAll<HTMLElement>(
+          '.philosophy-title-line'
+        );
+        const description = root.querySelector<HTMLElement>(
+          '.philosophy-description'
+        );
+        const pillarsContainer = root.querySelector<HTMLElement>(
+          '.philosophy-pillars'
+        );
+        const pillars =
+          root.querySelectorAll<HTMLElement>('.philosophy-pillar');
 
-        const timeline = gsap.timeline({
-          defaults: {
-            ease: 'none',
-          },
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 88%',
-            end: 'bottom 25%',
-            scrub: 0.8,
-          },
-        });
-
-        timeline
-          .fromTo(
+        // 1. Editorial introduction.
+        if (copy && eyebrow && description && titleLines.length > 0) {
+          createMarketingIntroTimeline({
+            trigger: copy,
             eyebrow,
-            { autoAlpha: 0, y: 20 },
-            { autoAlpha: 1, y: 0, duration: 0.7 }
-          )
-          .fromTo(
             titleLines,
-            { autoAlpha: 0, y: 38 },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 1.8,
-              stagger: 0.18,
-            },
-            0.35
-          )
-          .fromTo(
             description,
-            { autoAlpha: 0, y: 22 },
-            { autoAlpha: 1, y: 0, duration: 0.9 },
-            1.35
-          )
-          .fromTo(
-            pillars,
-            { autoAlpha: 0, y: 30 },
+            start: 'top 88%',
+            end: 'top 42%',
+            scrub: true,
+          });
+        }
+
+        // 2. Content reveal.
+        // Desktop: starts exactly after the introduction.
+        // Mobile: starts when the cards naturally enter the viewport.
+        const isDesktop = () =>
+          window.matchMedia('(min-width: 1024px)').matches;
+
+        if (pillarsContainer && pillars.length > 0) {
+          gsap.set(pillars, {
+            opacity: 0,
+            y: 28,
+          });
+
+          const pillarsTimeline = createMarketingScrollTimeline(
+            pillarsContainer,
             {
-              autoAlpha: 1,
-              y: 0,
-              duration: 1.1,
-              stagger: 0.35,
-            },
-            1.8
+              start: () => (isDesktop() ? 'top 42%' : 'top 88%'),
+              end: () => (isDesktop() ? 'top -18%' : 'bottom 25%'),
+              scrub: true,
+            }
           );
+
+          pillarsTimeline.to(pillars, {
+            opacity: 1,
+            y: 0,
+            duration: 0.85,
+            stagger: 0.16,
+          });
+        }
       });
     },
     {
@@ -107,23 +114,35 @@ const PhilosophySection = () => {
       <div className="container-content py-24 lg:py-32">
         <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="philosophy-copy relative">
-            <p className="philosophy-eyebrow eyebrow">The MovieShelf idea</p>
+            <div className="philosophy-heading">
+              <p className="philosophy-eyebrow eyebrow">The MovieShelf idea</p>
 
-            <h2 className="mt-5 max-w-lg font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
-              <span className="philosophy-title-line block">Some stories</span>
+              <h2 className="mt-5 max-w-lg font-heading text-4xl font-bold tracking-[-0.04em] sm:text-5xl">
+                <span className="block overflow-hidden pb-[0.08em]">
+                  <span className="philosophy-title-line block">
+                    Some stories
+                  </span>
+                </span>
 
-              <span className="philosophy-title-line block">
-                entertain you.
-              </span>
+                <span className="block overflow-hidden pb-[0.08em]">
+                  <span className="philosophy-title-line block">
+                    entertain you.
+                  </span>
+                </span>
 
-              <span className="philosophy-title-line block text-gradient-primary">
-                Others stay
-              </span>
+                <span className="block overflow-hidden pb-[0.08em]">
+                  <span className="philosophy-title-line block text-gradient-primary">
+                    Others stay
+                  </span>
+                </span>
 
-              <span className="philosophy-title-line block text-gradient-primary">
-                with you.
-              </span>
-            </h2>
+                <span className="block overflow-hidden pb-[0.08em]">
+                  <span className="philosophy-title-line block text-gradient-primary">
+                    with you.
+                  </span>
+                </span>
+              </h2>
+            </div>
 
             <p className="philosophy-description mt-6 max-w-md text-sm leading-6 text-muted-foreground">
               MovieShelf gives the movies and TV shows that matter to you a
@@ -132,7 +151,7 @@ const PhilosophySection = () => {
             </p>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-3">
+          <div className="philosophy-pillars grid gap-8 sm:grid-cols-3">
             {pillars.map((pillar) => {
               const Icon = pillar.icon;
 
